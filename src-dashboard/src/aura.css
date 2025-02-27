@@ -692,3 +692,135 @@ body {
         padding: 10px;
     }
 }
+
+/* ===============================
+   SETTINGS PAGE STYLES
+   =============================== */
+
+/* Settings Tabs */
+.settings-tabs {
+    display: flex;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 24px;
+}
+
+.tab {
+    padding: 12px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+}
+
+.tab:hover {
+    color: #5997ac;
+}
+
+.tab.active {
+    color: #5997ac;
+    border-bottom-color: #5997ac;
+    font-weight: 600;
+}
+
+/* Settings Sections */
+.settings-section {
+    display: none;
+    padding: 24px;
+    background-color: #ffffff;
+    border-radius: 7px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.settings-section.active {
+    display: block;
+}
+
+/* Form Styles */
+.settings-form {
+    max-width: 800px;
+}
+
+.form-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    flex: 1;
+}
+
+label {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #4b5563;
+}
+
+.form-control {
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #5997ac;
+    box-shadow: 0 0 0 3px rgba(89, 151, 172, 0.2);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: 16px;
+    margin-top: 32px;
+}
+
+/* Button Styles */
+.btn-primary, .btn-secondary {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-primary {
+    background-color: #5997ac;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #4a7e8f;
+}
+
+.btn-secondary {
+    background-color: #f9fafb;
+    color: #5997ac;
+    border: 1px solid #e5e7eb;
+}
+
+.btn-secondary:hover {
+    background-color: #f3f4f6;
+    border-color: #5997ac;
+}
+
+/* Settings Page Responsive Styles */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .settings-tabs {
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+

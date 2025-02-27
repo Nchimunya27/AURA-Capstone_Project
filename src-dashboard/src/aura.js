@@ -104,14 +104,32 @@ class Dashboard {
     }
 
     /**
-     * Handle navigation item clicks
+     * Handle navigation item clicks,
+     * EDIT ADDED: Additions made to work with the settings page
      */
     handleNavigation(event) {
         const clickedItem = event.currentTarget;
+
         this.elements.navItems.forEach(item => {
             item.classList.remove('active');
         });
         clickedItem.classList.add('active');
+
+        // get nav text to determine which page to navigate to 
+        const navText = clickedItem.querySelector('.nav-text').textContent.trim();
+
+        // navigate based on the nav item text
+        switch(navText) {
+            
+            case 'Dashboard':
+                window.location.href = 'aura.html';
+                break;
+
+            case 'Settings':
+                window.location.href = 'settings.html';
+                break;
+
+        }
     }
 
     /**
@@ -420,4 +438,9 @@ document.addEventListener('DOMContentLoaded', function() {
 // Initialize dashboard when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     const dashboard = new Dashboard();
+});
+
+// initialize navigation links
+document.addEventListener('DOMContentLoaded', function() {
+    initializeNavigation();
 });
