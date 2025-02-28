@@ -7,7 +7,7 @@
 
 body {
     font-family: Inter, sans-serif;
-    background-color: #f9fafb;
+    background-color: #eeede7;
     color: #000000;
     line-height: 1.5;
 }
@@ -32,7 +32,7 @@ body {
 }
 
 .content-wrapper {
-    background-color: #f9fafb;
+    background-color: #eeede7;
     width: 100%;
 }
 
@@ -516,6 +516,12 @@ body {
     transition: background-color 0.2s;
 }
 
+.calendar-day.today {
+    background-color: #f0f0f0; /* Light gray background */
+    font-weight: bold;
+    border: 2px solid #000000; /* Black border to highlight the current day */
+}
+
 .calendar-navigation button:hover {
     background-color: #f3f4f6;
 }
@@ -823,4 +829,3 @@ label {
         white-space: nowrap;
     }
 }
-

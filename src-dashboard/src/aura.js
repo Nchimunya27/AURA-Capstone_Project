@@ -187,15 +187,37 @@ class Dashboard {
      */
     initializeCourseCards() {
         this.elements.courseCards.forEach(card => {
-            // Add click event for course details
             card.addEventListener('click', () => {
                 const courseTitle = card.querySelector('.course-title').textContent;
-                this.showCourseDetails(courseTitle);
+                // Add a data attribute to your cards like data-course-id="web-dev" if possible
+                const courseId = card.dataset.courseId || this.getCourseIdFromTitle(courseTitle);
+                this.navigateToCourse(courseId, courseTitle);
             });
 
             // Initialize progress indicators
             this.updateCourseProgress(card);
         });
+    }
+
+    /**
+     * Dashboard to course navigation
+     */
+    navigateToCourse(courseId, courseTitle) {
+        // Use the courseTitle passed from the click handler
+        switch(courseTitle) {
+            case 'Web Development':
+                window.location.href = 'coursepage.html';
+                break;
+            
+                // Add more cases as needed
+        }
+    }
+    
+    /**
+     * Optional helper to convert course titles to URL-friendly IDs
+     */
+    getCourseIdFromTitle(title) {
+        return title.toLowerCase().replace(/\s+/g, '-');
     }
 
     /**
@@ -285,11 +307,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 '2025-01-22': { type: 'exam', title: 'Web Development Review', course: 'Web Development' },
                 '2025-01-25': { type: 'deadline', title: 'Project Deadline', course: 'Data Science' }
             };
-
+        
             this.calendarDaysElement = document.querySelector('.calendar-days');
             this.monthYearElement = document.querySelector('.calendar-month-year');
             this.eventDetailsElement = document.querySelector('.event-details');
-
+            
+            // ADD THESE LINES
+            this._prevMonthHandler = null;
+            this._nextMonthHandler = null;
+        
             this.initializeCalendar();
         }
 
@@ -299,15 +325,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         setupEventListeners() {
-            document.querySelector('.prev-month').addEventListener('click', () => {
-                this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+            this._prevMonthHandler = () => {
+                this.currentDate.setDate(this.currentDate.getDate() - 7);
                 this.renderCalendar();
-            });
-
-            document.querySelector('.next-month').addEventListener('click', () => {
-                this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+            };
+            
+            this._nextMonthHandler = () => {
+                this.currentDate.setDate(this.currentDate.getDate() + 7);
                 this.renderCalendar();
-            });
+            };
+            
+            document.querySelector('.prev-month').addEventListener('click', this._prevMonthHandler);
+            document.querySelector('.next-month').addEventListener('click', this._nextMonthHandler);
         }
 
         renderCalendar() {
@@ -316,53 +345,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 year: 'numeric' 
             });
             this.monthYearElement.textContent = monthYear;
-
+        
             this.calendarDaysElement.innerHTML = '';
-
-            const firstDayOfMonth = new Date(
-                this.currentDate.getFullYear(),
-                this.currentDate.getMonth(),
-                1
-            );
-            const lastDayOfMonth = new Date(
-                this.currentDate.getFullYear(),
-                this.currentDate.getMonth() + 1,
-                0
-            );
-
-            const firstDayWeekday = firstDayOfMonth.getDay();
-            const prevMonthDays = new Date(
-                this.currentDate.getFullYear(),
-                this.currentDate.getMonth(),
-                0
-            ).getDate();
-
-            for (let i = firstDayWeekday - 1; i >= 0; i--) {
-                const dayElement = this.createDayElement(
-                    prevMonthDays - i,
-                    'prev-month'
-                );
+        
+            // REPLACE THE EXISTING CALENDAR RENDERING WITH THIS WEEK VIEW
+            // Get the current week's Sunday (or Monday if you prefer week to start on Monday)
+            const currentDay = new Date(this.currentDate);
+            const dayOfWeek = currentDay.getDay(); // 0 for Sunday, 1 for Monday, etc.
+            
+            // Calculate the start of the week (Sunday)
+            const startOfWeek = new Date(currentDay);
+            startOfWeek.setDate(currentDay.getDate() - dayOfWeek);
+            
+            // Create 7 days for the week view
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(startOfWeek);
+                date.setDate(startOfWeek.getDate() + i);
+                
+                const isCurrentMonth = date.getMonth() === this.currentDate.getMonth();
+                const monthType = isCurrentMonth ? 'current-month' : 
+                                  (date.getMonth() < this.currentDate.getMonth() ? 'prev-month' : 'next-month');
+                
+                const dayElement = this.createDayElement(date.getDate(), monthType, date);
                 this.calendarDaysElement.appendChild(dayElement);
             }
-
-            for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
-                const currentDate = new Date(
-                    this.currentDate.getFullYear(),
-                    this.currentDate.getMonth(),
-                    day
-                );
-                const dayElement = this.createDayElement(day, 'current-month', currentDate);
-                this.calendarDaysElement.appendChild(dayElement);
-            }
-
-            const totalCells = 42;
-            const remainingCells = totalCells - 
-                (firstDayWeekday + lastDayOfMonth.getDate());
-
-            for (let day = 1; day <= remainingCells; day++) {
-                const dayElement = this.createDayElement(day, 'next-month');
-                this.calendarDaysElement.appendChild(dayElement);
-            }
+            
+            // MODIFY THE NAVIGATION BUTTONS TO MOVE BY WEEK INSTEAD OF MONTH
+            // Update your event listeners for prev/next buttons:
+            document.querySelector('.prev-month').removeEventListener('click', this._prevMonthHandler);
+            document.querySelector('.next-month').removeEventListener('click', this._nextMonthHandler);
+            
+            this._prevMonthHandler = () => {
+                this.currentDate.setDate(this.currentDate.getDate() - 7);
+                this.renderCalendar();
+            };
+            
+            this._nextMonthHandler = () => {
+                this.currentDate.setDate(this.currentDate.getDate() + 7);
+                this.renderCalendar();
+            };
+            
+            document.querySelector('.prev-month').addEventListener('click', this._prevMonthHandler);
+            document.querySelector('.next-month').addEventListener('click', this._nextMonthHandler);
         }
 
         createDayElement(dayNumber, monthType, date = null) {
@@ -376,6 +400,16 @@ document.addEventListener('DOMContentLoaded', function() {
             dayElement.appendChild(dayNumberElement);
 
             if (monthType === 'current-month' && date) {
+
+                const today = new Date();
+                if (date.getDate() === today.getDate() && 
+                    date.getMonth() === today.getMonth() && 
+                    date.getFullYear() === today.getFullYear()) {
+                    dayElement.classList.add('today');
+                    dayNumberElement.style.color = '#000000'; // Make the day number black
+                    dayNumberElement.style.fontWeight = 'bold'; // Optional: make it bold too
+                }
+                
                 const dateString = date.toISOString().split('T')[0];
                 
                 if (this.events[dateString]) {
