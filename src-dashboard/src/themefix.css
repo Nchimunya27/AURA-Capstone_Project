@@ -1,0 +1,95 @@
+/* minimal-theme.css - Only theme variables without layout influence */
+
+/* === THEME VARIABLES === */
+/* Day Mode (default) */
+:root {
+    /* Light theme colors */
+    --background-primary: #f9fafb;
+    --background-secondary: #ffffff;
+    --background-tertiary: #eeede7;
+    --text-primary: #000000;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --accent-color: #5997ac;
+    --accent-hover: #4a7e8f;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    --stats-background: #f9dfe6;
+    
+    /* Sidebar gradient for day mode */
+    --sidebar-gradient: linear-gradient(180deg, #a1cbdd, #f7aec2);
+}
+
+/* Night Mode - Updated with the right color palette */
+[data-theme="night"] {
+    /* Night theme colors */
+    --background-primary: #121b3e;
+    --background-secondary: #4f5984;
+    --background-tertiary: #7090cb;
+    --text-primary: #ffffff;     /* Bright white for main text */
+    --text-secondary: #e2e8f0;   /* Light gray-blue for secondary text */
+    --text-muted: #aaa8a6;       /* Muted text for less important elements */
+    --border-color: #7090cb;     /* Brighter border color */
+    --accent-color: #7bb5f5;     /* Brighter blue accent for better visibility */
+    --accent-hover: #9ccaff;     /* Even brighter on hover */
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    --stats-background: #4f5984;
+    
+    /* Sidebar gradient for night mode */
+    --sidebar-gradient: linear-gradient(180deg, #121b3e, #4f5984);
+}
+
+/* IMPORTANT: No layout-affecting styles beyond this point */
+
+/* Basic transitions only */
+.course-title h1, .course-title h2, 
+.nav-button, .nav-button.active,
+.progress-card, .quiz-card, .streak-card,
+.documents-card, .flashcards-card, .todo-card, .scores-card,
+.document-item, .flashcard, .todo-item {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Night Mode Star & Moon Features */
+/* These won't affect layout since they're positioned absolutely */
+.star {
+    position: absolute;
+    border-radius: 50%;
+    background-color: white;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+[data-theme="night"] .star {
+    opacity: 0.5;
+}
+
+@keyframes twinkle {
+    0% { opacity: 0.2; }
+    50% { opacity: 0.7; }
+    100% { opacity: 0.2; }
+}
+
+[data-theme="night"] .sidebar-column::after {
+    content: "";
+    position: absolute;
+    top: 85px;
+    left: 170px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: transparent;
+    box-shadow: inset -10px 0 0 #E6E6E6;
+    z-index: 1;
+    pointer-events: none;
+    transform: rotate(-10deg);
+}
+
+/* To-Do List Fix */
+.todo-item {
+    background-color: transparent !important;
+    padding: 5px 0;
+    border: none !important;
+    box-shadow: none !important;
+}
