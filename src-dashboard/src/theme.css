@@ -1,0 +1,414 @@
+/* === THEME VARIABLES - Keep only these === */
+/* Day Mode (default) */
+:root {
+    /* Light theme colors */
+    --background-primary: #f9fafb;
+    --background-secondary: #ffffff;
+    --background-tertiary: #eeede7;
+    --text-primary: #000000;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --accent-color: #5997ac;
+    --accent-hover: #4a7e8f;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    --stats-background: #f9dfe6;
+    
+    /* Sidebar gradient for day mode */
+    --sidebar-gradient: linear-gradient(180deg, #a1cbdd, #f7aec2);
+}
+
+/* Night Mode - Updated with your color palette */
+[data-theme="night"] {
+    /* Night theme colors */
+    --background-primary: #121b3e;
+    --background-secondary: #4f5984;
+    --background-tertiary: #7090cb;
+    --text-primary: #f4f4f4;
+    --text-secondary: #aaa8a6;
+    --border-color: #4f5984;
+    --accent-color: #7090cb;
+    --accent-hover: #5a79b6;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    --stats-background: #4f5984;
+    
+    /* Sidebar gradient for night mode */
+    --sidebar-gradient: linear-gradient(180deg, #121b3e, #4f5984);
+}
+
+/* Apply the current theme gradient to sidebar */
+.sidebar-column {
+    background-image: var(--sidebar-gradient);
+    position: relative;
+    overflow: hidden;
+    transition: background-image 0.3s ease;
+}
+
+/* Ensure sidebar content is above decorative elements */
+.sidebar {
+    position: relative;
+    z-index: 2;
+}
+
+
+/* Night Mode - Crescent Moon */
+[data-theme="night"] .sidebar-column::after {
+    content: "";
+    position: absolute;
+    top: 80px; /* Positioned closer to logo but not too close */
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: transparent;
+    box-shadow: inset -10px 0 0 #E6E6E6; /* This creates the crescent shape */
+    z-index: 1;
+    pointer-events: none;
+    transform: rotate(-10deg); /* Angle the crescent slightly */
+}
+
+/* If you don't have a moon image, this will create a more realistic moon effect */
+@supports not (background-image: url('moon.png')) {
+    [data-theme="night"] .sidebar-column::after {
+        background-image: radial-gradient(
+            circle at 35% 40%,
+            #fffdf0 0%,
+            #e6e6e6 30%,
+            #d0d0d0 50%,
+            #e6e6e6 100%
+        );
+    }
+}
+
+/* Stars styles - keep as is */
+.star {
+    position: absolute;
+    border-radius: 50%;
+    background-color: white;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* Star positions and sizes */
+.star-1 {
+    top: 20%;
+    left: 30%;
+    width: 3px;
+    height: 3px;
+    box-shadow: 0 0 3px 1px rgba(255,255,255,0.4);
+}
+
+.star-2 {
+    top: 30%;
+    left: 20%;
+    width: 2px;
+    height: 2px;
+    box-shadow: 0 0 2px 1px rgba(255,255,255,0.4);
+}
+
+.star-3 {
+    top: 15%;
+    right: 30%;
+    width: 4px;
+    height: 4px;
+    box-shadow: 0 0 4px 1px rgba(255,255,255,0.5);
+}
+
+.star-4 {
+    top: 40%;
+    right: 20%;
+    width: 2px;
+    height: 2px;
+    box-shadow: 0 0 2px 1px rgba(255,255,255,0.3);
+}
+
+.star-5 {
+    top: 50%;
+    left: 15%;
+    width: 3px;
+    height: 3px;
+    box-shadow: 0 0 3px 1px rgba(255,255,255,0.4);
+}
+
+.star-6 {
+    top: 65%;
+    right: 15%;
+    width: 3px;
+    height: 3px;
+    box-shadow: 0 0 3px 1px rgba(255,255,255,0.4);
+}
+
+/* Make stars visible in night mode */
+[data-theme="night"] .star {
+    opacity: 0.5;
+}
+
+/* Twinkling animation */
+@keyframes twinkle {
+    0% { opacity: 0.2; }
+    50% { opacity: 0.7; }
+    100% { opacity: 0.2; }
+}
+
+[data-theme="night"] .star-1 {
+    animation: twinkle 4s infinite ease-in-out;
+}
+
+[data-theme="night"] .star-2 {
+    animation: twinkle 5s infinite ease-in-out 0.5s;
+}
+
+[data-theme="night"] .star-3 {
+    animation: twinkle 3.5s infinite ease-in-out 1s;
+}
+
+/* === COLOR TRANSITIONS ONLY FOR BASIC ELEMENTS === */
+/* These apply the theme colors without changing layout */
+body {
+    background-color: var(--background-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dashboard-header, 
+.settings-section, 
+.course-card, 
+.tasks-list,
+.theme-preview-card {
+    background-color: var(--background-secondary);
+    border-color: var(--border-color);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Navigation Highlight */
+.nav-item.active .nav-link {
+    background-color: var(--accent-color);
+    color: #ffffff;
+}
+
+/* Text colors */
+.section-title,
+.welcome-text {
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+}
+
+.current-date,
+label,
+.theme-preview-label,
+.user-streak,
+.preview-content {
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+}
+
+/* Form elements */
+.form-control {
+    background-color: var(--background-primary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--accent-color);
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+}
+
+.btn-secondary {
+    background-color: var(--background-primary);
+    color: var(--accent-color);
+    border-color: var(--border-color);
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Theme mode selector styles - Keep these as is */
+/* NIGHT MODE READABILITY IMPROVEMENTS */
+
+/* 1. Update base text variables for night mode */
+[data-theme="night"] {
+    /* Keep your existing background colors */
+    --background-primary: #121b3e;
+    --background-secondary: #4f5984;
+    --background-tertiary: #7090cb;
+    
+    /* Improved text colors */
+    --text-primary: #ffffff;     /* Bright white for main text */
+    --text-secondary: #e2e8f0;   /* Light gray-blue for secondary text */
+    --text-muted: #aaa8a6;       /* Muted text for less important elements */
+    
+    /* Improved interactive colors */
+    --border-color: #7090cb;     /* Brighter border color */
+    --accent-color: #7bb5f5;     /* Brighter blue accent for better visibility */
+    --accent-hover: #9ccaff;     /* Even brighter on hover */
+    
+    /* Other variables - keep as is */
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    --stats-background: #4f5984;
+    --sidebar-gradient: linear-gradient(180deg, #121b3e, #4f5984);
+}
+
+/* 2. General text improvements for night mode */
+[data-theme="night"] .welcome-text,
+[data-theme="night"] .section-title,
+[data-theme="night"] .course-title,
+[data-theme="night"] .task-name,
+[data-theme="night"] .preview-header {
+    color: var(--text-primary);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2); /* Subtle shadow for better contrast */
+}
+
+[data-theme="night"] .current-date,
+[data-theme="night"] .task-description,
+[data-theme="night"] .task-date,
+[data-theme="night"] .stat-label,
+[data-theme="night"] .mode-description,
+[data-theme="night"] .preview-content {
+    color: var(--text-secondary);
+}
+
+/* 3. Form elements in night mode */
+[data-theme="night"] label {
+    color: var(--text-secondary);
+    font-weight: 500; /* Make labels slightly bolder */
+}
+
+[data-theme="night"] .form-control {
+    background-color: #2c3d6d; /* Slightly lighter than background-primary */
+    color: #ffffff;
+    border-color: var(--border-color);
+}
+
+[data-theme="night"] .form-control:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(123, 181, 245, 0.3);
+}
+
+/* 4. Calendar specific improvements */
+[data-theme="night"] .calendar-container {
+    background-color: var(--background-secondary);
+    border-color: var(--border-color);
+}
+
+[data-theme="night"] .calendar-header h2 {
+    color: var(--text-primary);
+}
+
+[data-theme="night"] .calendar-month-year {
+    color: var(--text-primary);
+}
+
+[data-theme="night"] .weekday {
+    color: var(--text-secondary);
+}
+
+[data-theme="night"] .calendar-day {
+    background-color: #31456e; /* Lighter than primary background */
+    border-color: #4f5984;
+    color: var(--text-primary);
+}
+
+[data-theme="night"] .calendar-day:hover {
+    background-color: #3d5482;
+}
+
+[data-theme="night"] .calendar-day.other-month {
+    color: var(--text-muted);
+}
+
+[data-theme="night"] .calendar-day.selected {
+    background-color: var(--accent-color);
+    border-color: var(--accent-hover);
+    color: #ffffff;
+}
+
+[data-theme="night"] .calendar-day.has-event {
+    background-color: #3a5a8f;
+}
+
+[data-theme="night"] .event-indicator {
+    background-color: var(--accent-color);
+}
+
+[data-theme="night"] .event-details {
+    background-color: #3a5a8f;
+}
+
+[data-theme="night"] .event-title {
+    color: var(--text-primary);
+}
+
+[data-theme="night"] .event-course {
+    color: var(--text-secondary);
+}
+
+/* 5. Course cards and progress bars */
+[data-theme="night"] .course-card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="night"] .course-progress {
+    background-color: #263050;
+    color: var(--text-primary);
+}
+
+[data-theme="night"] .progress-bar {
+    background-color: #263050;
+}
+
+[data-theme="night"] .progress-fill.pink {
+    background-color: #e86dab;
+}
+
+[data-theme="night"] .progress-fill.blue {
+    background-color: #60a5fa;
+}
+
+/* 6. Tasks list styling */
+[data-theme="night"] .tasks-list {
+    border-color: var(--border-color);
+}
+
+[data-theme="night"] .task-item {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="night"] .task-indicator.red { background-color: #f87171; }
+[data-theme="night"] .task-indicator.blue { background-color: #60a5fa; }
+[data-theme="night"] .task-indicator.green { background-color: #4ade80; }
+
+/* 7. Stats and achievements */
+[data-theme="night"] .stat-item {
+    background-color: #31456e;
+}
+
+[data-theme="night"] .stat-value {
+    color: var(--text-primary);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+[data-theme="night"] .achievements-section,
+[data-theme="night"] .quick-stats {
+    background-color: var(--background-secondary);
+    border-color: var(--border-color);
+}
+
+/* 8. Navigation improvements */
+[data-theme="night"] .nav-text {
+    color: var(--text-secondary);
+}
+
+[data-theme="night"] .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="night"] .nav-item.active .nav-link {
+    background-color: var(--accent-color);
+}
+/* Already included in your CSS */

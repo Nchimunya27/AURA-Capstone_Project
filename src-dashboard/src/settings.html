@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Settings - AURA Learning Dashboard</title>
   <link rel="stylesheet" href="aura.css">
+  <script src="theme-init.js"></script>
+
 </head>
 <body>
     <div class="dashboard">
@@ -145,21 +147,55 @@
                         </div>
                       </div>
                       
-                      <!-- Appearance Section (not ready yet) -->
-                      <div class="settings-section" id="appearance">
-                        <h2 class="section-title">Appearance</h2>
-                        <div class="settings-form">
-                          <p>Appearance settings are coming soon.</p>
+                      <!-- Appearance Section with Bear Mascot Theme Selector -->
+                  <div class="settings-section" id="appearance">
+                    <h2 class="section-title">Theme Preferences</h2>
+                    
+                    <div class="theme-mode-options">
+                      <!-- Day Mode Option -->
+                      <div class="mode-option">
+                        <input type="radio" name="themeMode" id="dayMode" value="day" class="mode-radio" checked>
+                        <label for="dayMode" class="mode-label">
+                          <div class="mode-mascot">
+                            <img src="daymode.png" alt="Day Mode - Bear reading in daylight" class="mascot-image">
+                            <span class="mode-name">Day Mode</span>
+                          </div>
+                          <div class="mode-description">Light theme with bright colors</div>
+                        </label>
+                      </div>
+                      
+                      <!-- Night Mode Option -->
+                      <div class="mode-option">
+                        <input type="radio" name="themeMode" id="nightMode" value="night" class="mode-radio">
+                        <label for="nightMode" class="mode-label">
+                          <div class="mode-mascot">
+                            <img src="nightmode.png" alt="Night Mode - Bear reading in evening light" class="mascot-image">
+                            <span class="mode-name">Night Mode</span>
+                          </div>
+                          <div class="mode-description">Twilight theme with soft colors</div>
+                        </label>
+                      </div>
+                    </div>
+                    
+                    <!-- Theme Preview -->
+                    <div class="theme-preview">
+                      <h3 class="theme-preview-label">Preview</h3>
+                      <div class="theme-preview-card">
+                        <div class="preview-header">Sample Content</div>
+                        <div class="preview-content">
+                          This is how your content will appear with the selected theme.
                         </div>
                       </div>
                     </div>
-                  </main>
+                  </div>
                 </div>
-              </div>
+              </main>
             </div>
           </div>
         </div>
       </div>
+    </div>
+  </div>
   
   <script src="aura.js"></script>
   <script src="settings.js"></script>

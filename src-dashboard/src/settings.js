@@ -24,6 +24,38 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+// === THEME MANAGEMENT ===
+const themeModeRadios = document.querySelectorAll('input[name="themeMode"]');
+    
+// Apply current theme (should also match the checked radio button)
+const currentTheme = localStorage.getItem('theme') || 'day';
+document.documentElement.setAttribute('data-theme', currentTheme);
+console.log('Initial theme set to: ' + currentTheme);
+
+// Set the correct radio button based on current theme
+const radioToCheck = document.getElementById(currentTheme + 'Mode');
+if (radioToCheck) {
+  radioToCheck.checked = true;
+  console.log('Set checked radio to: ' + currentTheme + 'Mode');
+} else {
+  console.log('Could not find radio for theme: ' + currentTheme);
+}
+
+// Add change listeners to radio buttons
+themeModeRadios.forEach(radio => {
+  radio.addEventListener('change', function() {
+    // Get selected theme (day or night)
+    const theme = this.value;
+    console.log('Theme changed to: ' + theme);
+    
+    // Apply theme by setting attribute on <html> element
+    document.documentElement.setAttribute('data-theme', theme);
+    
+    // Save preference for future visits
+    localStorage.setItem('theme', theme);
+  });
+});
+
     
     // Form submission handling
     const saveChangesBtn = document.getElementById('saveChangesBtn');
