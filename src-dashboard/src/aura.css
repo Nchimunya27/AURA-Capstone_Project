@@ -72,7 +72,7 @@ body {
 }
 
 .content-wrapper {
-    background-color: var(--background-primary);
+    background-color: var(--background-tertiary);
     width: 100%;
     transition: background-color 0.3s ease;
 }
@@ -88,9 +88,7 @@ body {
 .sidebar-column {
     width: 16%;
     background-image: var(--sidebar-gradient);
-    border-right: 1px solid var(--border-color);
-    position: relative;
-    overflow: hidden;
+    border-right: 1px solid #e5e7eb;
     transition: border-color 0.3s ease, background-image 0.3s ease;
 }
 
@@ -196,8 +194,8 @@ body {
 [data-theme="night"] .sidebar-column::after {
     content: "";
     position: absolute;
-    top: 80px; /* Positioned closer to logo but not too close */
-    right: 20px;
+    top: 85px; /* Positioned closer to logo but not too close */
+    left: 170px;
     width: 50px;
     height: 50px;
     border-radius: 50%;
@@ -222,7 +220,7 @@ body {
 }
 
 .sidebar {
-    position: sticky;
+    position: fixed;
     top: 0;
     display: flex;
     flex-direction: column;
@@ -381,7 +379,7 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    background-color: #ffedd5;
+    background-color: var(--background-tertiary);
     padding: 6px 12px;
     border-radius: 20px;
     font-size: 15px;
@@ -396,7 +394,7 @@ body {
 }
 
 .achievements-section {
-    position: absolute; /* Changed from absolute to fixed */
+    position: absolute;
     top: 80px;
     right: 20px;
     width: 350px;  /* Adjust based on your needs */
@@ -407,7 +405,7 @@ body {
     margin-top: 120px;
     z-index: 10;
     transition: background-color 0.3s ease, border-color 0.3s ease;
-    box-shadow: var(--card-shadow); /* Added shadow for better visibility */
+    box-shadow: var(--card-shadow);
 }
 
 .section-title {
@@ -841,6 +839,7 @@ body {
         width: 100%;
         border-right: none;
         border-bottom: 1px solid var(--border-color);
+        
     }
 
     .main-content-column {
