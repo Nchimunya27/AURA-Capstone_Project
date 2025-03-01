@@ -22,6 +22,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     section.classList.remove('active');
                 }
             });
+            
+            // Initialize analytics if analytics tab is selected
+            if (tabId === 'overall-analytics' && typeof initializeAnalytics === 'function') {
+                // Add a slight delay to ensure the tab content is visible
+                setTimeout(initializeAnalytics, 100);
+            }
         });
     });
 // === THEME MANAGEMENT ===
@@ -53,6 +59,13 @@ themeModeRadios.forEach(radio => {
     
     // Save preference for future visits
     localStorage.setItem('theme', theme);
+    
+    // Update charts if we're on the analytics tab
+    if (document.getElementById('overall-analytics') && 
+        document.getElementById('overall-analytics').classList.contains('active') &&
+        typeof Chart !== 'undefined') {
+        updateChartsForTheme(theme);
+    }
   });
 });
 
@@ -91,3 +104,34 @@ themeModeRadios.forEach(radio => {
         });
     }
 });
+
+/**
+ * Function to update chart colors when theme changes
+ */
+function updateChartsForTheme(theme) {
+    if (typeof Chart === 'undefined') return;
+    
+    // Find all charts on the page
+    const charts = Object.values(Chart.instances);
+    if (charts.length === 0) return;
+
+    charts.forEach(chart => {
+        // Update the chart with new theme colors
+        chart.update();
+    });
+    
+    // Update heatmap colors if it exists
+    const heatmapContainer = document.getElementById('activityHeatmap');
+    if (heatmapContainer) {
+        const hourBlocks = heatmapContainer.querySelectorAll('.hour-block');
+        hourBlocks.forEach(block => {
+            const style = block.getAttribute('style');
+            if (style) {
+                const newStyle = theme === 'night'
+                    ? style.replace('rgba(89, 151, 172,', 'rgba(123, 181, 245,')
+                    : style.replace('rgba(123, 181, 245,', 'rgba(89, 151, 172,');
+                block.setAttribute('style', newStyle);
+            }
+        });
+    }
+}
