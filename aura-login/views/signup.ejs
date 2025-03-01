@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - AURA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Nunito:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="login-card">
+            <div class="login-container">
+                <!-- Image Container: Moves the bear to the left -->
+                <div class="image-container">
+                    <img src="/aura_wave.PNG" alt="Aura Waving Logo" class="left-image">
+                </div>
+                
+                <!-- Sign Up Form: Moves the form to the right -->
+                <div class="login-form-container">
+                    <div class="login-form">
+                        <img src="/aura_head_logo.PNG" alt="Aura Head Logo" height="100" width="100">
+                        <h2>Create Account</h2>
+                        <form action="/signup" method="POST">
+                            <div class="form-group">
+                                <label for="newEmail">Email Address</label>
+                                <input type="email" id="newEmail" name="email" placeholder="Enter your email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newUsername">Username</label>
+                                <input type="text" id="newUsername" name="username" placeholder="Choose a username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newPassword">Password</label>
+                                <input type="password" id="newPassword" name="password" placeholder="Create a password" required>
+                                <div class="password-hint">Must be a combination of minimum 8 letters, numbers, and symbols.</div>
+                            </div>
+                            <button type="submit" class="login-button">Create Account</button>
+                        </form>
+                        <div class="switch-view-link">
+                            Already have an account? <a href="/login">Log in</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
