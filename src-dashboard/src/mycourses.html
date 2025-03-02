@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Courses - Aura Learning Dashboard</title>
   <link rel="stylesheet" href="aura.css">
-  <link rel="stylesheet" href="mycouses.css">
+  <link rel="stylesheet" href="mycourses.css">
   <script src="theme-init.js"></script>
 </head>
 <body>
@@ -108,99 +109,7 @@
                   
                   <div class="courses-content">
                     <div class="courses-grid-container">
-                      <!-- First row of courses -->
-                      <div class="courses-row">
-                        <!-- Advanced Mathematics -->
-                        <div class="course-card">
-                          <div class="course-header">
-                            <div class="course-title">Advanced Mathematics</div>
-                            <div class="course-progress-badge progress-pink">75%</div>
-                          </div>
-                          <div class="progress-bar">
-                            <div class="progress-fill pink" style="width: 75%;"></div>
-                          </div>
-                          <div class="course-details">
-                            <div class="course-quiz">
-                              <span class="quiz-icon">📅</span>
-                              <span class="quiz-date">Next Quiz: Jan 20, 2025</span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <!-- Web Development -->
-                        <div class="course-card">
-                          <div class="course-header">
-                            <div class="course-title">Web Development</div>
-                            <div class="course-progress-badge progress-blue">45%</div>
-                          </div>
-                          <div class="progress-bar">
-                            <div class="progress-fill blue" style="width: 45%;"></div>
-                          </div>
-                          <div class="course-details">
-                            <div class="course-quiz">
-                              <span class="quiz-icon">📅</span>
-                              <span class="quiz-date">Next Quiz: Jan 22, 2025</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
                       
-                      <!-- Second row of courses -->
-                      <div class="courses-row">
-                        <!-- Introduction to AI -->
-                        <div class="course-card">
-                          <div class="course-header">
-                            <div class="course-title">Introduction to AI</div>
-                            <div class="course-progress-badge progress-purple">75%</div>
-                          </div>
-                          <div class="progress-bar">
-                            <div class="progress-fill purple" style="width: 75%;"></div>
-                          </div>
-                          <div class="course-details">
-                            <div class="course-quiz">
-                              <span class="quiz-icon">📅</span>
-                              <span class="quiz-date">Next Quiz: Jan 20, 2025</span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <!-- Data Science Basics -->
-                        <div class="course-card">
-                          <div class="course-header">
-                            <div class="course-title">Data Science Basics</div>
-                            <div class="course-progress-badge progress-purple">45%</div>
-                          </div>
-                          <div class="progress-bar">
-                            <div class="progress-fill purple" style="width: 45%;"></div>
-                          </div>
-                          <div class="course-details">
-                            <div class="course-quiz">
-                              <span class="quiz-icon">📅</span>
-                              <span class="quiz-date">Next Quiz: Jan 22, 2025</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <!-- Third row of courses (Chemistry) -->
-                      <div class="courses-row">
-                        <!-- Chemistry Basics -->
-                        <div class="course-card">
-                          <div class="course-header">
-                            <div class="course-title">Chemistry Basics</div>
-                            <div class="course-progress-badge progress-purple">80%</div>
-                          </div>
-                          <div class="progress-bar">
-                            <div class="progress-fill purple" style="width: 80%;"></div>
-                          </div>
-                          <div class="course-details">
-                            <div class="course-quiz">
-                              <span class="quiz-icon">📅</span>
-                              <span class="quiz-date">Next Quiz: Today</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 </main>
@@ -222,7 +131,7 @@
     <div class="modal-body">
       <div class="form-group">
         <label for="courseName">Course Name</label>
-        <input type="text" id="courseName" class="form-control" placeholder="e.g., Advanced Mathematics">
+        <input type="text" id="courseName" class="form-control" placeholder="e.g., MAT 140">
       </div>
       
       <div class="form-group">
@@ -254,7 +163,7 @@
         </div>
       </div>
       
-                <div class="form-group">
+      <div class="form-group">
         <label for="knowledgeLevel">Current Knowledge Level</label>
         <div class="range-container">
           <input type="range" id="knowledgeLevel" min="0" max="100" value="0" class="knowledge-slider">
@@ -273,44 +182,105 @@
 </div>
 
 <script>
-  // Modal functionality
   document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('addCourseModal');
     const addCourseBtn = document.getElementById('addNewCourseBtn');
     const cancelBtn = document.getElementById('cancelBtn');
+    const createCourseBtn = document.getElementById('createCourseBtn');
     const knowledgeSlider = document.getElementById('knowledgeLevel');
     const rangeValue = document.querySelector('.range-value');
     
-    // Set initial value to 0% explicitly
     rangeValue.textContent = knowledgeSlider.value + '%';
-    
-    // Initialize the slider fill (based on its initial value of 0)
-    knowledgeSlider.style.background = `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${knowledgeSlider.value}%, ${document.documentElement.getAttribute('data-theme') === 'night' ? '#2a3656' : '#e5e7eb'} ${knowledgeSlider.value}%)`;
-    
-    // Update the range value display and background fill when slider changes
+    knowledgeSlider.style.background = `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${knowledgeSlider.value}%, #e5e7eb ${knowledgeSlider.value}%)`;
+
     knowledgeSlider.addEventListener('input', function() {
       const value = this.value;
       rangeValue.textContent = value + '%';
-      
-      // Update the background fill to show progress
       this.style.background = `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${value}%, #e5e7eb ${value}%)`;
     });
-    
-    // Open modal when Add New Course button is clicked
+
     addCourseBtn.addEventListener('click', function() {
       modal.style.display = 'flex';
     });
-    
-    // Close modal when Cancel button is clicked
+
     cancelBtn.addEventListener('click', function() {
       modal.style.display = 'none';
     });
-    
-    // Close modal when clicking outside of it
+
     window.addEventListener('click', function(event) {
       if (event.target === modal) {
         modal.style.display = 'none';
       }
+    });
+
+    createCourseBtn.addEventListener('click', function() {
+      const courseName = document.getElementById('courseName').value;
+      const subjectArea = document.getElementById('subjectArea').value;
+      const examDate = document.getElementById('examDate').value;
+      const studyHours = document.getElementById('studyHours').value;
+      const knowledgeLevel = document.getElementById('knowledgeLevel').value;
+
+      const courseCardHTML = `
+        <div class="course-card">
+          <div class="course-header">
+            <div class="course-title">${courseName}</div>
+            <div class="course-progress-badge progress-blue">${knowledgeLevel}%</div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill blue" style="width: ${knowledgeLevel}%;"></div>
+          </div>
+          <div class="course-details">
+            <div class="course-quiz">
+              <span class="quiz-icon">📅</span>
+              <span class="quiz-date">Next Quiz: ${examDate}</span>
+            </div>
+          </div>
+          <div class="course-actions">
+            <button class="edit-btn">Edit</button>
+            <button class="delete-btn">Delete</button>
+          </div>
+        </div>
+      `;
+      
+      const coursesGridContainer = document.querySelector('.courses-grid-container');
+      coursesGridContainer.innerHTML += courseCardHTML;
+
+      modal.style.display = 'none';
+      
+      // Add event listeners for the new Edit and Delete buttons
+      const deleteBtns = document.querySelectorAll('.delete-btn');
+      deleteBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          this.closest('.course-card').remove();
+        });
+      });
+
+      const editBtns = document.querySelectorAll('.edit-btn');
+      editBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const courseCard = this.closest('.course-card');
+          const courseTitle = courseCard.querySelector('.course-title').textContent;
+          const quizDate = courseCard.querySelector('.quiz-date').textContent.replace('Next Quiz: ', '');
+          
+          // Pre-fill modal with current course information for editing
+          document.getElementById('courseName').value = courseTitle;
+          document.getElementById('examDate').value = quizDate;
+          modal.style.display = 'flex';
+          
+          // Modify the button to update
+          createCourseBtn.textContent = 'Update Course';
+          
+          // Change the event listener to update the course
+          createCourseBtn.removeEventListener('click', arguments.callee);
+          createCourseBtn.addEventListener('click', function() {
+            courseCard.querySelector('.course-title').textContent = document.getElementById('courseName').value;
+            courseCard.querySelector('.quiz-date').textContent = 'Next Quiz: ' + document.getElementById('examDate').value;
+
+            modal.style.display = 'none';
+            createCourseBtn.textContent = '+ Create Course'; // Reset button text
+          });
+        });
+      });
     });
   });
 </script>
