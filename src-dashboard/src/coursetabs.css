@@ -1,0 +1,598 @@
+/* Flashcard Tab Styles */
+.tab-content {
+    width: 100%;
+  }
+  
+  /* Flashcard Actions */
+  .flashcard-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  /* Flashcard Container and Item */
+  .flashcard-container {
+    width: 75%;
+    height: 300px;
+    margin-bottom: 30px;
+    left: 150px;
+    position: relative;
+    perspective: 1000px;
+  }
+  
+  .flashcard-item {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+  }
+  
+  .flashcard-item.flipped {
+    transform: rotateX(180deg);
+  }
+  
+  .flashcard-front, .flashcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    background-color: var(--background-secondary, #ffffff);
+    border-radius: 12px;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .flashcard-back {
+    transform: rotateX(180deg);
+  }
+  
+  .flashcard-category {
+    color: var(--text-tertiary, #6b7280);
+    font-size: 16px;
+    margin-bottom: 15px;
+  }
+  
+  .flashcard-question, .flashcard-answer {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary, #000000);
+    margin-bottom: 30px;
+  }
+  
+  .flashcard-controls {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .show-answer-btn {
+    background-color: #f0d4e4; /* Brand color with opacity */
+    color: var(--brand-color, #af5166);
+    border: none;
+    padding: 10px 25px;
+    border-radius: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .show-answer-btn:hover {
+    background-color: #e8c6dd;
+  }
+  
+  .rotate-btn {
+    background: none;
+    border: none;
+    color: var(--text-tertiary, #6b7280);
+    font-size: 20px;
+    cursor: pointer;
+    margin-left: 15px;
+  }
+  
+  /* Navigation controls */
+  .flashcard-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-radius: 30px;
+    background-color: var(--background-secondary, #ffffff);
+    box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.1));
+    width: 80%;
+    margin: 0 auto 30px;
+  }
+  
+  .nav-arrow {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color, #e5e7eb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-tertiary, #6b7280);
+    font-size: 18px;
+  }
+  
+  .card-count {
+    color: var(--text-tertiary, #6b7280);
+  }
+  
+  .nav-controls {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .control-btn {
+    background: none;
+    border: none;
+    color: var(--text-tertiary, #6b7280);
+    font-size: 18px;
+    cursor: pointer;
+  }
+  
+  /* Special Progress Section for Flashcards */
+  #flashcards-tab .progress-section {
+    margin-top: 40px;
+  }
+  
+  #flashcards-tab .progress-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  
+  #flashcards-tab .progress-card {
+    background-color: var(--background-secondary, #ffffff);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.1));
+    padding: 25px;
+  }
+  
+  #flashcards-tab .progress-title {
+    font-size: 18px;
+    color: var(--text-primary, #000000);
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+  
+  #flashcards-tab .progress-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  #flashcards-tab .progress-number {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary, #000000);
+    margin-right: 15px;
+  }
+  
+  #flashcards-tab .progress-label {
+    color: var(--text-tertiary, #6b7280);
+    font-size: 14px;
+  }
+  
+  #flashcards-tab .next-review {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  #flashcards-tab .time-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  #flashcards-tab .clock-icon, 
+  #flashcards-tab .progress-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: var(--bg-light, #f9fafb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: var(--text-tertiary, #6b7280);
+  }
+  
+  #flashcards-tab .progress-icon {
+    color: var(--brand-color, #af5166);
+  }
+  
+  #flashcards-tab .arrow-btn {
+    color: var(--link-color, #5997ac);
+    font-size: 20px;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 991px) {
+    #flashcards-tab .progress-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .flashcard-nav {
+      width: 100%;
+    }
+  }
+  
+  /* ==========================================
+     Notes Tab Styles
+     ========================================== */
+  
+  /* Section Layout */
+  .section-content {
+    display: flex;
+    gap: 25px;
+    margin-bottom: 30px;
+    margin-top: 20px;
+  }
+  
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary, #000000);
+    margin-bottom: 20px;
+  }
+  
+  .tab-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary, #000000);
+    margin-bottom: 25px;
+  }
+  
+  /* Documents Section */
+  .documents-section {
+    flex: 3;
+    background-color: var(--background-secondary, #ffffff);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.1));
+  }
+  
+  .documents-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .document-card {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: var(--background-primary, #f9fafb);
+  }
+  
+  .document-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    margin-right: 15px;
+    font-size: 20px;
+  }
+  
+  .pdf-icon {
+    background-color: #ffebee;
+    color: #f44336;
+  }
+  
+  .docx-icon {
+    background-color: #e3f2fd;
+    color: #2196f3;
+  }
+  
+  .document-info {
+    flex: 1;
+  }
+  
+  .document-title {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: var(--text-primary, #000000);
+  }
+  
+  .document-date {
+    font-size: 14px;
+    color: var(--text-tertiary, #6b7280);
+  }
+  
+  /* Upload Section */
+  .upload-section {
+    flex: 1;
+    background-color: var(--background-secondary, #ffffff);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.1));
+  }
+  
+  .upload-area {
+    border: 2px dashed var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: calc(100% - 50px);
+  }
+  
+  .upload-icon {
+    font-size: 30px;
+    color: #9e9e9e;
+    margin-bottom: 15px;
+  }
+  
+  .upload-text {
+    font-size: 14px;
+    color: var(--text-tertiary, #6b7280);
+    margin-bottom: 15px;
+  }
+  
+  .browse-btn {
+    background-color: var(--link-color, #5997ac);
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .browse-btn:hover {
+    background-color: var(--primary-color, #5997ac);
+  }
+  
+  /* Course Documents */
+  .course-documents {
+    background-color: var(--background-secondary, #ffffff);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.1));
+  }
+  
+  .document-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .document-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: var(--background-primary, #f9fafb);
+  }
+  
+  .document-item-left {
+    display: flex;
+    align-items: center;
+  }
+  
+  .document-download {
+    color: var(--text-tertiary, #6b7280);
+    font-size: 18px;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  
+  .document-download:hover {
+    color: var(--link-color, #5997ac);
+  }
+  
+  /* ==========================================
+     Quizzes Tab Styles
+     ========================================== */
+  
+  /* Quizzes Layout */
+  .quizzes-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 30px;
+  }
+  
+  .quiz-card {
+    background-color: var(--background-secondary, #ffffff);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.1));
+  }
+  
+  .quiz-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary, #000000);
+    margin-bottom: 20px;
+  }
+  
+  /* Next Quiz */
+  .next-quiz-content {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .quiz-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+    background-color: var(--bg-light, #f9fafb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-size: 25px;
+    color: var(--primary-color, #5997ac);
+  }
+  
+  .quiz-icon.locked {
+    background-color: #ffebee;
+    color: #f44336;
+  }
+  
+  .quiz-icon.question {
+    background-color: var(--bg-light, #f9fafb);
+    color: #9c27b0;
+  }
+  
+  .quiz-info {
+    flex: 1;
+  }
+  
+  .quiz-title {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: var(--text-primary, #000000);
+  }
+  
+  .quiz-date {
+    font-size: 14px;
+    color: var(--text-tertiary, #6b7280);
+  }
+  
+  .practice-quiz-btn {
+    width: 100%;
+    background-color: var(--success-color, #16a34a);
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .practice-quiz-btn:hover {
+    background-color: #43a047;
+  }
+  
+  /* Upcoming Quizzes */
+  .upcoming-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .upcoming-item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .quiz-status {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  
+  .quiz-status.pending {
+    background-color: #fdf6e5;
+    color: var(--warning-color, #ca8a04);
+  }
+  
+  .quiz-status.scheduled {
+    background-color: #ebf7ff;
+    color: #36b9cc;
+  }
+  
+  /* Past Quizzes */
+  .past-quizzes {
+    background-color: var(--background-secondary, #ffffff);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.1));
+  }
+  
+  .past-quiz-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .past-quiz-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: var(--background-primary, #f9fafb);
+  }
+  
+  .quiz-left {
+    display: flex;
+    align-items: center;
+  }
+  
+  .quiz-subject {
+    font-size: 14px;
+    color: var(--text-tertiary, #6b7280);
+  }
+  
+  .quiz-right {
+    text-align: right;
+    font-size: 14px;
+    color: var(--text-tertiary, #6b7280);
+  }
+  
+  /* Night mode compatibility */
+  [data-theme="night"] .document-card,
+  [data-theme="night"] .document-item,
+  [data-theme="night"] .past-quiz-item {
+    background-color: #31456e;
+  }
+  
+  [data-theme="night"] .upload-area {
+    border-color: #7090cb;
+  }
+  
+  [data-theme="night"] .quiz-icon {
+    background-color: #31456e;
+  }
+  
+  [data-theme="night"] .quiz-icon.question {
+    background-color: #31456e;
+  }
+  
+  [data-theme="night"] .show-answer-btn {
+    background-color: #3b2631;
+    color: #e2e8f0;
+  }
+  
+  [data-theme="night"] .progress-icon,
+  [data-theme="night"] .clock-icon {
+    background-color: #31456e;
+    color: #cbd5e1;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 991px) {
+    .section-content {
+      flex-direction: column;
+    }
+    
+    .quizzes-grid {
+      grid-template-columns: 1fr;
+    }
+  }

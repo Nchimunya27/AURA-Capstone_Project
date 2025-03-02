@@ -9,7 +9,7 @@
     --success-color: #16a34a;
     --warning-color: #ca8a04;
     --link-color: var(--accent-color, #5997ac);
-    --bg-light: var(--background-primary, #f9fafb);
+    --bg-light: var(--background-primary, #eeede7);
     --bg-white: var(--background-secondary, #ffffff);
     --brand-color: #af5166;
 }
