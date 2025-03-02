@@ -128,6 +128,14 @@ class Dashboard {
             case 'Settings':
                 window.location.href = 'settings.html';
                 break;
+            
+            case 'My Courses':
+                window.location.href = 'mycourses.html';
+                break;
+
+            case 'Calendar':
+                window.location.href = 'calendar.html';
+                break;
 
         }
     }

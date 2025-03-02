@@ -1,0 +1,530 @@
+/* === SCHEDULE PAGE STYLES === */
+
+.schedule-content {
+    padding: 20px 0;
+}
+
+.schedule-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+}
+
+.schedule-panel {
+    background-color: var(--background-secondary);
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--card-shadow);
+    padding: 20px;
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.panel-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    transition: color 0.3s ease;
+}
+
+/* Course Panel Styles */
+.course-panel {
+    height: fit-content;
+}
+
+.course-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.course-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    border-radius: 8px;
+    background-color: var(--background-primary);
+    transition: transform 0.2s ease, background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.course-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.course-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: color 0.3s ease;
+}
+
+.subject-math {
+    background-color: #f9d0e3;
+}
+
+.subject-physics {
+    background-color: #d0e6f9;
+}
+
+.subject-cs {
+    background-color: #d6f9d0;
+}
+
+.exam-count {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background-color: var(--background-tertiary);
+    padding: 4px 10px;
+    border-radius: 20px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+/* Calendar Panel Styles */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.month-navigation {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background-color: var(--background-primary);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.nav-button:hover {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+.current-month {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--accent-color);
+    background-color: var(--background-primary);
+    padding: 6px 12px;
+    border-radius: 20px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 10px;
+}
+
+.weekday {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: 10px 0;
+    transition: color 0.3s ease;
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.calendar-day {
+    min-height: 90px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    padding: 8px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    position: relative;
+}
+
+.calendar-day.empty {
+    background-color: transparent;
+    border: none;
+}
+
+.day-number {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+    margin-bottom: 5px;
+}
+
+.calendar-day.has-exam {
+    background-color: #fbf5f7;
+    border-color: #f9d0e3;
+}
+
+.exam-item {
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+}
+
+.math-exam {
+    background-color: #f9d0e3;
+}
+
+.physics-exam {
+    background-color: #d0e6f9;
+}
+
+.cs-exam {
+    background-color: #d6f9d0;
+}
+
+.exam-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.exam-time {
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+/* Night mode styles for schedule page */
+[data-theme="night"] .subject-math {
+    background-color: #3d2536;
+    color: #f9d0e3;
+}
+
+[data-theme="night"] .subject-physics {
+    background-color: #25303d;
+    color: #d0e6f9;
+}
+
+[data-theme="night"] .subject-cs {
+    background-color: #253d25;
+    color: #d6f9d0;
+}
+
+[data-theme="night"] .calendar-day.has-exam {
+    background-color: #2c1f28;
+    border-color: #3d2536;
+}
+
+[data-theme="night"] .math-exam {
+    background-color: #3d2536;
+    color: #f9d0e3;
+}
+
+[data-theme="night"] .physics-exam {
+    background-color: #25303d;
+    color: #d0e6f9;
+}
+
+[data-theme="night"] .cs-exam {
+    background-color: #253d25;
+    color: #d6f9d0;
+}
+
+[data-theme="night"] .current-month {
+    color: var(--accent-color);
+    background-color: #2c3d6d;
+}
+
+[data-theme="night"] .calendar-day {
+    background-color: #31456e;
+}
+
+/* Responsive design for schedule page */
+@media (max-width: 1024px) {
+    .schedule-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .calendar-days {
+        gap: 5px;
+    }
+
+    .calendar-day {
+        min-height: 80px;
+    }
+}
+
+@media (max-width: 768px) {
+    .calendar-weekdays, .calendar-days {
+        grid-template-columns: repeat(7, 1fr);
+        font-size: 12px;
+    }
+
+    .calendar-day {
+        min-height: 70px;
+        padding: 5px;
+    }
+
+    .exam-item {
+        padding: 5px;
+        font-size: 10px;
+    }
+
+    .calendar-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .month-navigation {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 480px) {
+    .calendar-weekdays, .calendar-days {
+        grid-template-columns: repeat(7, 1fr);
+    }
+
+    .weekday {
+        font-size: 12px;
+        padding: 5px 0;
+    }
+
+    .day-number {
+        font-size: 12px;
+    }
+
+    .calendar-day {
+        min-height: 50px;
+        padding: 3px;
+    }
+
+    .exam-item {
+        padding: 2px;
+        font-size: 9px;
+    }
+
+    .exam-time {
+        font-size: 8px;
+    }
+}
+
+/* === EXAM MODAL STYLES === */
+
+/* Modal Styling for Exams - to match the Add Course Modal */
+#examFormModal.modal, 
+#examDetailsModal.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(3px);
+}
+
+#examFormModal .modal-content,
+#examDetailsModal .modal-content {
+    background-color: var(--background-secondary);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    transition: background-color 0.3s ease;
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#examFormModal .modal-header,
+#examDetailsModal .modal-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+    transition: border-color 0.3s ease;
+}
+
+#examFormModal .modal-header h2,
+#examDetailsModal .modal-header h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    transition: color 0.3s ease;
+}
+
+#examFormModal .modal-header p,
+#examDetailsModal .modal-header p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+}
+
+#examFormModal .modal-body,
+#examDetailsModal .modal-body {
+    padding: 25px;
+}
+
+#examFormModal .modal-footer,
+#examDetailsModal .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    padding: 16px 25px;
+    border-top: 1px solid var(--border-color);
+    transition: border-color 0.3s ease;
+}
+
+.close-modal-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: 700;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: color 0.2s ease;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.close-modal-btn:hover {
+    color: var(--text-primary);
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Exam details specific styling */
+.exam-details-container {
+    border-radius: 8px;
+    padding: 16px;
+    background-color: var(--background-tertiary);
+    transition: background-color 0.3s ease;
+}
+
+.exam-detail-row {
+    display: flex;
+    margin-bottom: 12px;
+}
+
+.detail-label {
+    font-weight: 600;
+    width: 100px;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+}
+
+.detail-value {
+    flex: 1;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+}
+
+.detail-value.notes {
+    white-space: pre-line;
+}
+
+/* Subject specific background colors for exam details */
+.exam-details-container.math-exam {
+    background-color: rgba(249, 208, 227, 0.3);
+}
+
+.exam-details-container.physics-exam {
+    background-color: rgba(208, 230, 249, 0.3);
+}
+
+.exam-details-container.cs-exam {
+    background-color: rgba(214, 249, 208, 0.3);
+}
+
+/* Night mode styles */
+[data-theme="night"] .close-modal-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="night"] .exam-details-container.math-exam {
+    background-color: rgba(61, 37, 54, 0.6);
+}
+
+[data-theme="night"] .exam-details-container.physics-exam {
+    background-color: rgba(37, 48, 61, 0.6);
+}
+
+[data-theme="night"] .exam-details-container.cs-exam {
+    background-color: rgba(37, 61, 37, 0.6);
+}
+
+/* Danger button for delete action */
+.btn-danger {
+    background-color: #e74c3c;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+}
+
+/* Responsive styles for modals */
+@media (max-width: 640px) {
+    #examFormModal .modal-content,
+    #examDetailsModal .modal-content {
+        width: 90%;
+        margin: 0 15px;
+    }
+    
+    #examFormModal .modal-footer,
+    #examDetailsModal .modal-footer {
+        flex-direction: column-reverse;
+    }
+    
+    #examFormModal .modal-footer button,
+    #examDetailsModal .modal-footer button {
+        width: 100%;
+    }
+    
+    .detail-label {
+        width: 80px;
+    }
+}
