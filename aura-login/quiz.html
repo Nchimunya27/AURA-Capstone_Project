@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz Page - AURA</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="quiz.css" />
+    <script
+      src="https://kit.fontawesome.com/a076d05399.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div class="quiz-container">
+      <div class="sidebar">
+        <div class="logo-container">
+          <span class="logo-text">AURA</span>
+        </div>
+
+        <div class="profile-section">
+          <div class="notification-icon">
+            <i class="fas fa-bell"></i>
+          </div>
+          <div class="profile-pic">
+            <img src="profile.jpg" alt="Profile Picture" />
+          </div>
+        </div>
+
+        <nav class="nav-menu">
+          <a href="#" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="#" class="nav-item active">
+            <i class="fas fa-book"></i>
+            <span>My Courses</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-calendar"></i>
+            <span>Schedule</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </a>
+        </nav>
+
+        <div class="about-section">
+          <a href="#" class="about-link">About Us</a>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <h1 class="page-title">Quiz Page</h1>
+
+        <div class="quiz-card">
+          <div class="quiz-header">
+            <a href="#" class="back-button">
+              <i class="fas fa-arrow-left"></i>
+              Web Developmemnt Quiz #3
+            </a>
+
+            <div class="progress-container">
+              <span class="progress-text">Question 12 of 20</span>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 60%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="question-container">
+            <h2 class="question-text">
+              Which of the following is NOT a type of database index?
+            </h2>
+
+            <div class="options-container">
+              <label class="option-item">
+                <input type="radio" name="answer" value="b-tree" />
+                <span class="option-text">B-tree Index</span>
+              </label>
+
+              <label class="option-item">
+                <input type="radio" name="answer" value="hash" />
+                <span class="option-text">Hash Index</span>
+              </label>
+
+              <label class="option-item">
+                <input type="radio" name="answer" value="circle" checked />
+                <span class="option-text">Circle Index</span>
+              </label>
+
+              <label class="option-item">
+                <input type="radio" name="answer" value="bitmap" />
+                <span class="option-text">Bitmap Index</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="quiz-footer">
+            <div class="navigation-buttons">
+              <button class="nav-button prev-button">
+                <i class="fas fa-chevron-left"></i>
+                Previous
+              </button>
+
+              <button class="nav-button next-button">
+                Next
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+
+            <div class="action-buttons">
+              <button class="flag-button">
+                <i class="fas fa-flag"></i>
+                Flag Question
+              </button>
+
+              <button class="submit-button">Submit Quiz</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="quiz.js"></script>
+  </body>
+</html>

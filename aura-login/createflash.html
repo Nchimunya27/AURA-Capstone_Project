@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CreateFlash - AURA</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="createflash.css" />
+    <script
+      src="https://kit.fontawesome.com/a076d05399.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <header class="top-header">
+      <h1 class="page-title">CreateFlash</h1>
+    </header>
+
+    <div class="main-container">
+      <div class="sidebar">
+        <div class="logo-container">
+          <span class="logo-text">AURA</span>
+        </div>
+
+        <div class="profile-section">
+          <div class="notification-icon">
+            <i class="fas fa-bell"></i>
+          </div>
+          <div class="profile-pic">
+            <img src="profile.jpg" alt="Profile Picture" />
+          </div>
+        </div>
+
+        <nav class="nav-menu">
+          <a href="#" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-book"></i>
+            <span>My Courses</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-calendar"></i>
+            <span>Schedule</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </a>
+        </nav>
+
+        <div class="about-section">
+          <a href="#" class="about-link">About Us</a>
+        </div>
+      </div>
+
+      <div class="content-area">
+        <div class="flashcard-creator">
+          <div class="creator-header">
+            <h2 class="creator-title">Create Flashcard</h2>
+            <button class="save-button">Save Card</button>
+          </div>
+
+          <div class="card-editor">
+            <div class="card-side front">
+              <h3 class="side-title">Front</h3>
+              <div class="editor-container">
+                <textarea
+                  class="card-content"
+                  placeholder="Enter the question or term..."
+                ></textarea>
+                <div class="editor-tools">
+                  <button class="tool-button">
+                    <i class="fas fa-image"></i>
+                    Add Image
+                  </button>
+                  <button class="tool-button">
+                    <i class="fas fa-microphone"></i>
+                    Add Audio
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-side back">
+              <h3 class="side-title">Back</h3>
+              <div class="editor-container">
+                <textarea
+                  class="card-content"
+                  placeholder="Enter the answer or definition..."
+                ></textarea>
+                <div class="editor-tools">
+                  <button class="tool-button">
+                    <i class="fas fa-image"></i>
+                    Add Image
+                  </button>
+                  <button class="tool-button">
+                    <i class="fas fa-microphone"></i>
+                    Add Audio
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-options">
+            <h3 class="options-title">Card Options</h3>
+            <div class="options-grid">
+              <div class="option-group">
+                <label class="option-label">Course</label>
+                <select class="option-select">
+                  <option>Select Course</option>
+                  <option>Web Development</option>
+                  <option>Data Structures</option>
+                  <option>Algorithms</option>
+                </select>
+              </div>
+
+              <div class="option-group">
+                <label class="option-label">Topic</label>
+                <select class="option-select">
+                  <option>Select Topic</option>
+                  <option>HTML</option>
+                  <option>CSS</option>
+                  <option>JavaScript</option>
+                </select>
+              </div>
+
+              <div class="option-group">
+                <label class="option-label">Difficulty</label>
+                <select class="option-select">
+                  <option>Easy</option>
+                  <option>Medium</option>
+                  <option>Hard</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="createflash.js"></script>
+  </body>
+</html>

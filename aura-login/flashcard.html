@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flashcard - AURA</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="flashcard.css" />
+    <script
+      src="https://kit.fontawesome.com/a076d05399.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <header class="top-header">
+      <h1 class="page-title">Flashcard</h1>
+    </header>
+
+    <div class="main-container">
+      <div class="sidebar">
+        <div class="logo-container">
+          <span class="logo-text">AURA</span>
+        </div>
+
+        <div class="profile-section">
+          <div class="notification-icon">
+            <i class="fas fa-bell"></i>
+          </div>
+          <div class="profile-pic">
+            <img src="profile.jpg" alt="Profile Picture" />
+          </div>
+        </div>
+
+        <nav class="nav-menu">
+          <a href="#" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="#" class="nav-item active">
+            <i class="fas fa-book"></i>
+            <span>My Courses</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-calendar"></i>
+            <span>Schedule</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </a>
+        </nav>
+
+        <div class="about-section">
+          <a href="#" class="about-link">About Us</a>
+        </div>
+      </div>
+
+      <div class="content-area">
+        <div class="course-header">
+          <div class="course-info">
+            <h2 class="course-title">Web Development</h2>
+            <p class="course-subtitle">Introduction to Web apps</p>
+          </div>
+
+          <div class="course-tabs">
+            <a href="#" class="tab-item">Overview</a>
+            <a href="#" class="tab-item">Notes</a>
+            <a href="#" class="tab-item">Quizzes</a>
+            <a href="#" class="tab-item active">Flashcards</a>
+          </div>
+        </div>
+
+        <h3 class="section-title">Flashcards</h3>
+
+        <div class="flashcard-container">
+          <div class="flashcard-actions">
+            <button class="time-set-btn">
+              <i class="fas fa-clock"></i>
+              Time Set
+            </button>
+
+            <button class="filter-btn">
+              <i class="fas fa-filter"></i>
+              Filter
+            </button>
+          </div>
+
+          <div class="flashcard">
+            <div class="card-topic">Web Development</div>
+            <div class="card-question">What does HTML Stand for?</div>
+
+            <div class="card-actions">
+              <button class="reset-btn">
+                <i class="fas fa-redo"></i>
+              </button>
+              <button class="show-answer-btn">Show Answer</button>
+              <button class="refresh-btn">
+                <i class="fas fa-sync"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-navigation">
+            <button class="nav-btn prev-btn">
+              <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="card-counter">7 / 85</div>
+            <button class="nav-btn next-btn">
+              <i class="fas fa-arrow-right"></i>
+            </button>
+
+            <div class="card-controls">
+              <button class="control-btn play-btn">
+                <i class="fas fa-play"></i>
+              </button>
+              <button class="control-btn shuffle-btn">
+                <i class="fas fa-random"></i>
+              </button>
+              <button class="control-btn settings-btn">
+                <i class="fas fa-cog"></i>
+              </button>
+              <button class="control-btn fullscreen-btn">
+                <i class="fas fa-expand"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-container">
+          <div class="stats-card">
+            <h4 class="stats-title">Today's Progress</h4>
+            <div class="stats-content">
+              <div class="stats-number">12</div>
+              <div class="stats-label">Cards Reviewed</div>
+            </div>
+          </div>
+
+          <div class="stats-card">
+            <h4 class="stats-title">Next Review</h4>
+            <div class="stats-content">
+              <div class="time-info">
+                <i class="far fa-clock"></i>
+                <span>In 4 hours</span>
+              </div>
+              <div class="arrow-icon">
+                <i class="fas fa-arrow-right"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="flashcard.js"></script>
+  </body>
+</html>
