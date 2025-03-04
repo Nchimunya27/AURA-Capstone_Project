@@ -83,13 +83,6 @@
                     </ul>
                 </nav>
                 
-                <!-- Theme Toggle Button (Simple Version) -->
-                <div class="theme-toggle-container">
-                    <button id="themeToggleBtn" class="theme-toggle-btn">
-                        <span class="toggle-icon day-icon">☀️</span>
-                        <span class="toggle-icon night-icon">🌙</span>
-                        <span class="toggle-text">Switch Theme</span>
-                    </button>
                 </div>
             </aside>
         </div>
@@ -202,7 +195,7 @@
     
     <script src="aboutus.js"></script>
     <script>
-        
+
         // Theme toggle functionality
         document.addEventListener('DOMContentLoaded', function() {
             const themeToggleBtn = document.getElementById('themeToggleBtn');
@@ -227,16 +220,7 @@
                 updateToggleButton(newTheme);
             });
             
-            // Helper function to update button appearance
-            function updateToggleButton(theme) {
-                if (theme === 'night') {
-                    themeToggleBtn.classList.add('night-mode');
-                    themeToggleBtn.querySelector('.toggle-text').textContent = 'Switch to Day';
-                } else {
-                    themeToggleBtn.classList.remove('night-mode');
-                    themeToggleBtn.querySelector('.toggle-text').textContent = 'Switch to Night';
-                }
-            }
+    
         });
     </script>
 </body>
