@@ -68,7 +68,7 @@
     transform: translateY(0);
 }
 
-/* Theme variables - from your provided CSS */
+/* Theme variables -*/
 :root {
     /* Light theme colors */
     --background-primary: ##eeede7;
@@ -368,9 +368,9 @@ h4 {
     color: white;
     margin-top: 60px;
     width: 100%;
-    margin-left: -20px; /* Counteract the padding from main-content-column */
-    padding-left: 20px; /* Add padding back to maintain proper content alignment */
-    box-sizing: content-box; /* Include padding in the width */
+    margin-left: -20px; /*
+    padding-left: 20px; 
+    box-sizing: content-box; */
 }
 
 .footer-content {
