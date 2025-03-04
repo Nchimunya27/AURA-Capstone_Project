@@ -1,10 +1,49 @@
-* {
+/* Hero Section with Bear */
+.hero-section {
+    display: flex;
+    gap: 30px;
+    margin: 30px 0 50px;
+    align-items: center;
+}
+
+.hero-content {
+    flex: 1.5;
+}
+
+.hero-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.aura-bear {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+@media (max-width: 992px) {
+    .hero-section {
+        flex-direction: column;
+    }
+    
+    .hero-image {
+        order: -1;
+        margin-bottom: 20px;
+    }
+    
+    .aura-bear {
+        max-width: 300px;
+    }
+}* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
+    font-family: Inter, sans-serif;
 }
 
+/* Animation and Fade Effects */
 @keyframes fadeInDown {
     from {
         opacity: 0;
@@ -27,94 +66,217 @@
     transform: translateY(0);
 }
 
-body {
-    background: linear-gradient(120deg, 
-        #f7aec2 0%, 
-        rgba(183, 177, 204, 1) 50%,
-        #a1cbdd 100%);
+/* Theme variables - from your provided CSS */
+:root {
+    /* Light theme colors */
+    --background-primary: #F6EDDA;
+    --background-secondary: #ffffff;
+    --background-tertiary: #eeede7;
+    --text-primary: #000000;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --accent-color: #5997ac;
+    --accent-hover: #4a7e8f;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    --stats-background: #f9dfe6;
+    
+    /* Sidebar gradient for day mode */
+    --sidebar-gradient: linear-gradient(180deg, #a1cbdd, #f7aec2);
+}
+
+/* Night Mode */
+[data-theme="night"] {
+    /* Night theme colors */
+    --background-primary: #121b3e;
+    --background-secondary: #4f5984;
+    --background-tertiary: #7090cb;
+    --text-primary: #ffffff;     
+    --text-secondary: #e2e8f0;   
+    --text-muted: #aaa8a6;       
+    --border-color: #7090cb;     
+    --accent-color: #7bb5f5;     
+    --accent-hover: #9ccaff;     
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    --stats-background: #4f5984;
+    
+    /* Sidebar gradient for night mode */
+    --sidebar-gradient: linear-gradient(180deg, #121b3e, #4f5984);
+}
+
+.dashboard {
+    display: flex;
     min-height: 100vh;
-    color: white;
-    padding: 2rem;
-    overflow-x: hidden;
+    position: relative;
+}
+
+/* Sidebar Styles */
+.sidebar-column {
+    width: 220px;
+    flex-shrink: 0;
+    background-image: var(--sidebar-gradient);
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.3s ease, background-image 0.3s ease;
+    border-right: 1px solid var(--border-color);
+    z-index: 1; /* Ensure sidebar is above other elements */
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 20px 15px;
+    position: relative;
+    z-index: 2;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 0 10px;
+}
+
+.logo-image {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.logo-text {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+.user-profile {
+    margin-bottom: 30px;
+    padding: 0 10px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.user-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+}
+
+.main-nav {
+    flex: 1;
+}
+
+.nav-list {
+    list-style-type: none;
+}
+
+.nav-item {
+    margin-bottom: 8px;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-weight: 500;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item.active .nav-link {
+    background-color: var(--accent-color);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Main Content Styles */
+.main-content-column {
+    flex: 1;
+    background-color: var(--background-primary);
+    overflow-y: auto;
+    position: relative;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
 }
 
 .container {
-    max-width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 30px 40px;
+    color: var(--text-primary);
 }
 
 .header {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    text-align: left;
-    animation: fadeInDown 0.8s ease forwards;
+    margin-bottom: 20px;
 }
 
-.logo {
-    width: 40px;
-    height: 40px;
+.header img {
+    width: 60px;
+    height: 60px;
+    margin-right: 15px;
 }
 
-.logo-text {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: white;
-}
-
+/* Content Styles */
 .content {
-    text-align: center;
+    padding: 20px 0;
 }
 
 h1 {
-    font-size: 3rem;
-    margin-bottom: 2rem;
-    font-weight: normal;
-    animation: fadeInDown 0.8s ease forwards;
-    animation-delay: 0.2s;
-    opacity: 0;
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    font-weight: 600;
 }
 
 h2 {
-    font-size: 2.2rem;
-    margin-bottom: 1rem;
-    font-weight: normal;
-    animation: fadeInDown 0.8s ease forwards;
-    animation-delay: 0.4s;
-    opacity: 0;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    font-weight: 500;
 }
 
-.subtitle {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    animation: fadeInDown 0.8s ease forwards;
-    animation-delay: 0.6s;
-    opacity: 0;
+h4 {
+    font-size: 1rem;
+    font-weight: normal;
+    opacity: 0.8;
+}
+
+.section {
+    margin-bottom: 40px;
 }
 
 .description {
     font-size: 1.1rem;
     line-height: 1.6;
-    margin-bottom: 3rem;
+    margin-bottom: 25px;
     max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    animation: fadeInDown 0.8s ease forwards;
-    animation-delay: 0.8s;
-    opacity: 0;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
+/* Team Grid Styles */
 .team-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 2rem;
-    margin: 3rem auto;
-    max-width: 1400px;
-    animation: fadeInDown 0.8s ease forwards;
-    animation-delay: 1s;
-    opacity: 0;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    margin: 40px 0;
 }
 
 .team-member {
@@ -125,48 +287,298 @@ h2 {
 }
 
 .team-member img {
-    width: 200px;
-    height: 200px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
-    margin-bottom: 1.5rem;
-    background-color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 15px;
     object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.3);
 }
 
-.team-member p {
-    font-size: 1.5rem;
+/* Feature Cards */
+.feature-cards {
+    display: flex;
+    gap: 20px;
+    margin: 30px 0;
 }
 
-.section {
-    margin-bottom: 4rem;
-    text-align: center;
+.feature-card {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+    border-radius: 8px;
+    padding: 20px;
+    flex: 1;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.section h3 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    font-weight: normal;
-    animation: fadeInDown 0.8s ease forwards;
-    animation-delay: 1.2s;
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.feature-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #444;
+}
+
+.feature-card p {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* Footer Styles */
+.footer {
+    background-color: rgba(183, 89, 124, 0.9);
+    padding: 30px 0;
+    color: white;
+    margin-top: 60px;
+    width: 100%;
+    margin-left: -20px; /* Counteract the padding from main-content-column */
+    padding-left: 20px; /* Add padding back to maintain proper content alignment */
+    box-sizing: content-box; /* Include padding in the width */
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+.footer-column {
+    flex: 1;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.footer-logo img {
+    margin-right: 10px;
+}
+
+.footer-column p {
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+.footer-links h3 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: white;
+}
+
+.footer-links ul {
+    list-style: none;
+}
+
+.footer-links li {
+    margin-bottom: 8px;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-links a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+/* Night mode for footer */
+[data-theme="night"] .footer {
+    background-color: #4f5984;
+}
+
+/* Stars for sidebar decoration */
+.star {
+    position: absolute;
+    border-radius: 50%;
+    background-color: white;
+    z-index: 1;
+    pointer-events: none;
+    /* Default: invisible in day mode */
     opacity: 0;
+    /* Transition for mode changes */
+    transition: opacity 0.5s ease;
 }
 
-.section .description {
-    animation: fadeInDown 0.8s ease forwards;
-    animation-delay: 1.4s;
-    opacity: 0;
+/* Star positions and sizes */
+.star-1 {
+    top: 20%;
+    left: 30%;
+    width: 3px;
+    height: 3px;
+    box-shadow: 0 0 3px 1px rgba(255,255,255,0.4);
 }
 
+.star-2 {
+    top: 30%;
+    left: 20%;
+    width: 2px;
+    height: 2px;
+    box-shadow: 0 0 2px 1px rgba(255,255,255,0.4);
+}
+
+.star-3 {
+    top: 15%;
+    right: 30%;
+    width: 4px;
+    height: 4px;
+    box-shadow: 0 0 4px 1px rgba(255,255,255,0.5);
+}
+
+.star-4 {
+    top: 40%;
+    right: 20%;
+    width: 2px;
+    height: 2px;
+    box-shadow: 0 0 2px 1px rgba(255,255,255,0.3);
+}
+
+.star-5 {
+    top: 50%;
+    left: 15%;
+    width: 3px;
+    height: 3px;
+    box-shadow: 0 0 3px 1px rgba(255,255,255,0.4);
+}
+
+.star-6 {
+    top: 65%;
+    right: 15%;
+    width: 3px;
+    height: 3px;
+    box-shadow: 0 0 3px 1px rgba(255,255,255,0.4);
+}
+
+/* Night Mode Styles */
+[data-theme="night"] {
+    color-scheme: dark;
+}
+
+[data-theme="night"] .sidebar-column {
+    background-color: #1f2937;
+}
+
+[data-theme="night"] .logo-text,
+[data-theme="night"] .user-name,
+[data-theme="night"] .nav-link {
+    color: #e5e7eb;
+}
+
+[data-theme="night"] .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="night"] .nav-item.active .nav-link {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Make stars visible in night mode */
+[data-theme="night"] .star {
+    opacity: 0.5;
+}
+
+/* Twinkling animation */
+@keyframes twinkle {
+    0% { opacity: 0.2; }
+    50% { opacity: 0.7; }
+    100% { opacity: 0.2; }
+}
+
+[data-theme="night"] .star-1 {
+    animation: twinkle 4s infinite ease-in-out;
+}
+
+[data-theme="night"] .star-2 {
+    animation: twinkle 5s infinite ease-in-out 0.5s;
+}
+
+[data-theme="night"] .star-3 {
+    animation: twinkle 3.5s infinite ease-in-out 1s;
+}
+
+[data-theme="night"] .star-4 {
+    animation: twinkle 4.5s infinite ease-in-out 1.5s;
+}
+
+[data-theme="night"] .star-5 {
+    animation: twinkle 4s infinite ease-in-out 2s;
+}
+
+[data-theme="night"] .star-6 {
+    animation: twinkle 3s infinite ease-in-out 2.5s;
+}
+
+/* Night Mode - Crescent Moon */
+[data-theme="night"] .sidebar-column::after {
+    content: "";
+    position: fixed;
+    top: 85px;
+    left: 160px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: transparent;
+    box-shadow: inset -10px 0 0 #E6E6E6;
+    z-index: 1;
+    pointer-events: none;
+    transform: rotate(-10deg);
+}
+
+/* Responsive Design */
 @media (max-width: 1200px) {
     .team-grid {
         grid-template-columns: repeat(2, 1fr);
-        max-width: 800px;
     }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+    .dashboard {
+        flex-direction: column;
+    }
+    
+    .sidebar-column {
+        width: 100%;
+        height: auto;
+    }
+    
+    .sidebar {
+        padding: 15px;
+    }
+    
     .team-grid {
         grid-template-columns: 1fr;
-        max-width: 400px;
+    }
+    
+    .feature-cards {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 2rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    .container {
+        padding: 15px;
     }
 }
