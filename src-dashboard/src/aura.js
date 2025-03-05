@@ -137,6 +137,10 @@ class Dashboard {
                 window.location.href = 'calendar.html';
                 break;
 
+            case 'About Us':
+                window.location.href = 'aboutus.html';
+                break;
+
         }
     }
 
