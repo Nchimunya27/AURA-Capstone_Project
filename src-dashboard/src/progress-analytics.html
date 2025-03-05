@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Progress Analytics - AURA Learning Dashboard</title>
+  <link rel="stylesheet" href="aura.css">
+  <link rel="stylesheet" href="analytics.css">
+  <script src="theme-init.js"></script>
+</head>
+<body>
+  <div class="dashboard">
+    <div class="body">
+      <div class="content-wrapper">
+        <div class="layout-container">
+          <!-- Sidebar - same as dashboard page -->
+          <div class="sidebar-column">
+            <aside class="sidebar">
+              <div class="logo-container">
+                <img loading="lazy" src="aura_head_logo.PNG" class="logo-image" alt="Aura logo" />
+                <div class="logo-text">AURA</div>
+              </div>
+              <div class="user-profile">
+                <div class="user-info">
+                  <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/9dbfea57b8a729137111c79719a1c4f8e5573959547359abb4b9cbb79dbfb1bf?apiKey=5b35dfe34207418398a5304200905620&" class="user-avatar" alt="User avatar" />
+                  <div class="user-details">
+                    <div class="user-name">Sarah Johnson</div>
+                  </div>
+                </div>
+              </div>
+              <nav class="main-nav">
+                <ul class="nav-list">
+                  <li class="nav-item">
+                    <div class="nav-link">
+                      <div class="nav-icon-wrapper">
+                        <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/5deccc49932436dfe94bb29496dfa738ad0db7b28471baa92df567c6713a85cb?placeholderIfAbsent=true" class="nav-icon" alt="Dashboard icon" />
+                      </div>
+                      <div class="nav-text">Dashboard</div>
+                    </div>
+                  </li>
+                  <li class="nav-item">
+                    <div class="nav-link">
+                      <div class="nav-icon-wrapper">
+                        <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/7e4782e6f1f5afa6efe604f03bf1347075561660a5ea58537e1a7208704514c4?apiKey=5b35dfe34207418398a5304200905620&" class="nav-icon" alt="My Courses icon" />
+                      </div>
+                      <div class="nav-text">My Courses</div>
+                    </div>
+                  </li>
+                  <li class="nav-item">
+                    <div class="nav-link">
+                      <div class="nav-icon-wrapper">
+                        <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/9447e2aa5c597dcd39d0a9bc7b4cabdf945a9cdbd8076eff279bc84f66090d2d?apiKey=5b35dfe34207418398a5304200905620&" class="nav-icon" alt="Calendar icon" />
+                      </div>
+                      <div class="nav-text">Calendar</div>
+                    </div>
+                  </li>
+                  <li class="nav-item active">
+                    <div class="nav-link">
+                      <div class="nav-icon-wrapper">
+                        <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/6d682b869a1b0ede1e946d876b2ff1a8b81f16cec5c13220a34e44e9fc9e50eb?apiKey=5b35dfe34207418398a5304200905620&" class="nav-icon" alt="Progress Analytics icon" />
+                      </div>
+                      <div class="nav-text">Progress Analytics</div>
+                    </div>
+                  </li>
+                  <li class="nav-item">
+                    <div class="nav-link">
+                      <div class="nav-icon-wrapper">
+                        <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/be475ce0c5161593bab6cf3e27d8c506d27699bd1c854b69aceabe63f7401887?apiKey=5b35dfe34207418398a5304200905620&" class="nav-icon" alt="Settings icon" />
+                      </div>
+                      <div class="nav-text">Settings</div>
+                    </div>
+                  </li>
+                  <li class="nav-item">
+                    <div class="nav-link">
+                      <div class="nav-icon-wrapper">
+                        <img loading="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA6ElEQVR4nN2UWwrCMBBFDxW7ALsb0TUoPtotqXUXii7JanURPv4jA/FHEzO2+fLChRIm95RJMvDvSoEC2AEV8LCu7FpuaxppClwAE/AZmPwS3AHWimDz5hJINIAm4cZ6qWmLaemxLzxV9LwHZIGa2nfwheLvMgVAPHcB9hHaY6y3LsApIqByAW6KjX1goKiTrA/dFRtfCtVdcegYEXBwAXYRARsXII8ImLkAqR1c3zYOgKHioXXxaBLhio4IqGwRvkAhGbmrhpM04QeNbT9DwbWmLT517eCS2SJ3Wx6jWL5lTW6L90D/Q08RqyheiFaw0QAAAABJRU5ErkJggg==" alt="info"></img>
+                      </div>
+                      <div class="nav-text">About Us</div>
+                    </div>
+                  </li>
+                </ul>
+              </nav>
+            </aside>
+          </div>
+          
+          <!-- Main Content - Analytics Page -->
+          <div class="main-content-column">
+            <div class="main-content">
+              <main class="analytics-main">
+                <header class="dashboard-header">
+                  <div class="header-content">
+                    <div class="welcome-section">
+                      <div class="welcome-text">Progress Analytics</div>
+                    </div>
+                  </div>
+                </header>
+                
+                <!-- Motivational Quote Section -->
+                <div class="motivational-quote-container">
+                  <!-- Will be populated by JavaScript -->
+                </div>
+                
+                <section class="analytics-section">
+                  <h2 class="analytics-heading">Overall Course Analytics</h2>
+                  
+                  <!-- KPI Metrics Row -->
+                  <div class="analytics-kpi-row">
+                    <div class="kpi-card">
+                      <div class="kpi-title">Course Progress</div>
+                      <div class="kpi-value">75%</div>
+                      <div class="kpi-subtext">6 of 8 modules completed</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                      <div class="kpi-title">Current Streak</div>
+                      <div class="kpi-value">15</div>
+                      <div class="kpi-subtext">days in a row</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                      <div class="kpi-title">Longest Streak</div>
+                      <div class="kpi-value">32</div>
+                      <div class="kpi-subtext">days</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                      <div class="kpi-title">Study Time</div>
+                      <div class="kpi-value">24h</div>
+                      <div class="kpi-subtext">total hours</div>
+                    </div>
+                  </div>
+                  
+                  <!-- Charts Row -->
+                  <div class="analytics-charts-row">
+                    <!-- Streak Over Time Chart -->
+                    <div class="chart-card">
+                      <div class="chart-header">
+                        <h3>Streak Over Time</h3>
+                      </div>
+                      <div class="chart-container">
+                        <canvas id="streakLineChart"></canvas>
+                      </div>
+                    </div>
+                    
+                    <!-- Quiz Status Chart -->
+                    <div class="chart-card">
+                      <div class="chart-header">
+                        <h3>Quiz Status</h3>
+                      </div>
+                      <div class="chart-container" style="display: flex; justify-content: center; align-items: center;">
+                        <canvas id="quizStatusChart" style="max-width: 200px; max-height: 200px;"></canvas>
+                      </div>
+                      <div class="chart-legend" style="margin-top: 10px; text-align: center;">
+                        <div class="legend-item">
+                          <span class="legend-color" style="background-color: var(--accent-color);"></span>
+                          <span class="legend-text">Completed (7/10)</span>
+                        </div>
+                        <div class="legend-item">
+                          <span class="legend-color" style="background-color: #e5e7eb;"></span>
+                          <span class="legend-text">Pending (3/10)</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Second Row of Charts -->
+                  <div class="analytics-charts-row">
+                    <!-- Activity by Day Chart -->
+                    <div class="chart-card">
+                      <div class="chart-header">
+                        <h3>Activity by Day of Week</h3>
+                      </div>
+                      <div class="chart-container">
+                        <canvas id="activityBarChart"></canvas>
+                      </div>
+                    </div>
+                    
+                    <!-- Skill Coverage Chart -->
+                    <div class="chart-card">
+                      <div class="chart-header">
+                        <h3>Skill Coverage</h3>
+                      </div>
+                      <div class="chart-container">
+                        <canvas id="skillCoverageChart"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Recent Quizzes Table -->
+                  <div class="chart-card full-width">
+                    <div class="chart-header">
+                      <h3>Recent Quiz Performance</h3>
+                    </div>
+                    <table class="analytics-table">
+                      <thead>
+                        <tr>
+                          <th>Quiz Name</th>
+                          <th>Date Completed</th>
+                          <th>Score</th>
+                          <th>Time Spent</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Variables Quiz</td>
+                          <td>April 1, 2025</td>
+                          <td>90%</td>
+                          <td>15 min</td>
+                          <td><span class="status-badge completed">Completed</span></td>
+                        </tr>
+                        <tr>
+                          <td>Functions Quiz</td>
+                          <td>April 3, 2025</td>
+                          <td>85%</td>
+                          <td>20 min</td>
+                          <td><span class="status-badge completed">Completed</span></td>
+                        </tr>
+                        <tr>
+                          <td>Loops Quiz</td>
+                          <td>April 6, 2025</td>
+                          <td>75%</td>
+                          <td>25 min</td>
+                          <td><span class="status-badge completed">Completed</span></td>
+                        </tr>
+                        <tr>
+                          <td>Arrays Quiz</td>
+                          <td>-</td>
+                          <td>-</td>
+                          <td>-</td>
+                          <td><span class="status-badge pending">Pending</span></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              </main>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="aura.js"></script>
+  <script src="analytics-data-adapter.js"></script>
+  <script src="motivational-quotes.js"></script>
+  <script src="analytics.js"></script>
+  <script>
+    // Initialize analytics when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof initializeAnalytics === 'function') {
+        initializeAnalytics();
+      }
+      
+      // Make sure the Progress Analytics nav item is active
+      const navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.querySelector('.nav-text').textContent.trim() === 'Progress Analytics') {
+          item.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
