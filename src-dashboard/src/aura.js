@@ -136,6 +136,10 @@ class Dashboard {
             case 'Calendar':
                 window.location.href = 'calendar.html';
                 break;
+                
+            case 'Progress Analytics':
+                    window.location.href = 'progress-analytics.html';
+                    break;
 
         }
     }
@@ -486,3 +490,106 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', function() {
     initializeNavigation();
 });
+
+// Progress Analytics navigation handler - works from any page
+document.addEventListener('DOMContentLoaded', function() {
+    // Get elements
+    const navItems = document.querySelectorAll('.nav-item');
+    const dashboardContent = document.querySelector('.dashboard > .body > .content-wrapper > .layout-container > .main-content-column');
+    const sidebarColumn = document.querySelector('.dashboard > .body > .content-wrapper > .layout-container > .sidebar-column');
+    const progressAnalyticsPage = document.querySelector('.progress-analytics-page');
+    
+    // Check if Progress Analytics page exists, if not, add it to the DOM
+    let analyticsPageExists = !!progressAnalyticsPage;
+    let addedAnalyticsPage = null;
+    
+    if (!analyticsPageExists) {
+      console.log('Progress Analytics page not found in DOM - will create if needed');
+    }
+    
+    
+    
+    // Add event listeners to other nav items to handle returning to dashboard
+    navItems.forEach(navItem => {
+      // Skip the Progress Analytics item
+      if (navItem !== progressAnalyticsItem) {
+        navItem.addEventListener('click', function() {
+          // Only handle dashboard display, don't interfere with original navigation
+          const analytics = progressAnalyticsPage || addedAnalyticsPage;
+          if (analytics && analytics.style.display === 'block') {
+            console.log('Returning to dashboard from Analytics');
+            if (dashboardContent) {
+              dashboardContent.style.display = 'block';
+            }
+            analytics.style.display = 'none';
+          }
+        });
+      }
+    });
+    
+    // Override the Dashboard.handleNavigation for Progress Analytics
+    setTimeout(function() {
+      if (window.dashboard && typeof dashboard.handleNavigation === 'function') {
+        const originalHandleNavigation = dashboard.handleNavigation;
+        
+        dashboard.handleNavigation = function(event) {
+          const clickedItem = event.currentTarget;
+          const navText = clickedItem.querySelector('.nav-text').textContent.trim();
+          
+          // Only call original handler if NOT Progress Analytics
+          if (navText !== 'Progress Analytics') {
+            originalHandleNavigation.call(dashboard, event);
+          }
+        };
+        
+        console.log('Dashboard navigation handler modified');
+      }
+    }, 200);
+    
+    // Check if we need to show analytics based on localStorage flag
+    // This handles navigation from other pages
+    if (localStorage.getItem('showProgressAnalytics') === 'true' && dashboardContent) {
+      console.log('Found flag to show Progress Analytics');
+      localStorage.removeItem('showProgressAnalytics');
+      
+      setTimeout(function() {
+        if (progressAnalyticsItem) {
+          // Simulate click on Progress Analytics
+          progressAnalyticsItem.click();
+        }
+      }, 300); // Allow time for dashboard to initialize
+    }
+  });
+    
+    // Override the Dashboard.handleNavigation for Progress Analytics
+    setTimeout(function() {
+      if (window.dashboard && typeof dashboard.handleNavigation === 'function') {
+        const originalHandleNavigation = dashboard.handleNavigation;
+        
+        dashboard.handleNavigation = function(event) {
+          const clickedItem = event.currentTarget;
+          const navText = clickedItem.querySelector('.nav-text').textContent.trim();
+          
+          // Only call original handler if NOT Progress Analytics
+          if (navText !== 'Progress Analytics') {
+            originalHandleNavigation.call(dashboard, event);
+          }
+        };
+        
+        console.log('Dashboard navigation handler modified');
+      }
+    }, 200);
+    
+    // Check if we need to show analytics based on localStorage flag
+    // This handles navigation from other pages
+    if (localStorage.getItem('showProgressAnalytics') === 'true' && dashboardContent) {
+      console.log('Found flag to show Progress Analytics');
+      localStorage.removeItem('showProgressAnalytics');
+      
+      setTimeout(function() {
+        if (progressAnalyticsItem) {
+          // Simulate click on Progress Analytics
+          progressAnalyticsItem.click();
+        }
+      }, 300); // Allow time for dashboard to initialize
+    }
