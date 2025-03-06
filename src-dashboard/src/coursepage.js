@@ -393,6 +393,18 @@
     }, 1500);
   });
 
+  // Add event listeners for all practice quiz buttons
+  document.addEventListener('DOMContentLoaded', function() {
+    const practiceQuizButtons = document.querySelectorAll('.practice-quiz-btn, .practice-btn');
+    
+    practiceQuizButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Navigate to quiz.html when button is clicked
+            window.location.href = 'quiz.html';
+        });
+    });
+  });
+
   // Initialize app
   document.addEventListener("DOMContentLoaded", () => {
     initializeTabs();
