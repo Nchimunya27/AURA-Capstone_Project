@@ -1,6 +1,5 @@
 const express = require('express');
 const path = require("path");
-const bcrypt = require("bcrypt");
 const collection = require("./config");
 
 
@@ -9,7 +8,8 @@ const app = express();
 //convert data into json format
 app.use(express.json());
 
-app.use(urlencoded({extended: false}));
+app.use(express.urlencoded({extended: false}));
+
 
 
 
@@ -46,7 +46,7 @@ app.post("/signup", async (req, res) =>{
     console.log(userdata);
 })
 
-const port = 5000;
+const port = 9999;
 app.listen(port, () => {
     console.log(`Server running on Port: ${port}`);
 });
