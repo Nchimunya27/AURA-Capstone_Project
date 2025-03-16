@@ -266,34 +266,60 @@
                         <div class="tab" data-tab="appearance">Appearance</div>
                       </div>
                       
-                      <!-- User Information Section (Always visible initially) -->
-                      <div class="settings-section active" id="contact-info">
-                        <h2 class="section-title">User Information</h2>
-                        <div class="settings-form">
-                          <div class="form-row">
-                            <div class="form-group">
-                              <label for="firstName">First Name</label>
-                              <input type="text" id="firstName" value="John" class="form-control">
-                            </div>
-                            <div class="form-group">
-                              <label for="lastName">Last Name</label>
-                              <input type="text" id="lastName" value="Doe" class="form-control">
-                            </div>
-                          </div>
-                          <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" value="you@example.com" class="form-control">
-                          </div>
-                          <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password" id="password" value="••••••••" class="form-control">
-                          </div>
-                          <div class="form-actions">
-                            <button id="changePasswordBtn" class="btn-secondary">Change Password</button>
-                            <button id="saveChangesBtn" class="btn-primary">Save Changes</button>
-                          </div>
-                        </div>
-                      </div>
+                     <!-- User Information Section with side-by-side profile picture -->
+<div class="settings-section active" id="contact-info">
+  <h2 class="section-title">User Information</h2>
+  <div class="settings-form">
+    <!-- Two-column layout container -->
+    <div class="form-layout">
+      <!-- Left column - Form fields -->
+      <div class="form-fields-column">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" value="John" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" value="Doe" class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" value="you@example.com" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" value="••••••••" class="form-control">
+        </div>
+      </div>
+      
+      <!-- Right column - Profile picture -->
+      <div class="profile-column">
+        <div class="form-group">
+          <label for="profilePicture">Profile Picture</label>
+          <div class="profile-picture-container">
+            <div class="current-profile-picture">
+              <img src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/9dbfea57b8a729137111c79719a1c4f8e5573959547359abb4b9cbb79dbfb1bf?apiKey=5b35dfe34207418398a5304200905620&" alt="Current profile picture" class="profile-preview">
+            </div>
+            <div class="profile-upload-controls">
+              <input type="file" id="profilePictureUpload" accept="image/*" class="file-input">
+              <label for="profilePictureUpload" class="btn-secondary upload-btn">Choose New Picture</label>
+              <div class="upload-hint">JPEG, PNG or GIF, max 2MB</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Buttons at the bottom -->
+    <div class="form-actions">
+      <button id="changePasswordBtn" class="btn-secondary">Change Password</button>
+      <button id="saveChangesBtn" class="btn-primary">Save Changes</button>
+    </div>
+  </div>
+</div>
+                        
                       <!-- Appearance Section with Bear Mascot Theme Selector -->
                   <div class="settings-section" id="appearance">
                     <h2 class="section-title">Theme Preferences</h2>

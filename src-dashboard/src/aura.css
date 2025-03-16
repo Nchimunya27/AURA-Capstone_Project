@@ -1046,6 +1046,123 @@ label {
     background-color: var(--background-tertiary);
     border-color: var(--accent-color);
 }
+/* ===============================
+   PROFILE LAYOUT STYLES
+   =============================== */
+
+/* Modified two-column layout with improved spacing */
+.form-layout {
+    display: flex;
+    justify-content: space-between; /* This pushes the columns apart */
+    margin-bottom: 25px;
+    position: relative; /* For absolute positioning if needed */
+  }
+  
+  .form-fields-column {
+    width: 48%; /* Further reduced width to create more space */
+  }
+  
+  .profile-column {
+    width: 40%; /* Increased width */
+    padding-top: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 2%; /* Add some right margin */
+  }
+  
+  /* Center the "Profile Picture" label */
+  .profile-column label {
+    text-align: center;
+    width: 100%;
+    display: block;
+    margin-bottom: 12px;
+  }
+  
+  /* Profile picture styling improvements */
+  .profile-picture-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 15px;
+    width: 100%;
+  }
+  
+  .current-profile-picture {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .profile-preview {
+    width: 150px; /* Made slightly larger */
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--accent-color, #64b5f6);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .profile-upload-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .file-input {
+    display: none;
+  }
+  
+  .upload-btn {
+    display: inline-block;
+    padding: 10px 16px;
+    cursor: pointer;
+    text-align: center;
+    margin-bottom: 8px;
+    background-color: var(--accent-color, #64b5f6);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    width: 90%;
+    max-width: 200px;
+  }
+  
+  .upload-btn:hover {
+    background-color: var(--accent-hover, #4a7e8f);
+  }
+  
+  .upload-hint {
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+  }
+  
+  /* Form actions styling */
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+    width: 48%; /* Match the width of the form column */
+  }
+  
+  /* Responsive layout */
+  @media (max-width: 768px) {
+    .form-layout {
+      flex-direction: column;
+    }
+    
+    .form-fields-column,
+    .profile-column {
+      width: 100%;
+      margin-right: 0;
+    }
+    
+    .form-actions {
+      width: 100%;
+    }
+  }
 
 /* === THEME MODE SELECTOR STYLES === */
 .theme-mode-options {
@@ -1291,4 +1408,25 @@ label {
     .mode-mascot {
         padding-top: 56.25%; /* 16:9 aspect ratio for mobile */
     }
+
+    .profile-picture-container {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+      }
+      
+      .current-profile-picture {
+        margin-right: 20px;
+      }
+      
+      .profile-preview {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--accent-color, #64b5f6);
+      }
+      
+   
+
 }
