@@ -19,18 +19,18 @@
                     <div id="createAccountForm" class="form-view active">
                         <img src="aura_head_logo.PNG" alt="Aura Waving Logo" height="100" width="100">
                         <h2>Create Account</h2>
-                        <form>
+                        <form id="signupForm">
                             <div class="form-group">
                                 <label for="newEmail">Email Address</label>
-                                <input type="email" id="newEmail" placeholder="Enter your email">
+                                <input type="email" id="newEmail" placeholder="Enter your email" required>
                             </div>
                             <div class="form-group">
                                 <label for="newUsername">Username</label>
-                                <input type="text" id="newUsername" placeholder="Choose a username">
+                                <input type="text" id="newUsername" placeholder="Choose a username" required>
                             </div>
                             <div class="form-group">
                                 <label for="newPassword">Password</label>
-                                <input type="password" id="newPassword" placeholder="Create a password">
+                                <input type="password" id="newPassword" placeholder="Create a password" required>
                                 <div class="password-hint">Must be a combination of minimum 8 letters, numbers, and symbols.</div>
                             </div>
                             <button type="submit" class="login-button">Create Account</button>
@@ -49,7 +49,7 @@
                                 </button>
                             </div>
                             <div class="switch-view-link">
-                                Already have an account? <a onclick="toggleView('login')">Log in</a>
+                                Already have an account? <a href="#" onclick="toggleView('login')">Log in</a>
                             </div>
                         </form>
                     </div>
@@ -58,14 +58,14 @@
                     <div id="loginForm" class="form-view">
                         <img src="aura_head_logo.PNG" alt="Aura Waving Logo" height="100" width="100">
                         <h2>Log In</h2>
-                        <form>
+                        <form id="loginInputForm">
                             <div class="form-group">
                                 <label for="username">Username</label>
-                                <input type="text" id="username" placeholder="Enter your username">
+                                <input type="text" id="username" placeholder="Enter your username" required>
                             </div>
                             <div class="form-group">
                                 <label for="password">Password</label>
-                                <input type="password" id="password" placeholder="Enter your password">
+                                <input type="password" id="password" placeholder="Enter your password" required>
                             </div>
                             <div class="remember-forgot">
                                 <div class="remember-me">
@@ -90,7 +90,7 @@
                                 </button>
                             </div>
                             <div class="switch-view-link">
-                                Don't have an account? <a onclick="toggleView('create')">Create one</a>
+                                Don't have an account? <a href="#" onclick="toggleView('create')">Create one</a>
                             </div>
                         </form>
                     </div>
@@ -102,7 +102,11 @@
         </div>
     </div>
 
+    <!-- Status Message  -->
+    <div id="statusMessage" class="status-message"></div>
+
     <!-- Link to JS -->
     <script src="login.js"></script>
+
 </body>
 </html>

@@ -22,6 +22,7 @@ class Dashboard {
         this.updateDate = this.updateDate.bind(this);
         this.updateStreak = this.updateStreak.bind(this);
         this.handleNavigation = this.handleNavigation.bind(this);
+        this.handleLogout = this.handleLogout.bind(this);
 
         // Initialize the dashboard
         this.init();
@@ -40,7 +41,56 @@ class Dashboard {
         this.initializeCourseCards();
         this.initializeQuickStats();
         this.setupPeriodicUpdates();
+        this.setupLogoutButton();
     }
+
+    setupLogoutButton() {
+        const logoutButton = document.getElementById('logoutButton');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', this.handleLogout);
+        }
+    }
+
+    async handleLogout() {
+        try {
+            // Remove current user from session storage
+            sessionStorage.removeItem('currentUser');
+            
+            // Check if user was remembered
+            let savedUser = null;
+            
+            try {
+                const cache = await caches.open('aura-user-cache');
+                const response = await cache.match('/currentUser');
+                
+                if (response) {
+                    savedUser = await response.json();
+                }
+            } catch (error) {
+                console.log('Cache retrieval failed, using localStorage', error);
+                const localData = localStorage.getItem('currentUser');
+                savedUser = localData ? JSON.parse(localData) : null;
+            }
+            
+            // Only remove from cache/localStorage if user is not "remembered"
+            if (savedUser && !savedUser.remembered) {
+                try {
+                    const cache = await caches.open('aura-user-cache');
+                    await cache.delete('/currentUser');
+                } catch (error) {
+                    console.log('Cache deletion failed', error);
+                }
+                localStorage.removeItem('currentUser');
+            }
+            
+            // Redirect to login page
+            window.location.href = '../../aura-login/login.html';
+        } catch (error) {
+            console.error('Error during logout:', error);
+        }
+    }
+
+
 
     /**
      * Update the current date display
@@ -511,8 +561,6 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('Progress Analytics page not found in DOM - will create if needed');
     }
     
-    
-    
     // Add event listeners to other nav items to handle returning to dashboard
     navItems.forEach(navItem => {
       // Skip the Progress Analytics item
@@ -563,37 +611,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }, 300); // Allow time for dashboard to initialize
     }
-  });
-    
-    // Override the Dashboard.handleNavigation for Progress Analytics
-    setTimeout(function() {
-      if (window.dashboard && typeof dashboard.handleNavigation === 'function') {
-        const originalHandleNavigation = dashboard.handleNavigation;
-        
-        dashboard.handleNavigation = function(event) {
-          const clickedItem = event.currentTarget;
-          const navText = clickedItem.querySelector('.nav-text').textContent.trim();
-          
-          // Only call original handler if NOT Progress Analytics
-          if (navText !== 'Progress Analytics') {
-            originalHandleNavigation.call(dashboard, event);
-          }
-        };
-        
-        console.log('Dashboard navigation handler modified');
-      }
-    }, 200);
-    
-    // Check if we need to show analytics based on localStorage flag
-    // This handles navigation from other pages
-    if (localStorage.getItem('showProgressAnalytics') === 'true' && dashboardContent) {
-      console.log('Found flag to show Progress Analytics');
-      localStorage.removeItem('showProgressAnalytics');
-      
-      setTimeout(function() {
-        if (progressAnalyticsItem) {
-          // Simulate click on Progress Analytics
-          progressAnalyticsItem.click();
-        }
-      }, 300); // Allow time for dashboard to initialize
-    }
+});
