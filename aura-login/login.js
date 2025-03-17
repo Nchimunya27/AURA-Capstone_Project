@@ -213,7 +213,7 @@ async function isLoggedIn() {
     
     // If not in session, check cache for remembered user
     currentUser = await getData('currentUser');
-    return !!currentUser; // Convert to boolean
+    return !!currentUser; 
 }
 
 // Protect page function 
