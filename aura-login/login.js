@@ -72,17 +72,29 @@ async function removeData(key) {
 // Initialize the users array
 let users = [];
 
-// Show the status message function
-//function showStatusMessage(message, isError = false) {
-   // const statusElement = document.getElementById('statusMessage');
-    //statusElement.textContent = message;
-    //statusElement.className = 'status-message ' + (isError ? 'error' : 'success');
+// Show the status message function 
+function showStatusMessage(message, isError = false) {
+    // Create a status message element if it doesn't exist
+    let statusElement = document.getElementById('statusMessage');
+    
+    if (!statusElement) {
+        statusElement = document.createElement('div');
+        statusElement.id = 'statusMessage';
+        document.body.appendChild(statusElement);
+    }
+    
+    statusElement.textContent = message;
+    statusElement.className = 'status-message ' + (isError ? 'error' : 'success');
+    
+    // Make sure the element is visible
+    statusElement.style.display = 'block';
     
     // Auto hide after 3 seconds
-   // setTimeout(() => {
-    //    statusElement.className = 'status-message';
-   // }, 3000);
-//}
+    setTimeout(() => {
+        statusElement.className = 'status-message';
+        statusElement.style.display = 'none';
+    }, 3000);
+}
 
 // Handle form submissions
 document.addEventListener('DOMContentLoaded', async function() {
@@ -103,18 +115,18 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         // Validation for input
         if (!email || !username || !password) {
-            console.log('Please fill out all fields', true);
+            showStatusMessage('Please fill out all fields', true);
             return;
         }
         
         if (password.length < 8) {
-            console.log('Password must be at least 8 characters long', true);
+            showStatusMessage('Password must be at least 8 characters long', true);
             return;
         }
         
         // Check if username already exists
         if (users.some(user => user.username === username)) {
-            console.log('Username already exists. Please choose a different one.', true);
+            showStatusMessage('Username already exists. Please choose a different one.', true);
             return;
         }
         
@@ -128,7 +140,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Save to cache
         await saveData('users', users);
         
-        console.log('Account created successfully! You can now log in.');
+        showStatusMessage('Account created successfully! You can now log in.');
         
         // Clear the form
         createAccountForm.reset();
@@ -138,51 +150,50 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
     
     // Login Form Submission
-const loginForm = document.getElementById('loginInputForm');
-loginForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    const rememberMe = document.getElementById('remember').checked;
-    
-    console.log("Login attempt for:", username);
-    
-    // Find user in the array
-    const user = users.find(user => user.username === username && user.password === password);
-    
-    if (user) {
-        console.log("User found, authentication successful");
+    const loginForm = document.getElementById('loginInputForm');
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
         
-        // Store user info
-        const userData = {
-            username: username,
-            email: user.email,
-            remembered: rememberMe,
-            lastLogin: new Date().toISOString()
-        };
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const rememberMe = document.getElementById('remember').checked;
         
-        // If remember me is checked, save for longer term
-        if (rememberMe) {
-            await saveData('currentUser', userData);
+        console.log("Login attempt for:", username);
+        
+        // Find user in the array
+        const user = users.find(user => user.username === username && user.password === password);
+        
+        if (user) {
+            console.log("User found, authentication successful");
+            
+            // Store user info
+            const userData = {
+                username: username,
+                email: user.email,
+                remembered: rememberMe,
+                lastLogin: new Date().toISOString()
+            };
+            
+            // If remember me is checked, save for longer term
+            if (rememberMe) {
+                await saveData('currentUser', userData);
+            } else {
+                // For session only, use sessionStorage directly
+                sessionStorage.setItem('currentUser', JSON.stringify(userData));
+                // Remove any remembered user from cache
+                await removeData('currentUser');
+            }
+            
+            showStatusMessage('Login successful!');
+            
+            setTimeout(() => {
+                window.location.href = '../../src-dashboard/src/aura.html';
+            }, 1500);
         } else {
-            // For session only, use sessionStorage directly
-            sessionStorage.setItem('currentUser', JSON.stringify(userData));
-            // Remove any remembered user from cache
-            await removeData('currentUser');
+            console.log("Authentication failed: Invalid credentials");
+            showStatusMessage('Invalid username or password', true);
         }
-        
-        showStatusMessage('Login successful!');
-
-      
-        
-        setTimeout(() => {
-            window.location.href = '../../src-dashboard/src/aura.html';
-        }, 1500);
-    } else {
-        console.log("Authentication failed: Invalid credentials");
-        showStatusMessage('Invalid username or password', true);
-    }
+    });
 });
 
 // Function to check if user is logged in
@@ -199,7 +210,6 @@ async function checkLoginStatus() {
     if (currentUser) {
         // Display welcome message
         showStatusMessage(`Welcome back, ${currentUser.username}!`);
-        
     }
 }
 
@@ -244,4 +254,3 @@ async function logout() {
         window.location.href = 'login.html';
     }, 1500);
 }
-});
