@@ -73,16 +73,16 @@ async function removeData(key) {
 let users = [];
 
 // Show the status message function
-function showStatusMessage(message, isError = false) {
-    const statusElement = document.getElementById('statusMessage');
-    statusElement.textContent = message;
-    statusElement.className = 'status-message ' + (isError ? 'error' : 'success');
+//function showStatusMessage(message, isError = false) {
+   // const statusElement = document.getElementById('statusMessage');
+    //statusElement.textContent = message;
+    //statusElement.className = 'status-message ' + (isError ? 'error' : 'success');
     
     // Auto hide after 3 seconds
-    setTimeout(() => {
-        statusElement.className = 'status-message';
-    }, 3000);
-}
+   // setTimeout(() => {
+    //    statusElement.className = 'status-message';
+   // }, 3000);
+//}
 
 // Handle form submissions
 document.addEventListener('DOMContentLoaded', async function() {
@@ -103,18 +103,18 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         // Validation for input
         if (!email || !username || !password) {
-            showStatusMessage('Please fill out all fields', true);
+            console.log('Please fill out all fields', true);
             return;
         }
         
         if (password.length < 8) {
-            showStatusMessage('Password must be at least 8 characters long', true);
+            console.log('Password must be at least 8 characters long', true);
             return;
         }
         
         // Check if username already exists
         if (users.some(user => user.username === username)) {
-            showStatusMessage('Username already exists. Please choose a different one.', true);
+            console.log('Username already exists. Please choose a different one.', true);
             return;
         }
         
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Save to cache
         await saveData('users', users);
         
-        showStatusMessage('Account created successfully! You can now log in.');
+        console.log('Account created successfully! You can now log in.');
         
         // Clear the form
         createAccountForm.reset();
