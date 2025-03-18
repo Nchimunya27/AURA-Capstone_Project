@@ -8,7 +8,7 @@
 }
 
 body {
-    background-color: #C8B3E1;
+    background-image: linear-gradient(180deg, #a1cbdd, #f7aec2);
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -49,7 +49,7 @@ body {
 
 .image-container {
     flex: 1;
-    background: #f8f9fa;
+    background: #eeede7;
     display: flex;
     align-items: center;
     justify-content: center;
