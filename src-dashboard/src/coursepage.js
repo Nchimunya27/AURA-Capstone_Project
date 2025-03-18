@@ -1,15 +1,13 @@
-// Main JavaScript functionality
+
 (function () {
   // DOM Elements
-  const todoItems = document.querySelectorAll(
-    '.todo-item input[type="checkbox"]'
-  );
+  const todoItems = document.querySelectorAll('.todo-item input[type="checkbox"]');
   const uploadBtn = document.querySelector(".upload-btn");
   const navButtons = document.querySelectorAll(".nav-button");
   const flashcardItems = document.querySelectorAll(".flashcard");
   const browseBtn = document.querySelector(".browse-btn");
 
-  // Tab content sections - reference the main content sections
+  // Tab content sections 
   const tabContents = {
     overview: document.querySelector(".content-section"),
     notes: document.getElementById("notes-tab"),
@@ -17,31 +15,194 @@
     flashcards: document.getElementById("flashcards-tab")
   };
 
+  // ======= COURSE LOADING FUNCTIONALITY =======
+  
+  // Load course data when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    loadCourseData();
+    
+    // Initialize the rest of the UI
+    initializeTabs();
+    initializeFlashcardTab();
+    initializeQuizzesTab();
+    initializeDownloads();
+    initializeDragDrop();
+    animateProgress();
+  });
+  
+  // Function to load course data
+  function loadCourseData() {
+    // Get the course ID from URL query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const courseId = urlParams.get('id');
+    
+    console.log("Loading data for course ID:", courseId);
+    
+    // Get course data from localStorage
+    const courseData = localStorage.getItem('currentCourse');
+    
+    if (courseData) {
+      const course = JSON.parse(courseData);
+      console.log("Loaded course data:", course);
+      
+      // Verify this is the correct course
+      if (!courseId || course.id === courseId) {
+        // Update page title
+        document.title = course.name + " - AURA Learning Platform";
+        
+        // Update course title and subtitle
+        const titleElement = document.querySelector('.course-title h1');
+        const subtitleElement = document.querySelector('.course-title h2');
+        
+        if (titleElement && course.name) {
+          titleElement.textContent = course.name;
+        }
+        
+        if (subtitleElement) {
+          subtitleElement.textContent = course.subtitle || "Introduction to " + course.name;
+        }
+        
+        // Update progress components if present
+        const progressFill = document.querySelector('.progress-fill');
+        if (progressFill && course.knowledgeLevel) {
+          const knowledgeValue = parseInt(course.knowledgeLevel);
+          if (!isNaN(knowledgeValue)) {
+            progressFill.style.width = knowledgeValue + '%';
+          }
+        }
+        
+        // Update quiz dates if present
+        const quizDate = document.querySelector('.quiz-date');
+        if (quizDate && course.examDate) {
+          quizDate.textContent = "Next Quiz: " + course.examDate;
+        }
+        
+        // Update progress percentage display
+        const progressPercentage = document.querySelector('.progress-percentage');
+        if (progressPercentage && course.knowledgeLevel) {
+          progressPercentage.textContent = course.knowledgeLevel + '%';
+        }
+        
+      } else {
+        console.warn("URL course ID doesn't match stored course data ID");
+        // Try to find the course info from the storage
+        fetchCourseFromStorage(courseId);
+      }
+    } else {
+      console.warn("No course data found in localStorage");
+      // Try to find the course info from the storage if ID is available
+      if (courseId) {
+        fetchCourseFromStorage(courseId);
+      }
+    }
+  }
+  
+  // Function to fetch course data from storage when not in localStorage
+  function fetchCourseFromStorage(courseId) {
+    // Try to get the course from localStorage courses array
+    const coursesData = localStorage.getItem('courses');
+    if (coursesData) {
+      const courses = JSON.parse(coursesData);
+      const course = courses.find(c => c.id === courseId);
+      
+      if (course) {
+        // Create a full course object and store in localStorage
+        const courseObj = {
+          id: course.id,
+          name: course.name,
+          knowledgeLevel: course.knowledgeLevel || "0",
+          examDate: course.examDate || "Not scheduled",
+          subject: course.subject || '',
+          studyHours: course.studyHours || '',
+          subtitle: "Introduction to " + course.name
+        };
+        
+        localStorage.setItem('currentCourse', JSON.stringify(courseObj));
+        
+        // Reload the course data
+        loadCourseData();
+      } else {
+        console.error("Course with ID", courseId, "not found in storage");
+        displayErrorMessage("Course not found. Please return to My Courses.");
+      }
+    } else {
+      // Try Cache API as fallback
+      if ('caches' in window) {
+        caches.open('aura-courses-cache').then(cache => {
+          return cache.match('/courses-data');
+        }).then(response => {
+          if (response) {
+            return response.json();
+          }
+          return [];
+        }).then(courses => {
+          const course = courses.find(c => c.id === courseId);
+          if (course) {
+            // Create a full course object and store in localStorage
+            const courseObj = {
+              id: course.id,
+              name: course.name,
+              knowledgeLevel: course.knowledgeLevel || "0",
+              examDate: course.examDate || "Not scheduled",
+              subject: course.subject || '',
+              studyHours: course.studyHours || '',
+              subtitle: "Introduction to " + course.name
+            };
+            
+            localStorage.setItem('currentCourse', JSON.stringify(courseObj));
+            
+            // Reload the course data
+            loadCourseData();
+          } else {
+            console.error("Course with ID", courseId, "not found in cache");
+            displayErrorMessage("Course not found. Please return to My Courses.");
+          }
+        });
+      } else {
+        displayErrorMessage("Course not found. Please return to My Courses.");
+      }
+    }
+  }
+  
+  // Display error message if course not found
+  function displayErrorMessage(message) {
+    // Display error message in the UI
+    const courseTitle = document.querySelector('.course-title h1');
+    if (courseTitle) {
+      courseTitle.textContent = "Error";
+    }
+    
+    const subtitle = document.querySelector('.course-title h2');
+    if (subtitle) {
+      subtitle.textContent = message;
+    }
+    
+    // Add a button to go back to My Courses
+    const header = document.querySelector('.course-header');
+    if (header) {
+      const backButton = document.createElement('button');
+      backButton.className = 'btn-primary';
+      backButton.textContent = 'Back to My Courses';
+      backButton.style.marginTop = '20px';
+      backButton.addEventListener('click', () => {
+        window.location.href = 'index.html';
+      });
+      
+      header.appendChild(backButton);
+    }
+  }
+
+  // ======= TAB FUNCTIONALITY =======
+  
   // Initialize tabs functionality
   function initializeTabs() {
-    // Hide all tab contents except overview (first tab)
+    // Hide all tab contents except overview 
     for (const key in tabContents) {
       if (tabContents[key] && key !== "overview") {
         tabContents[key].style.display = "none";
       }
     }
-  }
-
-    // Initialize Quizzes tab functionality
-  function initializeQuizzesTab() {
-    const practiceQuizBtns = document.querySelectorAll(".practice-quiz-btn");
     
-    practiceQuizBtns.forEach(button => {
-      button.addEventListener("click", function() {
-        this.textContent = "Loading quiz...";
-        setTimeout(() => {
-          this.textContent = "Start Practice Quiz";
-        }, 1500);
-      });
-    });
-  }
-  
-
     // Tab switching functionality
     navButtons.forEach((button) => {
       button.addEventListener("click", function () {
@@ -59,8 +220,7 @@
           }
         }
         
-        // Get all the Overview-specific elements by their headings
-        // This approach looks for the specific text in headings (h3 elements)
+        // Get all the Overview elements by their headings
         const headings = document.querySelectorAll('h3');
         headings.forEach(heading => {
           const text = heading.textContent.trim();
@@ -69,7 +229,7 @@
             // Find the parent article or container element
             let container = heading.closest('article');
             if (!container) {
-              // If not in an article, try to find the closest substantial container
+             
               container = heading.closest('div[class*="card"]') || heading.closest('section');
             }
             
@@ -80,10 +240,10 @@
           }
         });
         
-        // Also specifically hide the Upload Document button
+        // Also specifically handle the Upload Document button visibility
         const actionButtons = document.querySelector('.action-buttons');
         if (actionButtons) {
-          actionButtons.style.display = (tabName === "overview") ? "" : "none";
+          actionButtons.style.display = (tabName === "notes") ? "block" : "none";
         }
         
         // Main content section hide/show
@@ -102,6 +262,44 @@
         }
       });
     });
+  }
+
+  // Initialize Quizzes tab functionality
+  function initializeQuizzesTab() {
+    const practiceQuizBtns = document.querySelectorAll(".practice-quiz-btn");
+    
+    practiceQuizBtns.forEach(button => {
+      button.addEventListener("click", function() {
+        this.textContent = "Loading quiz...";
+        
+        // Get current course ID to pass to the quiz page
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseId = urlParams.get('id');
+        
+        // Redirect to quiz page with course ID
+        setTimeout(() => {
+          window.location.href = courseId ? `quiz.html?courseId=${courseId}` : 'quiz.html';
+        }, 500);
+      });
+    });
+    
+    // Quiz practice button
+    const practiceBtn = document.querySelector(".practice-btn");
+    practiceBtn?.addEventListener("click", function () {
+      // Get current course ID to pass to the quiz page
+      const urlParams = new URLSearchParams(window.location.search);
+      const courseId = urlParams.get('id');
+      
+      // Simulate starting a practice quiz
+      console.log("Starting practice quiz");
+      this.textContent = "Loading quiz...";
+      
+      // Redirect to quiz page with course ID
+      setTimeout(() => {
+        window.location.href = courseId ? `quiz.html?courseId=${courseId}` : 'quiz.html';
+      }, 500);
+    });
+  }
 
   // Todo list functionality
   todoItems.forEach((item) => {
@@ -119,6 +317,14 @@
 
   // Upload button functionality
   uploadBtn?.addEventListener("click", function () {
+    // Show notes tab first
+    const notesTab = Array.from(navButtons).find(btn => 
+      btn.textContent.trim().toLowerCase() === 'notes'
+    );
+    if (notesTab) {
+      notesTab.click();
+    }
+    
     // Simulate file upload dialog
     const input = document.createElement("input");
     input.type = "file";
@@ -172,23 +378,35 @@
       </div>
     `;
 
-    document.querySelector(".documents-card").appendChild(progressBar);
+    const targetContainer = document.querySelector(".documents-card") || document.querySelector(".document-list");
+    
+    if (targetContainer) {
+      targetContainer.appendChild(progressBar);
+      
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 5;
+        progressBar.querySelector(".progress-percentage").textContent = `${progress}%`;
+        progressBar.querySelector(".progress-fill").style.width = `${progress}%`;
 
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 5;
-      progressBar.querySelector(".progress-percentage").textContent =
-        `${progress}%`;
-      progressBar.querySelector(".progress-fill").style.width = `${progress}%`;
-
-      if (progress >= 100) {
-        clearInterval(interval);
-        setTimeout(() => {
-          progressBar.remove();
-          // Could add the new document to the list here
-        }, 500);
-      }
-    }, 100);
+        if (progress >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            progressBar.remove();
+            
+            // Show success message
+            const successMsg = document.createElement("div");
+            successMsg.className = "upload-success";
+            successMsg.innerHTML = `<i class="fas fa-check-circle"></i> ${fileName} uploaded successfully!`;
+            targetContainer.appendChild(successMsg);
+            
+            setTimeout(() => {
+              successMsg.remove();
+            }, 3000);
+          }, 500);
+        }
+      }, 100);
+    }
   }
 
   // Regular flashcard interaction (from existing content)
@@ -292,20 +510,6 @@
     }
   }
 
-  // Quizzes tab functionality
-  function initializeQuizzesTab() {
-    const practiceQuizBtn = document.querySelector(".practice-quiz-btn");
-    
-    if (practiceQuizBtn) {
-      practiceQuizBtn.addEventListener("click", function() {
-        this.textContent = "Loading quiz...";
-        setTimeout(() => {
-          this.textContent = "Start Practice Quiz";
-        }, 1500);
-      });
-    }
-  }
-
   // Document download functionality
   function initializeDownloads() {
     const downloadButtons = document.querySelectorAll(".document-download");
@@ -349,6 +553,7 @@
         if (files.length > 0) {
           console.log(`File dropped: ${files[0].name}`);
           // Process the file
+          showUploadProgress(files[0].name);
         }
       });
     }
@@ -375,43 +580,9 @@
         ".document-details h4"
       ).textContent;
 
-      // Simulate download start
+      // Start download
       console.log(`Downloading: ${documentName}`);
-      // Could add download progress indicator here
+      
     });
-  });
-
-  // Quiz practice button
-  const practiceBtn = document.querySelector(".practice-btn");
-  practiceBtn?.addEventListener("click", function () {
-    // Simulate starting a practice quiz
-    console.log("Starting practice quiz");
-    this.textContent = "Loading quiz...";
-    setTimeout(() => {
-      this.textContent = "Start Practice Quiz";
-      // Could redirect to quiz page or show quiz modal
-    }, 1500);
-  });
-
-  // Add event listeners for all practice quiz buttons
-  document.addEventListener('DOMContentLoaded', function() {
-    const practiceQuizButtons = document.querySelectorAll('.practice-quiz-btn, .practice-btn');
-    
-    practiceQuizButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Navigate to quiz.html when button is clicked
-            window.location.href = 'quiz.html';
-        });
-    });
-  });
-
-  // Initialize app
-  document.addEventListener("DOMContentLoaded", () => {
-    initializeTabs();
-    initializeFlashcardTab();
-    initializeQuizzesTab();
-    initializeDownloads();
-    initializeDragDrop();
-    animateProgress();
   });
 })();

@@ -1,23 +1,82 @@
-// Document Management for Notes Tab
+// Document Management for Course Pages
 document.addEventListener('DOMContentLoaded', function() {
     // Check if we're on a course page
     if (!document.querySelector('.course-title')) {
       return; // Not on course page, exit
     }
   
-    // Get current course data
+    // Get current course data from URL or localStorage
     let currentCourse = null;
     const DOCS_CACHE_NAME = 'aura-documents-cache';
     let documents = {};
   
+    // Get course ID from URL parameter first
+    const urlParams = new URLSearchParams(window.location.search);
+    const courseIdFromUrl = urlParams.get('id');
+    
     // Load course data from localStorage
     const courseData = localStorage.getItem('currentCourse');
     if (courseData) {
       currentCourse = JSON.parse(courseData);
+      
+      // If we have a course ID from URL but it doesn't match the localStorage course,
+      // we need to make sure we're using the correct course
+      if (courseIdFromUrl && courseIdFromUrl !== currentCourse.id) {
+        // Try to find this course in the courses array
+        const coursesData = localStorage.getItem('courses');
+        if (coursesData) {
+          const courses = JSON.parse(coursesData);
+          const matchingCourse = courses.find(c => c.id === courseIdFromUrl);
+          
+          if (matchingCourse) {
+            // Create a full course object
+            currentCourse = {
+              id: matchingCourse.id,
+              name: matchingCourse.name,
+              knowledgeLevel: matchingCourse.knowledgeLevel || "0",
+              examDate: matchingCourse.examDate || "Not scheduled",
+              subject: matchingCourse.subject || '',
+              studyHours: matchingCourse.studyHours || '',
+              subtitle: "Introduction to " + matchingCourse.name
+            };
+            
+            // Update localStorage for future use
+            localStorage.setItem('currentCourse', JSON.stringify(currentCourse));
+          }
+        }
+      }
+      
       console.log("Current course loaded:", currentCourse);
+    } else if (courseIdFromUrl) {
+      // If we have a course ID from URL but no course in localStorage,
+      // try to find this course in the courses array
+      const coursesData = localStorage.getItem('courses');
+      if (coursesData) {
+        const courses = JSON.parse(coursesData);
+        const matchingCourse = courses.find(c => c.id === courseIdFromUrl);
+        
+        if (matchingCourse) {
+          // Create a full course object
+          currentCourse = {
+            id: matchingCourse.id,
+            name: matchingCourse.name,
+            knowledgeLevel: matchingCourse.knowledgeLevel || "0",
+            examDate: matchingCourse.examDate || "Not scheduled",
+            subject: matchingCourse.subject || '',
+            studyHours: matchingCourse.studyHours || '',
+            subtitle: "Introduction to " + matchingCourse.name
+          };
+          
+          // Update localStorage for future use
+          localStorage.setItem('currentCourse', JSON.stringify(currentCourse));
+          
+          console.log("Current course loaded from URL:", currentCourse);
+        }
+      }
     } else {
       // Default course ID for development
       currentCourse = { id: 'default-course' };
+      console.log("Using default course for development");
     }
   
     // Keep track of elements that already have listeners
@@ -131,19 +190,174 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Add to UI
         addDocumentToUI(doc);
+        
+        // Create success notification
+        showSuccessNotification(file.name);
       };
       
       reader.onerror = function() {
         console.error("Error reading file");
+        // Show error notification
+        showErrorNotification(file.name);
       };
       
       // Read file as data URL
       reader.readAsDataURL(file);
     }
+    
+    // Show success notification
+    function showSuccessNotification(fileName) {
+      const notification = document.createElement('div');
+      notification.className = 'upload-notification success';
+      notification.innerHTML = `
+        <div class="notification-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="notification-message">
+          <h3>Upload Successful</h3>
+          <p>${fileName} has been uploaded.</p>
+        </div>
+        <div class="notification-close">
+          <i class="fas fa-times"></i>
+        </div>
+      `;
+      
+      //Styles 
+      if (!document.getElementById('notification-styles')) {
+        const styles = document.createElement('style');
+        styles.id = 'notification-styles';
+        styles.textContent = `
+          .upload-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            min-width: 300px;
+            padding: 15px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+          }
+          .upload-notification.success {
+            border-left: 4px solid #4caf50;
+          }
+          .upload-notification.error {
+            border-left: 4px solid #f44336;
+          }
+          .upload-notification.show {
+            transform: translateY(0);
+            opacity: 1;
+          }
+          .notification-icon {
+            margin-right: 15px;
+            font-size: 24px;
+          }
+          .upload-notification.success .notification-icon {
+            color: #4caf50;
+          }
+          .upload-notification.error .notification-icon {
+            color: #f44336;
+          }
+          .notification-message h3 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+          }
+          .notification-message p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.7;
+          }
+          .notification-close {
+            margin-left: auto;
+            cursor: pointer;
+            opacity: 0.5;
+          }
+          .notification-close:hover {
+            opacity: 1;
+          }
+        `;
+        document.head.appendChild(styles);
+      }
+      
+      document.body.appendChild(notification);
+      
+      // Show notification
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 10);
+      
+      // Hide notification after 5 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 5000);
+      
+      // Handle close button
+      notification.querySelector('.notification-close').addEventListener('click', function() {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      });
+    }
+    
+    // Show error notification
+    function showErrorNotification(fileName) {
+      const notification = document.createElement('div');
+      notification.className = 'upload-notification error';
+      notification.innerHTML = `
+        <div class="notification-icon">
+          <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <div class="notification-message">
+          <h3>Upload Failed</h3>
+          <p>Could not upload ${fileName}.</p>
+        </div>
+        <div class="notification-close">
+          <i class="fas fa-times"></i>
+        </div>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Show notification
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 10);
+      
+      // Hide notification after 5 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 5000);
+      
+      // Handle close button
+      notification.querySelector('.notification-close').addEventListener('click', function() {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      });
+    }
   
     // Save document to storage
     function saveDocument(doc) {
       console.log("Saving document:", doc.name);
+      
+      // Load existing documents first
+      const localDocs = localStorage.getItem('auraDocuments');
+      if (localDocs) {
+        documents = JSON.parse(localDocs);
+      }
       
       // Make sure we have an array for this course
       if (!documents[doc.courseId]) {
@@ -176,8 +390,12 @@ document.addEventListener('DOMContentLoaded', function() {
       // Try localStorage first
       const localDocs = localStorage.getItem('auraDocuments');
       if (localDocs) {
-        documents = JSON.parse(localDocs);
-        displayDocuments();
+        try {
+          documents = JSON.parse(localDocs);
+          displayDocuments();
+        } catch (e) {
+          console.error("Error parsing documents from localStorage:", e);
+        }
       }
       
       // Also check cache if available
@@ -206,11 +424,13 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Check if we have documents for this course
       if (!documents[currentCourse.id]) {
+        console.log("No documents found for course ID:", currentCourse.id);
         return;
       }
       
       // Get documents for current course
       const courseDocuments = documents[currentCourse.id];
+      console.log("Found", courseDocuments.length, "documents for this course");
       
       // Sort by date (newest first)
       const sortedDocs = [...courseDocuments].sort((a, b) => {
@@ -237,8 +457,23 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Get file type for icon
       const fileType = doc.name.split('.').pop().toLowerCase();
-      const iconClass = fileType === 'pdf' ? 'pdf-icon' : 'docx-icon';
-      const iconType = fileType === 'pdf' ? 'fa-file-pdf' : 'fa-file-word';
+      let iconClass = 'docx-icon'; // Default
+      let iconType = 'fa-file-alt'; // Default
+      
+      // Set icon based on file type
+      if (fileType === 'pdf') {
+        iconClass = 'pdf-icon';
+        iconType = 'fa-file-pdf';
+      } else if (fileType === 'doc' || fileType === 'docx') {
+        iconClass = 'docx-icon';
+        iconType = 'fa-file-word';
+      } else if (fileType === 'ppt' || fileType === 'pptx') {
+        iconClass = 'ppt-icon';
+        iconType = 'fa-file-powerpoint';
+      } else if (fileType === 'txt') {
+        iconClass = 'txt-icon';
+        iconType = 'fa-file-alt';
+      }
       
       // Format time ago
       const timeAgo = getTimeAgo(doc.uploadDate);
@@ -352,49 +587,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   
-    // Setup tabs functionality to ensure Notes tab works
-    function setupTabs() {
-      const navButtons = document.querySelectorAll('.course-nav .nav-button');
-      
-      if (!listenersAttached.has('tabs')) {
-        navButtons.forEach(button => {
-          button.addEventListener('click', function() {
-            // Update active button
-            navButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Get the tab name
-            const tabName = this.textContent.trim().toLowerCase();
-            
-            // Hide all tab contents
-            const tabContents = document.querySelectorAll('.tab-content');
-            tabContents.forEach(tab => tab.style.display = 'none');
-            
-            // Show content section for Overview tab
-            const contentSection = document.querySelector('.content-section');
-            if (contentSection) {
-              contentSection.style.display = tabName === 'overview' ? 'block' : 'none';
-            }
-            
-            // Show selected tab
-            const selectedTab = document.getElementById(`${tabName}-tab`);
-            if (selectedTab) {
-              selectedTab.style.display = 'block';
-              
-              // If Notes tab is selected, ensure upload functionality is set up
-              if (tabName === 'notes') {
-                setupDocumentUpload();
-              }
-            }
-          });
-        });
-        
-        listenersAttached.add('tabs');
-      }
-    }
-  
     // Initialize functionality
-    setupTabs();
     loadDocuments();
     
     // Setup upload functionality immediately if Notes tab is visible
@@ -433,4 +626,48 @@ document.addEventListener('DOMContentLoaded', function() {
       
       listenersAttached.add('upload-btn');
     }
-  });
+    
+    // Set up tab functionality if it's not already set up in coursepage.js
+    function setupTabs() {
+      // Only set up tabs if they're not already set up in the main JS
+      if (typeof window.tabsInitialized === 'undefined') {
+        const navButtons = document.querySelectorAll('.course-nav .nav-button');
+        
+        if (!listenersAttached.has('tabs')) {
+          navButtons.forEach(button => {
+            button.addEventListener('click', function() {
+              // Update active button
+              navButtons.forEach(btn => btn.classList.remove('active'));
+              this.classList.add('active');
+              
+              // Get the tab name
+              const tabName = this.textContent.trim().toLowerCase();
+              
+              // Hide all tab contents
+              const tabContents = document.querySelectorAll('.tab-content');
+              tabContents.forEach(tab => tab.style.display = 'none');
+              
+              // Show content section for Overview tab
+              const contentSection = document.querySelector('.content-section');
+              if (contentSection) {
+                contentSection.style.display = tabName === 'overview' ? 'block' : 'none';
+              }
+              
+              // Show selected tab
+              const selectedTab = document.getElementById(`${tabName}-tab`);
+              if (selectedTab) {
+                selectedTab.style.display = 'block';
+                
+                // If Notes tab is selected, ensure upload functionality is set up
+                if (tabName === 'notes') {
+                  setupDocumentUpload();
+                }
+              }
+            });
+          });
+          
+          listenersAttached.add('tabs');
+        }
+      }
+    }
+});
