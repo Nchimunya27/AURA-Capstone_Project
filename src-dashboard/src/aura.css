@@ -1426,7 +1426,7 @@ label {
     }
     
     .mode-mascot {
-        padding-top: 56.25%; /* 16:9 aspect ratio for mobile */
+        padding-top: 56.25%;
     }
 
     .profile-picture-container {
