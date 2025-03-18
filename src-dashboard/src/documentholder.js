@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', function() {
       return; // Not on course page, exit
     }
   
+    console.log("Document manager initializing...");
+  
     // Get current course data from URL or localStorage
     let currentCourse = null;
     const DOCS_CACHE_NAME = 'aura-documents-cache';
@@ -78,9 +80,53 @@ document.addEventListener('DOMContentLoaded', function() {
       currentCourse = { id: 'default-course' };
       console.log("Using default course for development");
     }
+
+    // Ensure document storage is properly initialized
+    ensureDocumentStorage();
   
     // Keep track of elements that already have listeners
     const listenersAttached = new Set();
+
+    // Helper function to ensure document storage is properly set up
+    function ensureDocumentStorage() {
+      console.log("Ensuring document storage is set up correctly");
+      
+      // Check if documents variable is initialized
+      if (!documents || typeof documents !== 'object') {
+        documents = {};
+      }
+      
+      // Check localStorage for existing documents
+      const localDocs = localStorage.getItem('auraDocuments');
+      
+      if (localDocs) {
+        try {
+          // Try to parse existing documents
+          const parsedDocs = JSON.parse(localDocs);
+          
+          // If valid, use them
+          if (parsedDocs && typeof parsedDocs === 'object') {
+            documents = parsedDocs;
+          }
+        } catch (e) {
+          console.error("Error parsing documents from localStorage:", e);
+          // If localStorage is corrupted, reset it
+          localStorage.setItem('auraDocuments', JSON.stringify({}));
+        }
+      } else {
+        // If no documents in localStorage, initialize with empty object
+        localStorage.setItem('auraDocuments', JSON.stringify({}));
+      }
+      
+      // Ensure the current course has a document array
+      if (currentCourse && currentCourse.id && !documents[currentCourse.id]) {
+        documents[currentCourse.id] = [];
+        // Save the updated documents object back to localStorage
+        localStorage.setItem('auraDocuments', JSON.stringify(documents));
+      }
+      
+      console.log("Document storage initialized:", documents);
+    }
 
     // Set up document upload functionality
     function setupDocumentUpload() {
@@ -95,22 +141,35 @@ document.addEventListener('DOMContentLoaded', function() {
           e.preventDefault();
           e.stopPropagation();
           
-          // Create a file input
+          // Create a file input element
           const input = document.createElement('input');
           input.type = 'file';
           input.accept = '.pdf,.doc,.docx,.txt';
           input.style.display = 'none';
           
-          input.addEventListener('change', function(e) {
-            if (e.target.files.length > 0) {
-              console.log("File selected:", e.target.files[0].name);
-              handleFileUpload(e.target.files[0]);
+          // Add the change event listener before appending to DOM
+          input.onchange = function(e) {
+            console.log("File input change event fired");
+            if (this.files && this.files.length > 0) {
+              const file = this.files[0];
+              console.log("File selected:", file.name);
+              // Process the file right away
+              handleFileUpload(file);
+              
+              // Remove the input element after selection
+              setTimeout(() => {
+                document.body.removeChild(input);
+              }, 100);
             }
-          });
+          };
           
+          // Append to body and trigger click
           document.body.appendChild(input);
-          input.click();
-          document.body.removeChild(input);
+          
+          // Use a slight delay to ensure the input is fully added to DOM
+          setTimeout(() => {
+            input.click();
+          }, 50);
         });
         
         // Mark this element as having listeners
@@ -127,26 +186,22 @@ document.addEventListener('DOMContentLoaded', function() {
           uploadArea.addEventListener(eventName, function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log(eventName + " event triggered");
           });
         });
         
         // Visual feedback for drag events
         uploadArea.addEventListener('dragover', function() {
-          console.log("Drag over upload area");
           this.style.borderColor = 'var(--link-color, #5997ac)';
           this.style.backgroundColor = 'rgba(89, 151, 172, 0.1)';
         });
         
         uploadArea.addEventListener('dragleave', function() {
-          console.log("Drag leave upload area");
           this.style.borderColor = '#64748b';
           this.style.backgroundColor = 'transparent';
         });
         
         // Handle file drop
         uploadArea.addEventListener('drop', function(e) {
-          console.log("File dropped");
           this.style.borderColor = '#64748b';
           this.style.backgroundColor = 'transparent';
           
@@ -163,6 +218,11 @@ document.addEventListener('DOMContentLoaded', function() {
   
     // Handle file upload
     function handleFileUpload(file) {
+      if (!file) {
+        console.error("No file provided to handleFileUpload");
+        return;
+      }
+      
       console.log("Handling file upload for:", file.name);
       
       // Generate unique ID for the document
@@ -171,38 +231,55 @@ document.addEventListener('DOMContentLoaded', function() {
       // Read the file
       const reader = new FileReader();
       
+      // Set up onload before starting the read operation
       reader.onload = function(e) {
         console.log("File read successfully");
         
-        // Create document object
-        const doc = {
-          id: docId,
-          name: file.name,
-          type: file.type,
-          size: file.size,
-          content: e.target.result,
-          courseId: currentCourse.id,
-          uploadDate: new Date().toISOString()
-        };
-        
-        // Save document to storage
-        saveDocument(doc);
-        
-        // Add to UI
-        addDocumentToUI(doc);
-        
-        // Create success notification
-        showSuccessNotification(file.name);
+        try {
+          // Create document object
+          const doc = {
+            id: docId,
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            content: e.target.result,
+            courseId: currentCourse.id,
+            uploadDate: new Date().toISOString()
+          };
+          
+          // Save document to storage
+          saveDocument(doc);
+          
+          // Force a refresh of document displays
+          refreshDocumentDisplays();
+          
+          // Create success notification
+          showSuccessNotification(file.name);
+        } catch (error) {
+          console.error("Error processing uploaded file:", error);
+          showErrorNotification(file.name);
+        }
       };
       
-      reader.onerror = function() {
-        console.error("Error reading file");
+      reader.onerror = function(e) {
+        console.error("Error reading file:", e);
         // Show error notification
         showErrorNotification(file.name);
       };
       
       // Read file as data URL
-      reader.readAsDataURL(file);
+      try {
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error("Error starting file read:", error);
+        showErrorNotification(file.name);
+      }
+    }
+    
+    // Function to explicitly refresh document displays
+    function refreshDocumentDisplays() {
+      console.log("Refreshing document displays");
+      displayDocuments();
     }
     
     // Show success notification
@@ -280,6 +357,19 @@ document.addEventListener('DOMContentLoaded', function() {
           .notification-close:hover {
             opacity: 1;
           }
+
+          /* Style for empty document lists */
+          .empty-message {
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+          }
+
+          /* Hide Upload Document button */
+          .action-buttons {
+            display: none;
+          }
         `;
         document.head.appendChild(styles);
       }
@@ -356,7 +446,12 @@ document.addEventListener('DOMContentLoaded', function() {
       // Load existing documents first
       const localDocs = localStorage.getItem('auraDocuments');
       if (localDocs) {
-        documents = JSON.parse(localDocs);
+        try {
+          documents = JSON.parse(localDocs);
+        } catch (e) {
+          console.error("Error parsing documents from localStorage:", e);
+          documents = {};
+        }
       }
       
       // Make sure we have an array for this course
@@ -395,7 +490,21 @@ document.addEventListener('DOMContentLoaded', function() {
           displayDocuments();
         } catch (e) {
           console.error("Error parsing documents from localStorage:", e);
+          // Initialize with empty object if parse failed
+          documents = {};
+          localStorage.setItem('auraDocuments', JSON.stringify(documents));
         }
+      } else {
+        // Initialize with empty object if no documents found
+        documents = {};
+        localStorage.setItem('auraDocuments', JSON.stringify(documents));
+      }
+      
+      // Check if we have documents for this course already
+      if (!documents[currentCourse.id]) {
+        // Initialize course documents array
+        documents[currentCourse.id] = [];
+        localStorage.setItem('auraDocuments', JSON.stringify(documents));
       }
       
       // Also check cache if available
@@ -416,15 +525,47 @@ document.addEventListener('DOMContentLoaded', function() {
           console.error('Error loading from cache:', error);
         });
       }
+      
+      // Display documents regardless of cache result
+      displayDocuments();
     }
   
     // Display documents in the UI
     function displayDocuments() {
       console.log("Displaying documents in UI");
       
+      // Get document containers first and log their existence
+      const recentDocsGrid = document.querySelector('.documents-grid');
+      const docList = document.querySelector('.document-list');
+      
+      console.log("Document containers found:", {
+        recentDocsGrid: recentDocsGrid ? true : false,
+        docList: docList ? true : false
+      });
+      
+      // Exit if no containers found
+      if (!recentDocsGrid && !docList) {
+        console.error("Document containers not found in DOM");
+        return;
+      }
+      
+      // Clear existing content
+      if (recentDocsGrid) recentDocsGrid.innerHTML = '';
+      if (docList) docList.innerHTML = '';
+      
       // Check if we have documents for this course
-      if (!documents[currentCourse.id]) {
+      if (!documents[currentCourse.id] || documents[currentCourse.id].length === 0) {
         console.log("No documents found for course ID:", currentCourse.id);
+        
+        // Add placeholder message
+        if (recentDocsGrid) {
+          recentDocsGrid.innerHTML = '<div class="empty-message">No recent documents</div>';
+        }
+        
+        if (docList) {
+          docList.innerHTML = '<div class="empty-message">No course documents</div>';
+        }
+        
         return;
       }
       
@@ -432,23 +573,19 @@ document.addEventListener('DOMContentLoaded', function() {
       const courseDocuments = documents[currentCourse.id];
       console.log("Found", courseDocuments.length, "documents for this course");
       
-      // Sort by date (newest first)
-      const sortedDocs = [...courseDocuments].sort((a, b) => {
-        return new Date(b.uploadDate) - new Date(a.uploadDate);
-      });
-      
-      // Get document containers
-      const recentDocsGrid = document.querySelector('.documents-grid');
-      const docList = document.querySelector('.document-list');
-      
-      // Clear existing content
-      if (recentDocsGrid) recentDocsGrid.innerHTML = '';
-      if (docList) docList.innerHTML = '';
-      
-      // Add documents to UI
-      sortedDocs.forEach(doc => {
-        addDocumentToUI(doc);
-      });
+      try {
+        // Sort by date (newest first)
+        const sortedDocs = [...courseDocuments].sort((a, b) => {
+          return new Date(b.uploadDate) - new Date(a.uploadDate);
+        });
+        
+        // Add documents to UI
+        sortedDocs.forEach(doc => {
+          addDocumentToUI(doc);
+        });
+      } catch (error) {
+        console.error("Error displaying documents:", error);
+      }
     }
   
     // Add document to UI
@@ -587,18 +724,32 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   
+    // Make sure document display is updated when Notes tab is selected
+    const navButtons = document.querySelectorAll('.course-nav .nav-button');
+    navButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const tabName = this.textContent.trim().toLowerCase();
+        if (tabName === 'notes') {
+          console.log("Notes tab selected, refreshing document display");
+          // When Notes tab is selected, refresh documents after a short delay
+          setTimeout(() => {
+            setupDocumentUpload();
+            loadDocuments();
+          }, 100);
+        }
+      });
+    });
+  
     // Initialize functionality
+    setupDocumentUpload();
     loadDocuments();
     
-    // Setup upload functionality immediately if Notes tab is visible
-    if (document.getElementById('notes-tab')?.style.display !== 'none') {
-      setupDocumentUpload();
-    }
-    
-    // Also handle Upload button in header
+    // Also handle Upload button in header (if present)
     const uploadBtn = document.querySelector('.upload-btn');
     if (uploadBtn && !listenersAttached.has('upload-btn')) {
       uploadBtn.addEventListener('click', function() {
+        console.log("Upload button clicked");
+        
         // Show Notes tab
         const notesBtn = Array.from(document.querySelectorAll('.course-nav .nav-button'))
           .find(btn => btn.textContent.trim().toLowerCase() === 'notes');
@@ -613,61 +764,29 @@ document.addEventListener('DOMContentLoaded', function() {
         input.accept = '.pdf,.doc,.docx,.txt';
         input.style.display = 'none';
         
-        input.addEventListener('change', function(e) {
-          if (e.target.files.length > 0) {
-            handleFileUpload(e.target.files[0]);
+        // Add the change event listener before appending to DOM
+        input.onchange = function() {
+          if (this.files && this.files.length > 0) {
+            const file = this.files[0];
+            console.log("File selected from upload button:", file.name);
+            handleFileUpload(file);
+            
+            // Remove the input element after selection
+            setTimeout(() => {
+              document.body.removeChild(input);
+            }, 100);
           }
-        });
+        };
         
+        // Append to body and trigger click
         document.body.appendChild(input);
-        input.click();
-        document.body.removeChild(input);
+        
+        // Use a slight delay to ensure the input is fully added to DOM
+        setTimeout(() => {
+          input.click();
+        }, 50);
       });
       
       listenersAttached.add('upload-btn');
-    }
-    
-    // Set up tab functionality if it's not already set up in coursepage.js
-    function setupTabs() {
-      // Only set up tabs if they're not already set up in the main JS
-      if (typeof window.tabsInitialized === 'undefined') {
-        const navButtons = document.querySelectorAll('.course-nav .nav-button');
-        
-        if (!listenersAttached.has('tabs')) {
-          navButtons.forEach(button => {
-            button.addEventListener('click', function() {
-              // Update active button
-              navButtons.forEach(btn => btn.classList.remove('active'));
-              this.classList.add('active');
-              
-              // Get the tab name
-              const tabName = this.textContent.trim().toLowerCase();
-              
-              // Hide all tab contents
-              const tabContents = document.querySelectorAll('.tab-content');
-              tabContents.forEach(tab => tab.style.display = 'none');
-              
-              // Show content section for Overview tab
-              const contentSection = document.querySelector('.content-section');
-              if (contentSection) {
-                contentSection.style.display = tabName === 'overview' ? 'block' : 'none';
-              }
-              
-              // Show selected tab
-              const selectedTab = document.getElementById(`${tabName}-tab`);
-              if (selectedTab) {
-                selectedTab.style.display = 'block';
-                
-                // If Notes tab is selected, ensure upload functionality is set up
-                if (tabName === 'notes') {
-                  setupDocumentUpload();
-                }
-              }
-            });
-          });
-          
-          listenersAttached.add('tabs');
-        }
-      }
     }
 });

@@ -1,8 +1,6 @@
-
 (function () {
   // DOM Elements
   const todoItems = document.querySelectorAll('.todo-item input[type="checkbox"]');
-  const uploadBtn = document.querySelector(".upload-btn");
   const navButtons = document.querySelectorAll(".nav-button");
   const flashcardItems = document.querySelectorAll(".flashcard");
   const browseBtn = document.querySelector(".browse-btn");
@@ -14,6 +12,9 @@
     quizzes: document.getElementById("quizzes-tab"),
     flashcards: document.getElementById("flashcards-tab")
   };
+
+  // Flag to indicate tabs have been initialized
+  window.tabsInitialized = false;
 
   // ======= COURSE LOADING FUNCTIONALITY =======
   
@@ -28,6 +29,9 @@
     initializeDownloads();
     initializeDragDrop();
     animateProgress();
+    
+    // Mark tabs as initialized for other scripts
+    window.tabsInitialized = true;
   });
   
   // Function to load course data
@@ -229,7 +233,6 @@
             // Find the parent article or container element
             let container = heading.closest('article');
             if (!container) {
-             
               container = heading.closest('div[class*="card"]') || heading.closest('section');
             }
             
@@ -240,10 +243,11 @@
           }
         });
         
-        // Also specifically handle the Upload Document button visibility
+        // Hide the action buttons container in Notes tab
+        // If we're using Browse Files button for uploads, we don't need this
         const actionButtons = document.querySelector('.action-buttons');
         if (actionButtons) {
-          actionButtons.style.display = (tabName === "notes") ? "block" : "none";
+          actionButtons.style.display = "none";
         }
         
         // Main content section hide/show
@@ -315,35 +319,6 @@
     });
   });
 
-  // Upload button functionality
-  uploadBtn?.addEventListener("click", function () {
-    // Show notes tab first
-    const notesTab = Array.from(navButtons).find(btn => 
-      btn.textContent.trim().toLowerCase() === 'notes'
-    );
-    if (notesTab) {
-      notesTab.click();
-    }
-    
-    // Simulate file upload dialog
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".pdf,.doc,.docx";
-    input.style.display = "none";
-
-    input.addEventListener("change", function (e) {
-      const file = e.target.files[0];
-      if (file) {
-        // Show upload progress (example)
-        showUploadProgress(file.name);
-      }
-    });
-
-    document.body.appendChild(input);
-    input.click();
-    document.body.removeChild(input);
-  });
-
   // Browse files button (in Notes tab)
   browseBtn?.addEventListener("click", function() {
     const input = document.createElement("input");
@@ -354,8 +329,8 @@
     input.addEventListener("change", function(e) {
       const file = e.target.files[0];
       if (file) {
-        // Show upload success message or add file to list
-        console.log(`File selected: ${file.name}`);
+        // Show upload progress (example)
+        showUploadProgress(file.name);
       }
     });
 
@@ -378,7 +353,7 @@
       </div>
     `;
 
-    const targetContainer = document.querySelector(".documents-card") || document.querySelector(".document-list");
+    const targetContainer = document.querySelector(".document-list") || document.querySelector(".documents-grid");
     
     if (targetContainer) {
       targetContainer.appendChild(progressBar);
