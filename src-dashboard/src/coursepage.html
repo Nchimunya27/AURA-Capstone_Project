@@ -3,11 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="notestab.css">
   <link rel="stylesheet" href="themefix.css">
   <link rel="stylesheet" href="coursepage.css">
   <link rel="stylesheet" href="coursetheme.css">
   <link rel="stylesheet" href="coursetabs.css">
+  <link rel="stylesheet" href="progress-bar.css">
+  <link rel="stylesheet" href="profile-picture-styler.css">
+
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="mycoursestocoursepage.js"></script>
+  <script src="documentholder.js"></script>
   <script src="theme-init.js"></script>
   <title>AURA Learning Platform</title>
 </head>
@@ -92,7 +99,7 @@
       <header class="course-header">
         <div class="course-title">
           <h1>Web Development</h1>
-          <h2>Introduction to Web apps</h2>
+          <h2>Introduction to Web Applications</h2>
         </div>
   
         <div class="course-nav-container">
@@ -114,117 +121,40 @@
           </div>
         </div>
 
-                <!-- Tab Content Sections -->
-        <div id="notes-tab" class="tab-content" style="display: none;">
-          <div class="section-content">
-            <!-- Recent Documents Section -->
-            <div class="documents-section">
-              <h2 class="section-title">Recent Documents</h2>
-              
-              <div class="documents-grid">
-                <div class="document-card">
-                  <div class="document-icon pdf-icon">
-                    <i class="fas fa-file-pdf"></i>
-                  </div>
-                  <div class="document-info">
-                    <h3 class="document-title">Week 5 Notes.pdf</h3>
-                    <p class="document-date">Updated 2 days ago</p>
-                  </div>
-                </div>
-                
-                <div class="document-card">
-                  <div class="document-icon docx-icon">
-                    <i class="fas fa-file-word"></i>
-                  </div>
-                  <div class="document-info">
-                    <h3 class="document-title">Assignment 3.docx</h3>
-                    <p class="document-date">Updated 5 days ago</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Quick Upload Section -->
-            <div class="upload-section">
-              <h2 class="section-title">Quick Upload</h2>
-              
-              <div class="upload-area">
-                <div class="upload-icon">
-                  <i class="fas fa-cloud-upload-alt"></i>
-                </div>
-                <p class="upload-text">Drag and drop files here or</p>
-                <button class="browse-btn">Browse Files</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Course Documents Section -->
-          <div class="course-documents">
-            <h2 class="section-title">Course Documents</h2>
-            
-            <div class="document-list">
-              <div class="document-item">
-                <div class="document-item-left">
-                  <div class="document-icon pdf-icon">
-                    <i class="fas fa-file-pdf"></i>
-                  </div>
-                  <div class="document-info">
-                    <h3 class="document-title">Introduction to Programming.pdf</h3>
-                    <p class="document-date">Added 2 days ago</p>
-                  </div>
-                </div>
-                <div class="document-download">
-                  <i class="fas fa-download"></i>
-                </div>
-              </div>
-              
-              <div class="document-item">
-                <div class="document-item-left">
-                  <div class="document-icon pdf-icon">
-                    <i class="fas fa-file-pdf"></i>
-                  </div>
-                  <div class="document-info">
-                    <h3 class="document-title">Variables and Data Types.pdf</h3>
-                    <p class="document-date">Added 5 days ago</p>
-                  </div>
-                </div>
-                <div class="document-download">
-                  <i class="fas fa-download"></i>
-                </div>
-              </div>
-              
-              <div class="document-item">
-                <div class="document-item-left">
-                  <div class="document-icon pdf-icon">
-                    <i class="fas fa-file-pdf"></i>
-                  </div>
-                  <div class="document-info">
-                    <h3 class="document-title">Introduction to Programming.pdf</h3>
-                    <p class="document-date">Added 2 days ago</p>
-                  </div>
-                </div>
-                <div class="document-download">
-                  <i class="fas fa-download"></i>
-                </div>
-              </div>
-              
-              <div class="document-item">
-                <div class="document-item-left">
-                  <div class="document-icon pdf-icon">
-                    <i class="fas fa-file-pdf"></i>
-                  </div>
-                  <div class="document-info">
-                    <h3 class="document-title">Variables and Data Types.pdf</h3>
-                    <p class="document-date">Added 5 days ago</p>
-                  </div>
-                </div>
-                <div class="document-download">
-                  <i class="fas fa-download"></i>
-                </div>
-              </div>
-            </div>
-          </div>
+<!-- Tab Content Sections -->
+<!-- Notes Tab Content -->
+<div id="notes-tab" class="tab-content" style="display: none;">
+  <!-- Top row with Recent Documents and Quick Upload side by side -->
+  <div class="top-row">
+    <!-- Recent Documents (left panel) -->
+    <div class="recent-documents-panel">
+      <h2 class="panel-title">Recent Documents</h2>
+      <div class="documents-grid">
+        <!-- Documents will be dynamically added here -->
+      </div>
+    </div>
+    
+    <!-- Quick Upload (right panel) -->
+    <div class="upload-panel">
+      <h2 class="panel-title">Quick Upload</h2>
+      <div class="upload-area">
+        <div class="upload-icon">
+          <i class="fas fa-cloud-upload-alt"></i>
         </div>
+        <p class="upload-text">Drag and drop files here or</p>
+        <button class="browse-btn">Browse Files</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Course Documents (bottom panel) -->
+  <div class="course-documents-panel">
+    <h2 class="panel-title">Course Documents</h2>
+    <div class="document-list">
+      <!-- Course documents will be dynamically added here -->
+    </div>
+  </div>
+</div>
 
         <div id="quizzes-tab" class="tab-content" style="display: none;">
           
@@ -732,18 +662,7 @@
             <article class="todo-card">
               <h3>To-Do List</h3>
               <div class="todo-list">
-                <label class="todo-item">
-                  <input type="checkbox" class="todo-checkbox" />
-                  <span>Complete Chapter 3 Quiz</span>
-                </label>
-                <label class="todo-item">
-                  <input type="checkbox" class="todo-checkbox" />
-                  <span>Review Flashcards</span>
-                </label>
-                <label class="todo-item">
-                  <input type="checkbox" class="todo-checkbox" />
-                  <span>Submit Programming Assignment</span>
-                </label>
+                
               </div>
             </article>
   
@@ -752,15 +671,15 @@
               <div class="scores-list">
                 <div class="score-item">
                   <span class="quiz-name">Variables Quiz</span>
-                  <span class="score high">90%</span>
+                  <span class="score high"></span>
                 </div>
                 <div class="score-item">
                   <span class="quiz-name">Functions Quiz</span>
-                  <span class="score high">85%</span>
+                  <span class="score high"></span>
                 </div>
                 <div class="score-item">
                   <span class="quiz-name">Loops Quiz</span>
-                  <span class="score medium">75%</span>
+                  <span class="score medium"></span>
                 </div>
               </div>
             </article>
@@ -771,5 +690,10 @@
   </div>
 <script src="coursepage.js"></script>
 <script src= "aura.js" ></script>
+<script src="tab-system-fix.js"></script>
+<script src="task-bar.js"></script>
+<script src="profile-picture-manager.js"></script>
+
+
 </body>
 </html>

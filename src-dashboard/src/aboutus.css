@@ -322,6 +322,26 @@ h4 {
     border: 3px solid rgba(255, 255, 255, 0.3);
 }
 
+/* Adjusting bals photo */
+#bal-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 15px auto;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+  }
+  
+  #bal-container img {
+    position: absolute;
+    width: 200%; /* Make image wider to fit circle width */
+    height: 100%; /* Keep height of container */
+    left: -50%; /* Center the image */
+    top: 0;
+    border: none;
+  }
+
 /* Feature Cards */
 .feature-cards {
     display: flex;
@@ -330,7 +350,7 @@ h4 {
 }
 
 .feature-card {
-    /*background-color: rgba(255, 255, 255, 0.9);*/
+    
     background-color: var(--background-secondary);
     color: #333;
     border-radius: 8px;
@@ -368,9 +388,7 @@ h4 {
     color: white;
     margin-top: 60px;
     width: 100%;
-    margin-left: -20px; /*
-    padding-left: 20px; 
-    box-sizing: content-box; */
+    margin-left: -20px; 
 }
 
 .footer-content {

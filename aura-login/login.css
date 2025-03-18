@@ -191,6 +191,30 @@ input[type="text"]:focus {
     text-decoration: underline;
 }
 
+/* New status message styles */
+.status-message {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    z-index: 1000;
+    display: none;
+}
+
+.status-message.success {
+    background-color: #4CAF50;
+    display: block;
+}
+
+.status-message.error {
+    background-color: #f44336;
+    display: block;
+}
+
 @media (max-width: 768px) {
     .login-container {
         flex-direction: column;

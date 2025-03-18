@@ -5,9 +5,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Courses - Aura Learning Dashboard</title>
+  <link rel="stylesheet" href="notestab.css">
   <link rel="stylesheet" href="aura.css">
   <link rel="stylesheet" href="mycourses.css">
+  <link rel="stylesheet" href="profile-picture-styler.css">
+
+  <script src="mycoursestocoursepage.js"></script>
+  <script src="coursepage.js"></script>
+  <script src="documentholder.js"></script>
   <script src="theme-init.js"></script>
+  <script src="examdate.js"></script>
 </head>
 <body>
   <div class="dashboard">
@@ -183,106 +190,285 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('addCourseModal');
-    const addCourseBtn = document.getElementById('addNewCourseBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const createCourseBtn = document.getElementById('createCourseBtn');
-    const knowledgeSlider = document.getElementById('knowledgeLevel');
-    const rangeValue = document.querySelector('.range-value');
-    
-    rangeValue.textContent = knowledgeSlider.value + '%';
-    knowledgeSlider.style.background = `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${knowledgeSlider.value}%, #e5e7eb ${knowledgeSlider.value}%)`;
+  const modal = document.getElementById('addCourseModal');
+  const addCourseBtn = document.getElementById('addNewCourseBtn');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const createCourseBtn = document.getElementById('createCourseBtn');
+  const knowledgeSlider = document.getElementById('knowledgeLevel');
+  const rangeValue = document.querySelector('.range-value');
+  const coursesGridContainer = document.querySelector('.courses-grid-container');
+  
+  // Name of cache
+  const CACHE_NAME = 'aura-courses-cache';
+  // Array to store courses in memory
+  let courses = [];
+  
+  // Initialize the knowledge slider
+  rangeValue.textContent = knowledgeSlider.value + '%';
+  knowledgeSlider.style.background = `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${knowledgeSlider.value}%, #e5e7eb ${knowledgeSlider.value}%)`;
 
-    knowledgeSlider.addEventListener('input', function() {
-      const value = this.value;
-      rangeValue.textContent = value + '%';
-      this.style.background = `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${value}%, #e5e7eb ${value}%)`;
-    });
+  // Load existing courses on page load
+  loadCoursesFromCache();
 
-    addCourseBtn.addEventListener('click', function() {
-      modal.style.display = 'flex';
-    });
-
-    cancelBtn.addEventListener('click', function() {
-      modal.style.display = 'none';
-    });
-
-    window.addEventListener('click', function(event) {
-      if (event.target === modal) {
-        modal.style.display = 'none';
-      }
-    });
-
-    createCourseBtn.addEventListener('click', function() {
-      const courseName = document.getElementById('courseName').value;
-      const subjectArea = document.getElementById('subjectArea').value;
-      const examDate = document.getElementById('examDate').value;
-      const studyHours = document.getElementById('studyHours').value;
-      const knowledgeLevel = document.getElementById('knowledgeLevel').value;
-
-      const courseCardHTML = `
-        <div class="course-card">
-          <div class="course-header">
-            <div class="course-title">${courseName}</div>
-            <div class="course-progress-badge progress-blue">${knowledgeLevel}%</div>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill blue" style="width: ${knowledgeLevel}%;"></div>
-          </div>
-          <div class="course-details">
-            <div class="course-quiz">
-              <span class="quiz-icon">📅</span>
-              <span class="quiz-date">Next Quiz: ${examDate}</span>
-            </div>
-          </div>
-          <div class="course-actions">
-            <button class="edit-btn">Edit</button>
-            <button class="delete-btn">Delete</button>
-          </div>
-        </div>
-      `;
-      
-      const coursesGridContainer = document.querySelector('.courses-grid-container');
-      coursesGridContainer.innerHTML += courseCardHTML;
-
-      modal.style.display = 'none';
-      
-      // Add event listeners for the new Edit and Delete buttons
-      const deleteBtns = document.querySelectorAll('.delete-btn');
-      deleteBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-          this.closest('.course-card').remove();
-        });
-      });
-
-      const editBtns = document.querySelectorAll('.edit-btn');
-      editBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-          const courseCard = this.closest('.course-card');
-          const courseTitle = courseCard.querySelector('.course-title').textContent;
-          const quizDate = courseCard.querySelector('.quiz-date').textContent.replace('Next Quiz: ', '');
-          
-          // Pre-fill modal with current course information for editing
-          document.getElementById('courseName').value = courseTitle;
-          document.getElementById('examDate').value = quizDate;
-          modal.style.display = 'flex';
-          
-          // Modify the button to update
-          createCourseBtn.textContent = 'Update Course';
-          
-          // Change the event listener to update the course
-          createCourseBtn.removeEventListener('click', arguments.callee);
-          createCourseBtn.addEventListener('click', function() {
-            courseCard.querySelector('.course-title').textContent = document.getElementById('courseName').value;
-            courseCard.querySelector('.quiz-date').textContent = 'Next Quiz: ' + document.getElementById('examDate').value;
-
-            modal.style.display = 'none';
-            createCourseBtn.textContent = '+ Create Course'; // Reset button text
-          });
-        });
-      });
-    });
+  // Slider event listener
+  knowledgeSlider.addEventListener('input', function() {
+    const value = this.value;
+    rangeValue.textContent = value + '%';
+    this.style.background = `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${value}%, #e5e7eb ${value}%)`;
   });
+
+  // Open modal when "Add New Course" is clicked
+  addCourseBtn.addEventListener('click', function() {
+    modal.style.display = 'flex';
+
+    // Reset the form when opening for a new course
+    document.getElementById('courseName').value = '';
+    document.getElementById('examDate').value = '';
+    document.getElementById('studyHours').value = '';
+    document.getElementById('knowledgeLevel').value = 0;
+    rangeValue.textContent = '0%';
+    knowledgeSlider.style.background = `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) 0%, #e5e7eb 0%)`;
+    createCourseBtn.textContent = '+ Create Course';
+    
+    // Remove any existing event listeners and add new one for creating course
+    createCourseBtn.replaceWith(createCourseBtn.cloneNode(true));
+    document.getElementById('createCourseBtn').addEventListener('click', createCourse);
+  });
+
+  // Close modal when "Cancel" is clicked
+  cancelBtn.addEventListener('click', function() {
+    modal.style.display = 'none';
+  });
+
+  // Close modal when clicking outside of it
+  window.addEventListener('click', function(event) {
+    if (event.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+
+  // Function to create a new course
+  function createCourse() {
+    const courseName = document.getElementById('courseName').value;
+    const subjectArea = document.getElementById('subjectArea').value;
+    const examDate = document.getElementById('examDate').value;
+    const studyHours = document.getElementById('studyHours').value;
+    const knowledgeLevel = document.getElementById('knowledgeLevel').value;
+    
+    // Validating course name input
+    if (!courseName.trim()) {
+      alert('Please enter a course name');
+      return;
+    }
+
+    // Create a unique ID for each course
+    const courseId = Date.now().toString();
+    
+    // Create course object
+    const course = {
+      id: courseId,
+      name: courseName,
+      subject: subjectArea,
+      examDate: examDate,
+      studyHours: studyHours,
+      knowledgeLevel: knowledgeLevel
+    };
+    
+    // Add to courses array
+    courses.push(course);
+    
+    // Save to cache
+    saveCoursesToCache();
+    
+    // Add to the UI
+    addCourseToUI(course);
+    
+    // Close the modal
+    modal.style.display = 'none';
+  }
+  
+  // Function to save courses to Cache API
+  function saveCoursesToCache() {
+    // Check if Cache API is supported
+    if ('caches' in window) {
+      const coursesBlob = new Blob([JSON.stringify(courses)], { type: 'application/json' });
+      const coursesResponse = new Response(coursesBlob);
+      
+      caches.open(CACHE_NAME).then(cache => {
+        cache.put('/courses-data', coursesResponse);
+      }).catch(error => {
+        console.error('Error saving to cache:', error);
+        // Fallback to localStorage if cache fails
+        localStorage.setItem('courses', JSON.stringify(courses));
+      });
+    } else {
+      // Fallback for browsers that don't support Cache API
+      localStorage.setItem('courses', JSON.stringify(courses));
+    }
+  }
+  
+  // Function to load courses from Cache API
+  function loadCoursesFromCache() {
+    // Check if Cache API is supported
+    if ('caches' in window) {
+      caches.open(CACHE_NAME).then(cache => {
+        return cache.match('/courses-data');
+      }).then(response => {
+        if (response) {
+          return response.json();
+        } else {
+          // If no data in cache, try localStorage as fallback
+          const localData = localStorage.getItem('courses');
+          return localData ? JSON.parse(localData) : [];
+        }
+      }).then(data => {
+        courses = data;
+        loadCourses();
+      }).catch(error => {
+        console.error('Error loading from cache:', error);
+        // Try localStorage as fallback
+        const localData = localStorage.getItem('courses');
+        courses = localData ? JSON.parse(localData) : [];
+        loadCourses();
+      });
+    } else {
+      // Fallback for browsers that don't support Cache API
+      const localData = localStorage.getItem('courses');
+      courses = localData ? JSON.parse(localData) : [];
+      loadCourses();
+    }
+  }
+  
+  // Function to add a course card to the UI
+  function addCourseToUI(course) {
+    const courseCard = document.createElement('div');
+    courseCard.className = 'course-card';
+    courseCard.dataset.id = course.id;
+    
+    courseCard.innerHTML = `
+      <div class="course-header">
+        <div class="course-title">${course.name}</div>
+        <div class="course-progress-badge progress-blue">${course.knowledgeLevel}%</div>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill blue" style="width: ${course.knowledgeLevel}%;"></div>
+      </div>
+      <div class="course-details">
+        <div class="course-quiz">
+          <span class="quiz-icon">📅</span>
+          <span class="quiz-date">Next Quiz: ${course.examDate}</span>
+        </div>
+      </div>
+      <div class="course-actions">
+        <button class="edit-btn">Edit</button>
+        <button class="delete-btn">Delete</button>
+      </div>
+    `;
+    
+    coursesGridContainer.appendChild(courseCard);
+    
+    // Add event listener for delete button
+    const deleteBtn = courseCard.querySelector('.delete-btn');
+    deleteBtn.addEventListener('click', function() {
+      deleteCourse(course.id);
+    });
+    
+    // Add event listener for edit button
+    const editBtn = courseCard.querySelector('.edit-btn');
+    editBtn.addEventListener('click', function() {
+      openEditModal(course.id);
+    });
+  }
+  
+  // Function to load courses from memory to UI
+  function loadCourses() {
+    // Clear existing course cards
+    coursesGridContainer.innerHTML = '';
+    
+    // Add each course to the UI
+    courses.forEach(course => {
+      addCourseToUI(course);
+    });
+  }
+  
+  // Function to delete a course
+  function deleteCourse(courseId) {
+    // Filter out the course with the specified ID
+    courses = courses.filter(course => course.id !== courseId);
+    
+    // Save updated courses array to cache
+    saveCoursesToCache();
+    
+    // Remove the course card from the UI
+    const courseCard = document.querySelector(`.course-card[data-id="${courseId}"]`);
+    if (courseCard) {
+      courseCard.remove();
+    }
+  }
+  
+  // Function to open edit modal for a course
+  function openEditModal(courseId) {
+    // Find the course with the specified ID
+    const course = courses.find(course => course.id === courseId);
+    
+    if (!course) return;
+    
+    // Pre-fill the form with course details
+    document.getElementById('courseName').value = course.name;
+    document.getElementById('subjectArea').value = course.subject;
+    document.getElementById('examDate').value = course.examDate;
+    document.getElementById('studyHours').value = course.studyHours;
+    document.getElementById('knowledgeLevel').value = course.knowledgeLevel;
+    
+    // Update the slider
+    rangeValue.textContent = course.knowledgeLevel + '%';
+    knowledgeSlider.style.background = `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${course.knowledgeLevel}%, #e5e7eb ${course.knowledgeLevel}%)`;
+    
+    // Show the modal
+    modal.style.display = 'flex';
+    
+    // Update the create button text
+    const createBtn = document.getElementById('createCourseBtn');
+    createBtn.textContent = 'Update Course';
+    
+    // Remove existing event listeners and add new one for updating
+    createBtn.replaceWith(createBtn.cloneNode(true));
+    document.getElementById('createCourseBtn').addEventListener('click', function() {
+      updateCourse(courseId);
+    });
+  }
+  
+  // Function to update a course
+  function updateCourse(courseId) {
+    // Find the index of the course with the specified ID
+    const courseIndex = courses.findIndex(course => course.id === courseId);
+    
+    if (courseIndex === -1) return;
+    
+    // Update the course details
+    courses[courseIndex] = {
+      ...courses[courseIndex],
+      name: document.getElementById('courseName').value,
+      subject: document.getElementById('subjectArea').value,
+      examDate: document.getElementById('examDate').value,
+      studyHours: document.getElementById('studyHours').value,
+      knowledgeLevel: document.getElementById('knowledgeLevel').value
+    };
+    
+    // Save updated courses array to cache
+    saveCoursesToCache();
+    
+    // Reload courses to refresh the UI
+    loadCourses();
+    
+    // Close the modal
+    modal.style.display = 'none';
+  }
+});
 </script>
+<script src="common.js"></script>
+<script src="profile-picture-manager.js"></script>
+
+
 </body>
 </html>
