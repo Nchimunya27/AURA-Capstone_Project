@@ -1,0 +1,128 @@
+/* profile picture styling */
+
+/* Ensure all profile pictures have consistent styling */
+.user-avatar, 
+.profile-preview, 
+.user-profile-image, 
+.profile-icon {
+  object-fit: cover; 
+  border-radius: 50%; 
+  transition: all 0.3s ease; 
+}
+
+/* adds a border */
+.user-avatar {
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Profile picture preview on settings page */
+.profile-preview {
+  width: 120px;
+  height: 120px;
+  display: block;
+  margin: 0 auto;
+  border: 3px solid #f0f0f0;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Upload button styling */
+.upload-btn {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 8px 16px;
+  background-color: var(--primary-color, #5997ac);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+  text-align: center;
+}
+
+.upload-btn:hover {
+  background-color: var(--primary-color-dark, #4a8697);
+}
+
+/* File input styling (hidden) */
+.file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* Profile upload section styling */
+.profile-picture-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  background-color: var(--bg-light, #f9fafb);
+  border-radius: 8px;
+}
+
+.current-profile-picture {
+  margin-bottom: 15px;
+}
+
+.upload-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-secondary, #6b7280);
+}
+
+/* Enhanced layout for the profile section */
+.profile-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.profile-upload-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Night mode adjustments */
+[data-theme="night"] .profile-picture-container {
+  background-color: var(--bg-dark, #31456e);
+}
+
+[data-theme="night"] .profile-preview {
+  border-color: #424d66;
+}
+
+[data-theme="night"] .upload-btn {
+  background-color: var(--primary-color-night, #7bb5f5);
+}
+
+[data-theme="night"] .upload-btn:hover {
+  background-color: var(--primary-color-night-dark, #6aa4e4);
+}
+
+/* Animation for when profile picture is updated */
+@keyframes profile-update-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(89, 151, 172, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 5px rgba(89, 151, 172, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(89, 151, 172, 0);
+  }
+}
+
+.profile-updated {
+  animation: profile-update-pulse 0.8s ease-out;
+}
