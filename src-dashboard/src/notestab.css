@@ -1,190 +1,215 @@
 /* Notes Tab */
 #notes-tab {
-    display: block; 
-    width: 100%;
-    padding: 20px;
-    background-color: rgb(20, 24, 54);
-  }
-  
-  /* Container for the top row with Recent Documents and Quick Upload */
+  display: block; 
+  width: 100%;
+  padding: 20px;
+  background-color: var(--background-primary, #eeede7);
+}
+
+/* Container for the top row with Recent Documents and Quick Upload */
+.top-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* Recent Documents */
+.recent-documents-panel {
+  flex: 3; 
+  background-color: var(--background-secondary, #ffffff);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.1));
+}
+
+/* Quick Upload*/
+.upload-panel {
+  flex: 1; 
+  background-color: var(--background-secondary, #ffffff);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.1));
+}
+
+/* Course Documents */
+.course-documents-panel {
+  width: 100%;
+  background-color: var(--background-secondary, #ffffff);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.1));
+}
+
+/* Panel titles */
+.panel-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary, #000000);
+  margin-bottom: 20px;
+}
+
+/* Document Grid */
+.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 15px;
+}
+
+/* Document Cards */
+.document-card {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background-color: var(--background-tertiary, #eeede7);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.document-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Document Icons */
+.document-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  margin-right: 15px;
+  font-size: 20px;
+}
+
+.pdf-icon {
+  background-color: #f44336;
+  color: white;
+}
+
+.docx-icon {
+  background-color: #2196f3;
+  color: white;
+}
+
+/* Document Info */
+.document-info {
+  flex: 1;
+}
+
+.document-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: var(--text-primary, #000000);
+}
+
+.document-date {
+  font-size: 13px;
+  color: var(--text-secondary, #6b7280);
+  margin: 0;
+}
+
+/* Upload Area */
+.upload-area {
+  border: 2px dashed var(--border-color, #e5e7eb);
+  border-radius: 8px;
+  padding: 25px 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: calc(100% - 60px);
+  min-height: 200px;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.upload-icon {
+  font-size: 30px;
+  color: var(--text-secondary, #6b7280);
+  margin-bottom: 15px;
+}
+
+.upload-text {
+  font-size: 14px;
+  color: var(--text-secondary, #6b7280);
+  margin-bottom: 15px;
+}
+
+.browse-btn {
+  background-color: var(--accent-color, #5997ac);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.browse-btn:hover {
+  background-color: var(--accent-hover, #4a7e8f);
+}
+
+/* Course Document List */
+.document-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.document-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: var(--background-tertiary, #eeede7);
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+
+.document-item:hover {
+  transform: translateY(-2px);
+}
+
+.document-item-left {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.document-download {
+  color: var(--accent-color, #5997ac);
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.document-download:hover {
+  color: var(--accent-hover, #4a7e8f);
+  transform: scale(1.1);
+}
+
+/* Night Mode Specific Adjustments */
+[data-theme="night"] .document-title {
+  color: var(--text-primary, #ffffff);
+}
+
+[data-theme="night"] .upload-area:hover {
+  border-color: var(--accent-color, #7bb5f5);
+  background-color: rgba(123, 181, 245, 0.05);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
   .top-row {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
+    flex-direction: column;
   }
   
-  /* Recent Documents */
-  .recent-documents-panel {
-    flex: 3; 
-    background-color: rgb(59, 70, 117);
-    border-radius: 12px;
-    padding: 20px;
-  }
-  
-  /* Quick Upload*/
-  .upload-panel {
-    flex: 1; 
-    background-color: rgb(59, 70, 117);
-    border-radius: 12px;
-    padding: 20px;
-  }
-  
-  /* Course Documents */
-  .course-documents-panel {
+  .recent-documents-panel, .upload-panel {
     width: 100%;
-    background-color: rgb(59, 70, 117);
-    border-radius: 12px;
-    padding: 20px;
-    margin-top: 20px;
   }
-  
-  /* Panel titles */
-  .panel-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: white;
-    margin-bottom: 20px;
-  }
-  
-  /* Document Grid */
-  .documents-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 15px;
-  }
-  
-  /* Document Cards */
-  .document-card {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    background-color: rgb(47, 58, 99);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-  }
-  
-  .document-card:hover {
-    transform: translateY(-2px);
-  }
-  
-  /* Document Icons */
-  .document-icon {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 5px;
-    margin-right: 15px;
-    font-size: 20px;
-  }
-  
-  .pdf-icon {
-    background-color: #f44336;
-    color: white;
-  }
-  
-  .docx-icon {
-    background-color: #2196f3;
-    color: white;
-  }
-  
-  /* Document Info */
-  .document-info {
-    flex: 1;
-  }
-  
-  .document-title {
-    font-size: 16px;
-    font-weight: 500;
-    margin-bottom: 5px;
-    color: white;
-  }
-  
-  .document-date {
-    font-size: 13px;
-    color: rgb(170, 178, 200);
-    margin: 0;
-  }
-  
-  /* Upload Area */
-  .upload-area {
-    border: 2px dashed rgb(100, 116, 139);
-    border-radius: 8px;
-    padding: 25px 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    height: calc(100% - 60px);
-    min-height: 200px;
-  }
-  
-  .upload-icon {
-    font-size: 30px;
-    color: rgb(148, 163, 184);
-    margin-bottom: 15px;
-  }
-  
-  .upload-text {
-    font-size: 14px;
-    color: rgb(148, 163, 184);
-    margin-bottom: 15px;
-  }
-  
-  .browse-btn {
-    background-color: rgb(99, 145, 235);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 8px 20px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .browse-btn:hover {
-    background-color: rgb(79, 116, 188);
-  }
-  
-  /* Course Document List */
-  .document-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .document-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    background-color: rgb(47, 58, 99);
-    border-radius: 8px;
-  }
-  
-  .document-item-left {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-  }
-  
-  .document-download {
-    color: rgb(148, 163, 184);
-    font-size: 18px;
-    cursor: pointer;
-    transition: color 0.2s;
-  }
-  
-  .document-download:hover {
-    color: white;
-  }
-  
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .recent-documents-panel, .upload-panel {
-      flex-basis: 100%; 
-    }
-  }
+}
