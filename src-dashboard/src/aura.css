@@ -388,14 +388,37 @@ body {
 /* Course Cards */
 .courses-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr); /* Exactly two columns */
+    gap: 12px; /* Reduced from 20px to 12px */
     margin-top: 20px;
+    width: 67%;
+}
+
+.course-card {
+    background-color: var(--background-secondary);
+    border-radius: 7px;
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 8px; /* Add small margin at bottom */
+}
+
+/* Adjust the hover effect to be more subtle */
+.course-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 5px rgba(0,0,0,0.1);
+}
+
+/* Remove the course-row class as it's no longer needed */
+.course-row {
+    width: 100%;
 }
 
 .achievements-section {
     position: absolute;
-    top: 80px;
+    top: 30px;
     right: 20px;
     width: 350px;  /* Adjust based on your needs */
     background-color: var(--background-secondary);
@@ -486,20 +509,6 @@ body {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
-}
-
-.course-card {
-    background-color: var(--background-secondary);
-    border-radius: 7px;
-    padding: 16px;
-    border: 1px solid var(--border-color);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
-    cursor: pointer;
-}
-
-.course-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .course-header {
@@ -632,10 +641,11 @@ body {
 
 /* Quick Stats */
 .quick-stats {
-    margin-top: 20px;
+    margin-top: 1px;
     position: absolute; 
-    top: 440px; /* Adjusted top position to appear below achievements */
+    top: 340px; /* Adjusted top position to appear below achievements */
     right: 20px;
+    height: 305px;
     width: 350px;  /* Adjust based on your needs */
     background-color: var(--background-secondary);
     border-radius: 7px;
@@ -648,10 +658,10 @@ body {
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    margin-top: 15px;
-    padding: 20px;
+    grid-template-columns: repeat(2, 1.5fr);
+    gap: 10px;
+    /* margin-top: 15px; */
+    padding: 8px;
 }
 
 .stat-item {
@@ -659,7 +669,7 @@ body {
     padding: 15px;
     border-radius: 7px;
     background-color: var(--stats-background);
-    margin-top: 20px;
+    margin-top: 5px;
     transition: background-color 0.3s ease;
 }
 
@@ -885,6 +895,11 @@ body {
 
     .calendar-header {
         display: none;
+    }
+
+    .courses-grid {
+        grid-template-columns: 1fr;
+        gap: 10px; /* Even smaller gap on mobile */
     }
 }
 
@@ -1449,4 +1464,90 @@ label {
       
    
 
+}
+
+.no-courses-message {
+    text-align: center;
+    padding: 2rem;
+    background-color: var(--background-secondary);
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.no-courses-message p {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.no-courses-message .add-course-btn {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.no-courses-message .add-course-btn:hover {
+    background-color: var(--accent-color-dark);
+}
+
+.error-message {
+    text-align: center;
+    padding: 1rem;
+    background-color: #fee2e2;
+    border: 1px solid #ef4444;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.error-message p {
+    color: #dc2626;
+    font-weight: 500;
+}
+
+.no-content-message {
+    text-align: center;
+    padding: 2rem;
+    background-color: var(--background-secondary);
+    border-radius: 8px;
+    margin: 1rem 0;
+    color: var(--text-secondary);
+}
+
+.no-content-message p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* Update tasks list empty state */
+.tasks-list:empty::after {
+    content: 'No upcoming tasks';
+    display: block;
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* Update achievements list empty state */
+.achievements-list:empty::after {
+    content: 'No achievements yet';
+    display: block;
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* Update stats grid empty state */
+.stats-grid:empty::after {
+    content: 'No stats available';
+    display: block;
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
 }

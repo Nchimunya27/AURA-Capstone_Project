@@ -243,6 +243,13 @@
           </div>
         </div>
 
+        <div id="flashcard-generator-container" class="flashcard-generator-section">
+          <p id="generation-status"></p>
+          <div id="loading-indicator" style="display: none;">
+            <i class="fas fa-spinner fa-spin"></i> Processing...
+          </div>
+        </div>
+
                 <!-- Flashcards Tab Content -->
         <div class="tab-content" id="flashcards-tab" style="display: none;">
           <div class="flashcard-actions">
@@ -259,7 +266,6 @@
           <div class="flashcard-container">
             <div class="flashcard-item">
               <div class="flashcard-front">
-                <p class="flashcard-category">Web Development</p>
                 <h3 class="flashcard-question">What does HTML Stand for?</h3>
                 
                 <div class="flashcard-controls">
@@ -270,9 +276,8 @@
                 </div>
               </div>
               <div class="flashcard-back">
-                <p class="flashcard-category">Web Development</p>
                 <h3 class="flashcard-answer">HyperText Markup Language</h3>
-                
+
                 <div class="flashcard-controls">
                   <button class="show-answer-btn">Show Question</button>
                   <button class="rotate-btn">
@@ -332,6 +337,7 @@
         </div>
 
 
+
                 <!-- Notes Tab Content -->
         <div class="tab-content" id="notes-tab" style="display: none;">
           <div class="section-content">
@@ -378,69 +384,7 @@
 
           <!-- Course Documents Section -->
           <div class="course-documents">
-            <h2 class="section-title">Course Documents</h2>
-            
-            <div class="document-list">
-              <div class="document-item">
-                <div class="document-item-left">
-                  <div class="document-icon pdf-icon">
-                    <i class="fas fa-file-pdf"></i>
-                  </div>
-                  <div class="document-info">
-                    <h3 class="document-title">Introduction to Programming.pdf</h3>
-                    <p class="document-date">Added 2 days ago</p>
-                  </div>
-                </div>
-                <div class="document-download">
-                  <i class="fas fa-download"></i>
-                </div>
-              </div>
-              
-              <div class="document-item">
-                <div class="document-item-left">
-                  <div class="document-icon pdf-icon">
-                    <i class="fas fa-file-pdf"></i>
-                  </div>
-                  <div class="document-info">
-                    <h3 class="document-title">Variables and Data Types.pdf</h3>
-                    <p class="document-date">Added 5 days ago</p>
-                  </div>
-                </div>
-                <div class="document-download">
-                  <i class="fas fa-download"></i>
-                </div>
-              </div>
-              
-              <div class="document-item">
-                <div class="document-item-left">
-                  <div class="document-icon pdf-icon">
-                    <i class="fas fa-file-pdf"></i>
-                  </div>
-                  <div class="document-info">
-                    <h3 class="document-title">Introduction to Programming.pdf</h3>
-                    <p class="document-date">Added 2 days ago</p>
-                  </div>
-                </div>
-                <div class="document-download">
-                  <i class="fas fa-download"></i>
-                </div>
-              </div>
-              
-              <div class="document-item">
-                <div class="document-item-left">
-                  <div class="document-icon pdf-icon">
-                    <i class="fas fa-file-pdf"></i>
-                  </div>
-                  <div class="document-info">
-                    <h3 class="document-title">Variables and Data Types.pdf</h3>
-                    <p class="document-date">Added 5 days ago</p>
-                  </div>
-                </div>
-                <div class="document-download">
-                  <i class="fas fa-download"></i>
-                </div>
-              </div>
-            </div>
+            <h2 class="section-title">Course Documents</h2>        
           </div>
         </div>
       </header>
@@ -594,46 +538,7 @@
                 <button class="link-btn">View All</button>
               </header>
               <div class="document-list">
-                <div class="document-item">
-                  <div class="document-info">
-                    <div class="icon-wrapper">
-                      <img
-                        src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/7eeb31c9772435be613db098dd0e531621558f7460de936f53cb8ddcc62deacc?placeholderIfAbsent=true"
-                        alt="PDF"
-                        class="document-icon"
-                      />
-                    </div>
-                    <div class="document-details">
-                      <h4>Introduction to Programming.pdf</h4>
-                      <p>Added 2 days ago</p>
-                    </div>
-                  </div>
-                  <img
-                    src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/541499bdfc8ad1548292b67af0abdbdc4d1be01c226849e2dd953b248c59de14?placeholderIfAbsent=true"
-                    alt="Download"
-                    class="download-icon"
-                  />
-                </div>
-                <div class="document-item">
-                  <div class="document-info">
-                    <div class="icon-wrapper">
-                      <img
-                        src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/442f06f226280e6f6c8217e84684d170484abff6a96863218e83d4581355b1b4?placeholderIfAbsent=true"
-                        alt="PDF"
-                        class="document-icon"
-                      />
-                    </div>
-                    <div class="document-details">
-                      <h4>Variables and Data Types.pdf</h4>
-                      <p>Added 5 days ago</p>
-                    </div>
-                  </div>
-                  <img
-                    src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/1641ce72c16b52755fd91fe9acc89a93d18dd85a8b340d232fe472931f2c706d?placeholderIfAbsent=true"
-                    alt="Download"
-                    class="download-icon"
-                  />
-                </div>
+                <!-- Documents will be added dynamically -->
               </div>
             </article>
   
