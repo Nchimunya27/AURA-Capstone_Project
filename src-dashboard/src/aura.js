@@ -3,364 +3,437 @@
  * Handles all interactive functionality for the learning dashboard
  */
 
-class Dashboard {
-    constructor() {
-        // Cache DOM elements
-        this.elements = {
-            date: document.querySelector('.current-date'),
-            streakCount: document.querySelector('.streak-count'),
-            streakText: document.querySelector('.streak-text'),
-            progressBars: document.querySelectorAll('.progress-bar'),
-            navItems: document.querySelectorAll('.nav-item'),
-            calendar: document.querySelector('.calendar-grid'),
-            tasks: document.querySelector('.tasks-list'),
-            courseCards: document.querySelectorAll('.course-card'),
-            statsContainer: document.querySelector('.quick-stats')
-        };
+// Immediate-executing function to avoid global namespace pollution
+(function() {
+    // Wait for DOM content to be loaded
+    document.addEventListener('DOMContentLoaded', async function() {
+        
+        const dashboard = new Dashboard();
+        window.dashboard = dashboard; // Make dashboard accessible globally
 
-        // Bind methods to maintain this context
-        this.updateDate = this.updateDate.bind(this);
-        this.updateStreak = this.updateStreak.bind(this);
-        this.handleNavigation = this.handleNavigation.bind(this);
-        this.handleLogout = this.handleLogout.bind(this);
-
-        // Initialize the dashboard
-        this.init();
-    }
-
-    /**
-     * Initialize all dashboard components
-     */
-    init() {
-        this.updateDate();
-        this.initializeProgressBars();
-        this.initializeNavigation();
-        this.initializeCalendar();
-        this.updateStreak();
-        this.initializeTaskList();
-        this.initializeCourseCards();
-        this.initializeQuickStats();
-        this.setupPeriodicUpdates();
-        this.setupLogoutButton();
-    }
-
-    setupLogoutButton() {
-        const logoutButton = document.getElementById('logoutButton');
-        if (logoutButton) {
-            logoutButton.addEventListener('click', this.handleLogout);
-        }
-    }
-
-    async handleLogout() {
+        // Then, add Supabase functionality on top
         try {
-            // Remove current user from session storage
-            sessionStorage.removeItem('currentUser');
+            // Initialize Supabase client
+            const supabaseClient = supabase.createClient(
+                'https://uumdfsnboqkounadxijq.supabase.co', //Supabase URL
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1bWRmc25ib3Frb3VuYWR4aWpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIzNDc5NzMsImV4cCI6MjA1NzkyMzk3M30.s3IDgE3c4kpaiRhCpaKATKdaZzdlTb91heIhrwDZrU0' //anon key
+            );
+
+            // Check if user is logged in
+            const { data: { session } } = await supabaseClient.auth.getSession();
             
-            // Check if user was remembered
-            let savedUser = null;
-            
-            try {
-                const cache = await caches.open('aura-user-cache');
-                const response = await cache.match('/currentUser');
-                
-                if (response) {
-                    savedUser = await response.json();
-                }
-            } catch (error) {
-                console.log('Cache retrieval failed, using localStorage', error);
-                const localData = localStorage.getItem('currentUser');
-                savedUser = localData ? JSON.parse(localData) : null;
+            if (!session) {
+                // Redirect to login page if not logged in
+                window.location.href = '../../aura-login/login.html'; // Adjust path as needed
+                return;
             }
+
+            // Get user profile information 
+            const { data: profile, error } = await supabaseClient
+                .from('profiles')
+                .select('username, full_name')
+                .eq('id', session.user.id)
+                .single();
             
-            // Only remove from cache/localStorage if user is not "remembered"
-            if (savedUser && !savedUser.remembered) {
+            if (error) {
+                console.error('Error fetching user profile:', error);
+            } else if (profile) {
+                // Update welcome message
+                const welcomeTextElement = document.querySelector('.welcome-text');
+                if (welcomeTextElement) {
+                    welcomeTextElement.textContent = `Welcome back, ${profile.username}!`;
+                }
+
+                // Update username in sidebar
+                const userNameElement = document.querySelector('.user-name');
+                if (userNameElement) {
+                    userNameElement.textContent = profile.username;
+                }
+            }
+
+            // Override logout button functionality for Supabase
+            const logoutButton = document.getElementById('logoutButton');
+            if (logoutButton) {
+                // Remove previous event listeners
+                const newLogoutButton = logoutButton.cloneNode(true);
+                logoutButton.parentNode.replaceChild(newLogoutButton, logoutButton);
+                
+                // Add new event listener
+                newLogoutButton.addEventListener('click', async () => {
+                    try {
+                        await supabaseClient.auth.signOut();
+                        window.location.href = '../../aura-login/login.html';
+                    } catch (error) {
+                        console.error('Error signing out:', error);
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Supabase initialization error:', error);
+        }
+    });
+
+    // dashboard cace class
+    class Dashboard {
+        constructor() {
+            // Cache DOM elements
+            this.elements = {
+                date: document.querySelector('.current-date'),
+                streakCount: document.querySelector('.streak-count'),
+                streakText: document.querySelector('.streak-text'),
+                progressBars: document.querySelectorAll('.progress-bar'),
+                navItems: document.querySelectorAll('.nav-item'),
+                calendar: document.querySelector('.calendar-grid'),
+                tasks: document.querySelector('.tasks-list'),
+                courseCards: document.querySelectorAll('.course-card'),
+                statsContainer: document.querySelector('.quick-stats')
+            };
+
+            // Bind methods to maintain this context
+            this.updateDate = this.updateDate.bind(this);
+            this.updateStreak = this.updateStreak.bind(this);
+            this.handleNavigation = this.handleNavigation.bind(this);
+            this.handleLogout = this.handleLogout.bind(this);
+
+            // Initialize the dashboard
+            this.init();
+        }
+
+        /**
+         * Initialize all dashboard components
+         */
+        init() {
+            this.updateDate();
+            this.initializeProgressBars();
+            this.initializeNavigation();
+            this.initializeCalendar();
+            this.updateStreak();
+            this.initializeTaskList();
+            this.initializeCourseCards();
+            this.initializeQuickStats();
+            this.setupPeriodicUpdates();
+            this.setupLogoutButton();
+        }
+
+        setupLogoutButton() {
+            const logoutButton = document.getElementById('logoutButton');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', this.handleLogout);
+            }
+        }
+
+        async handleLogout() {
+            try {
+                // Remove current user from session storage
+                sessionStorage.removeItem('currentUser');
+                
+                // Check if user was remembered
+                let savedUser = null;
+                
                 try {
                     const cache = await caches.open('aura-user-cache');
-                    await cache.delete('/currentUser');
+                    const response = await cache.match('/currentUser');
+                    
+                    if (response) {
+                        savedUser = await response.json();
+                    }
                 } catch (error) {
-                    console.log('Cache deletion failed', error);
+                    console.log('Cache retrieval failed, using localStorage', error);
+                    const localData = localStorage.getItem('currentUser');
+                    savedUser = localData ? JSON.parse(localData) : null;
                 }
-                localStorage.removeItem('currentUser');
-            }
-            
-            // Redirect to login page
-            window.location.href = '../../aura-login/login.html';
-        } catch (error) {
-            console.error('Error during logout:', error);
-        }
-    }
-
-
-
-    /**
-     * Update the current date display
-     */
-    updateDate() {
-        const currentDate = new Date();
-        const options = { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-        };
-        
-        if (this.elements.date) {
-            this.elements.date.textContent = currentDate.toLocaleDateString('en-US', options);
-        }
-    }
-
-    /**
-     * Initialize and update progress bars
-     */
-    initializeProgressBars() {
-        this.elements.progressBars.forEach(bar => {
-            try {
-                const card = bar.closest('.course-card');
-                if (!card) return;
-
-                const progressText = card.querySelector('.course-progress');
-                if (!progressText) return;
-
-                const percentage = parseInt(progressText.textContent);
-                const fill = bar.querySelector('.progress-fill');
                 
-                if (fill) {
-                    fill.style.width = `${percentage}%`;
-                    fill.style.backgroundColor = this.getProgressColor(percentage);
+                // Only remove from cache/localStorage if user is not "remembered"
+                if (savedUser && !savedUser.remembered) {
+                    try {
+                        const cache = await caches.open('aura-user-cache');
+                        await cache.delete('/currentUser');
+                    } catch (error) {
+                        console.log('Cache deletion failed', error);
+                    }
+                    localStorage.removeItem('currentUser');
                 }
+                
+                // Redirect to login page
+                window.location.href = '../../aura-login/login.html';
             } catch (error) {
-                console.error('Error initializing progress bar:', error);
+                console.error('Error during logout:', error);
             }
-        });
-    }
+        }
 
-    /**
-     * Get color based on progress percentage
-     */
-    getProgressColor(percentage) {
-        if (percentage >= 75) return '#22c55e'; // Green
-        if (percentage >= 50) return '#f59e0b'; // Orange
-        if (percentage >= 25) return '#f97316'; // Light Red
-        return '#ef4444'; // Red
-    }
-
-    /**
-     * Initialize navigation functionality
-     */
-    initializeNavigation() {
-        this.elements.navItems.forEach(item => {
-            item.addEventListener('click', this.handleNavigation);
-        });
-    }
-
-    /**
-     * Handle navigation item clicks,
-     * EDIT ADDED: Additions made to work with the settings page
-     */
-    handleNavigation(event) {
-        const clickedItem = event.currentTarget;
-
-        this.elements.navItems.forEach(item => {
-            item.classList.remove('active');
-        });
-        clickedItem.classList.add('active');
-
-        // get nav text to determine which page to navigate to 
-        const navText = clickedItem.querySelector('.nav-text').textContent.trim();
-
-        // navigate based on the nav item text
-        switch(navText) {
+        /**
+         * Update the current date display
+         */
+        updateDate() {
+            const currentDate = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
             
-            case 'Dashboard':
-                window.location.href = 'aura.html';
-                break;
+            if (this.elements.date) {
+                this.elements.date.textContent = currentDate.toLocaleDateString('en-US', options);
+            }
+        }
 
-            case 'Settings':
-                window.location.href = 'settings.html';
-                break;
-            
-            case 'My Courses':
-                window.location.href = 'mycourses.html';
-                break;
+        /**
+         * Initialize and update progress bars
+         */
+        initializeProgressBars() {
+            this.elements.progressBars.forEach(bar => {
+                try {
+                    const card = bar.closest('.course-card');
+                    if (!card) return;
 
-            case 'Calendar':
-                window.location.href = 'calendar.html';
-                break;
+                    const progressText = card.querySelector('.course-progress');
+                    if (!progressText) return;
+
+                    const percentage = parseInt(progressText.textContent);
+                    const fill = bar.querySelector('.progress-fill');
+                    
+                    if (fill) {
+                        fill.style.width = `${percentage}%`;
+                        fill.style.backgroundColor = this.getProgressColor(percentage);
+                    }
+                } catch (error) {
+                    console.error('Error initializing progress bar:', error);
+                }
+            });
+        }
+
+        /**
+         * Get color based on progress percentage
+         */
+        getProgressColor(percentage) {
+            if (percentage >= 75) return '#22c55e'; // Green
+            if (percentage >= 50) return '#f59e0b'; // Orange
+            if (percentage >= 25) return '#f97316'; // Light Red
+            return '#ef4444'; // Red
+        }
+
+        /**
+         * Initialize navigation functionality
+         */
+        initializeNavigation() {
+            this.elements.navItems.forEach(item => {
+                item.addEventListener('click', this.handleNavigation);
+            });
+        }
+
+        /**
+         * Handle navigation item clicks,
+         * EDIT ADDED: Additions made to work with the settings page
+         */
+        handleNavigation(event) {
+            const clickedItem = event.currentTarget;
+
+            this.elements.navItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            clickedItem.classList.add('active');
+
+            // get nav text to determine which page to navigate to 
+            const navText = clickedItem.querySelector('.nav-text').textContent.trim();
+
+            // navigate based on the nav item text
+            switch(navText) {
                 
-            case 'Progress Analytics':
+                case 'Dashboard':
+                    window.location.href = 'aura.html';
+                    break;
+
+                case 'Settings':
+                    window.location.href = 'settings.html';
+                    break;
+                
+                case 'My Courses':
+                    window.location.href = 'mycourses.html';
+                    break;
+
+                case 'Calendar':
+                    window.location.href = 'calendar.html';
+                    break;
+                    
+                case 'Progress Analytics':
                     window.location.href = 'progress-analytics.html';
                     break;
 
-            case 'About Us':
-                window.location.href = 'aboutus.html';
-                break;
+                case 'About Us':
+                    window.location.href = 'aboutus.html';
+                    break;
 
-        }
-    }
-
-    /**
-     * Initialize calendar display
-     */
-    initializeCalendar() {
-        if (!this.elements.calendar) return;
-
-        const currentDay = new Date().getDate();
-        const days = this.elements.calendar.querySelectorAll('.calendar-day');
-
-        days.forEach(day => {
-            const dayNumber = parseInt(day.textContent);
-            if (dayNumber === currentDay) {
-                day.classList.add('active');
             }
-        });
-    }
-
-    /**
-     * Update streak information
-     */
-    updateStreak() {
-        const { streakCount, streakText } = this.elements;
-        
-        if (streakCount && streakText) {
-            const days = parseInt(streakCount.textContent);
-            streakText.textContent = `${days} day streak`;
         }
-    }
 
-    /**
-     * Initialize task list with sorting and filtering
-     */
-    initializeTaskList() {
-        if (!this.elements.tasks) return;
+        /**
+         * Initialize calendar display
+         */
+        initializeCalendar() {
+            if (!this.elements.calendar) return;
 
-        const tasks = Array.from(this.elements.tasks.querySelectorAll('.task-item'));
-        
-        // Sort tasks by date
-        tasks.sort((a, b) => {
-            const dateA = new Date(a.querySelector('.task-date').textContent);
-            const dateB = new Date(b.querySelector('.task-date').textContent);
-            return dateA - dateB;
-        });
+            const currentDay = new Date().getDate();
+            const days = this.elements.calendar.querySelectorAll('.calendar-day');
 
-        // Clear and reappend sorted tasks
-        const tasksList = this.elements.tasks;
-        tasksList.innerHTML = '';
-        tasks.forEach(task => tasksList.appendChild(task));
-    }
+            days.forEach(day => {
+                const dayNumber = parseInt(day.textContent);
+                if (dayNumber === currentDay) {
+                    day.classList.add('active');
+                }
+            });
+        }
 
-    /**
-     * Initialize course cards with progress tracking
-     */
-    initializeCourseCards() {
-        this.elements.courseCards.forEach(card => {
-            card.addEventListener('click', () => {
-                const courseTitle = card.querySelector('.course-title').textContent;
-                // Add a data attribute to your cards like data-course-id="web-dev" if possible
-                const courseId = card.dataset.courseId || this.getCourseIdFromTitle(courseTitle);
-                this.navigateToCourse(courseId, courseTitle);
+        /**
+         * Update streak information
+         */
+        updateStreak() {
+            const { streakCount, streakText } = this.elements;
+            
+            if (streakCount && streakText) {
+                const days = parseInt(streakCount.textContent);
+                streakText.textContent = `${days} day streak`;
+            }
+        }
+
+        /**
+         * Initialize task list with sorting and filtering
+         */
+        initializeTaskList() {
+            if (!this.elements.tasks) return;
+
+            const tasks = Array.from(this.elements.tasks.querySelectorAll('.task-item'));
+            
+            // Sort tasks by date
+            tasks.sort((a, b) => {
+                const dateA = new Date(a.querySelector('.task-date').textContent);
+                const dateB = new Date(b.querySelector('.task-date').textContent);
+                return dateA - dateB;
             });
 
-            // Initialize progress indicators
-            this.updateCourseProgress(card);
-        });
-    }
-
-    /**
-     * Dashboard to course navigation
-     */
-    navigateToCourse(courseId, courseTitle) {
-        // Use the courseTitle passed from the click handler
-        switch(courseTitle) {
-            case 'Web Development':
-                window.location.href = 'coursepage.html';
-                break;
-            
-                // Add more cases as needed
+            // Clear and reappend sorted tasks
+            const tasksList = this.elements.tasks;
+            tasksList.innerHTML = '';
+            tasks.forEach(task => tasksList.appendChild(task));
         }
-    }
-    
-    /**
-     * Optional helper to convert course titles to URL-friendly IDs
-     */
-    getCourseIdFromTitle(title) {
-        return title.toLowerCase().replace(/\s+/g, '-');
-    }
 
-    /**
-     * Update individual course progress
-     */
-    updateCourseProgress(card) {
-        const progress = card.querySelector('.course-progress');
-        const progressBar = card.querySelector('.progress-fill');
+        /**
+         * Initialize course cards with progress tracking
+         */
+        initializeCourseCards() {
+            this.elements.courseCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const courseTitle = card.querySelector('.course-title').textContent;
+                    // Add a data attribute to your cards like data-course-id="web-dev" if possible
+                    const courseId = card.dataset.courseId || this.getCourseIdFromTitle(courseTitle);
+                    this.navigateToCourse(courseId, courseTitle);
+                });
 
-        if (progress && progressBar) {
-            const percentage = parseInt(progress.textContent);
-            progressBar.style.width = `${percentage}%`;
-            progressBar.style.backgroundColor = this.getProgressColor(percentage);
+                // Initialize progress indicators
+                this.updateCourseProgress(card);
+            });
         }
-    }
 
-    /**
-     * Show course details (placeholder for modal/detailed view)
-     */
-    showCourseDetails(courseTitle) {
-        console.log(`Showing details for: ${courseTitle}`);
-        // Implementation for showing course details would go here
-    }
-
-    /**
-     * Initialize quick stats display
-     */
-    initializeQuickStats() {
-        if (!this.elements.statsContainer) return;
-
-        const stats = {
-            coursesInProgress: this.elements.courseCards.length,
-            completedQuizzes: this.calculateCompletedQuizzes(),
-            flashcardsMastered: this.calculateMasteredFlashcards(),
-            averageScore: this.calculateAverageScore()
-        };
-
-        Object.entries(stats).forEach(([stat, value]) => {
-            const element = this.elements.statsContainer.querySelector(`[data-stat="${stat}"]`);
-            if (element) {
-                element.textContent = stat === 'averageScore' ? `${value}%` : value;
+        /**
+         * Dashboard to course navigation
+         */
+        navigateToCourse(courseId, courseTitle) {
+            // Use the courseTitle passed from the click handler
+            switch(courseTitle) {
+                case 'Web Development':
+                    window.location.href = 'coursepage.html';
+                    break;
+                
+                    // Add more cases as needed
             }
-        });
-    }
-
-    /**
-     * Calculate completed quizzes (placeholder)
-     */
-    calculateCompletedQuizzes() {
-        return 28; // This would normally fetch from an API
-    }
-
-    /**
-     * Calculate mastered flashcards (placeholder)
-     */
-    calculateMasteredFlashcards() {
-        return 156; // This would normally fetch from an API
-    }
-
-    /**
-     * Calculate average score (placeholder)
-     */
-    calculateAverageScore() {
-        return 85; // This would normally fetch from an API
-    }
-
-    /**
-     * Setup periodic updates for dynamic content
-     */
-    setupPeriodicUpdates() {
-        // Update date every minute
-        setInterval(this.updateDate, 60000);
+        }
         
-        // Update streak every 5 minutes
-        setInterval(this.updateStreak, 300000);
+        /**
+         * Optional helper to convert course titles to URL-friendly IDs
+         */
+        getCourseIdFromTitle(title) {
+            return title.toLowerCase().replace(/\s+/g, '-');
+        }
+
+        /**
+         * Update individual course progress
+         */
+        updateCourseProgress(card) {
+            const progress = card.querySelector('.course-progress');
+            const progressBar = card.querySelector('.progress-fill');
+
+            if (progress && progressBar) {
+                const percentage = parseInt(progress.textContent);
+                progressBar.style.width = `${percentage}%`;
+                progressBar.style.backgroundColor = this.getProgressColor(percentage);
+            }
+        }
+
+        /**
+         * Show course details (placeholder for modal/detailed view)
+         */
+        showCourseDetails(courseTitle) {
+            console.log(`Showing details for: ${courseTitle}`);
+            // Implementation for showing course details would go here
+        }
+
+        /**
+         * Initialize quick stats display
+         */
+        initializeQuickStats() {
+            if (!this.elements.statsContainer) return;
+
+            const stats = {
+                coursesInProgress: this.elements.courseCards.length,
+                completedQuizzes: this.calculateCompletedQuizzes(),
+                flashcardsMastered: this.calculateMasteredFlashcards(),
+                averageScore: this.calculateAverageScore()
+            };
+
+            Object.entries(stats).forEach(([stat, value]) => {
+                const element = this.elements.statsContainer.querySelector(`[data-stat="${stat}"]`);
+                if (element) {
+                    element.textContent = stat === 'averageScore' ? `${value}%` : value;
+                }
+            });
+        }
+
+        /**
+         * Calculate completed quizzes (placeholder)
+         */
+        calculateCompletedQuizzes() {
+            return 28; // This would normally fetch from an API
+        }
+
+        /**
+         * Calculate mastered flashcards (placeholder)
+         */
+        calculateMasteredFlashcards() {
+            return 156; // This would normally fetch from an API
+        }
+
+        /**
+         * Calculate average score (placeholder)
+         */
+        calculateAverageScore() {
+            return 85; // This would normally fetch from an API
+        }
+
+        /**
+         * Setup periodic updates for dynamic content
+         */
+        setupPeriodicUpdates() {
+            // Update date every minute
+            setInterval(this.updateDate, 60000);
+            
+            // Update streak every 5 minutes
+            setInterval(this.updateStreak, 300000);
+        }
     }
-}
+
+    // Expose the Dashboard class to the global scope
+    window.Dashboard = Dashboard;
+})();
 
 document.addEventListener('DOMContentLoaded', function() {
     class Calendar {
@@ -532,17 +605,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    const calendar = new Calendar();
+    // Only initialize Calendar if not already initialized
+    if (!window.calendarInitialized) {
+        const calendar = new Calendar();
+        window.calendarInitialized = true;
+    }
 });
 
-// Initialize dashboard when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    const dashboard = new Dashboard();
-});
-
-// initialize navigation links
+// Initialize navigation links
 document.addEventListener('DOMContentLoaded', function() {
-    initializeNavigation();
+    // Check if initializeNavigation function exists
+    if (typeof initializeNavigation === 'function') {
+        initializeNavigation();
+    }
 });
 
 // Progress Analytics navigation handler - works from any page
@@ -552,6 +627,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const dashboardContent = document.querySelector('.dashboard > .body > .content-wrapper > .layout-container > .main-content-column');
     const sidebarColumn = document.querySelector('.dashboard > .body > .content-wrapper > .layout-container > .sidebar-column');
     const progressAnalyticsPage = document.querySelector('.progress-analytics-page');
+    
+    // Find Progress Analytics item
+    const progressAnalyticsItem = Array.from(navItems).find(item => {
+        const navText = item.querySelector('.nav-text');
+        return navText && navText.textContent.trim() === 'Progress Analytics';
+    });
     
     // Check if Progress Analytics page exists, if not, add it to the DOM
     let analyticsPageExists = !!progressAnalyticsPage;
@@ -564,7 +645,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add event listeners to other nav items to handle returning to dashboard
     navItems.forEach(navItem => {
       // Skip the Progress Analytics item
-      if (navItem !== progressAnalyticsItem) {
+      if (progressAnalyticsItem && navItem !== progressAnalyticsItem) {
         navItem.addEventListener('click', function() {
           // Only handle dashboard display, don't interfere with original navigation
           const analytics = progressAnalyticsPage || addedAnalyticsPage;
