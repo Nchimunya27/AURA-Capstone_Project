@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AURA Desktop App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Nunito:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #A7C7E7;
+      --secondary: #9B8FCB;
+      --accent: #E6B3CC;
+      --background: #303030;
+      --text: #FFFFFF;
+    }
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+      outline: 0;
+    }
+    body {
+      background: linear-gradient(to bottom, #241d33 0%, #171930 51%, #091119 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      flex-direction: column;
+      position: relative;
+      opacity: 1;
+      transition: opacity 1s ease-out;
+    }
+    .fade-out {
+        opacity: 0;
+    }
+    /* gradient background */
+    .blob-outer-container {
+      position: fixed;
+      height: 100vh;
+      width: 100vw;
+      z-index: 0;
+      inset: 0;
+      filter: blur(100px);
+    }
+    .blob-inner-container {
+      border-radius: 99999px;
+      position: absolute;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: transparent;
+    }
+    .blob {
+      position: absolute;
+      width: 150vw;
+      height: 150vh;
+      inset: 0;
+      background: conic-gradient(from 0deg, var(--primary), var(--secondary), var(--accent), var(--primary));
+      animation: spinBlob 18s linear infinite;
+    }
+    @keyframes spinBlob {
+      0% { transform: rotate(0deg) scale(2); }
+      100% { transform: rotate(1turn) scale(2); }
+    }
+    /* AURA with an animation */
+    .svg-obj {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      font-family: 'Nunito', sans-serif;
+    }
+    .path {
+      fill: none;
+      stroke: white;
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-dasharray: 1200;
+      stroke-dashoffset: 1200;
+      animation: draw 20s ease-out forwards;
+    }
+    @keyframes draw {
+      0% { stroke-dashoffset: 1200; }
+      100% { stroke-dashoffset: 0; }
+    }
+    /* subtitle (adaptive user reflective assistant) */
+    .reflective-text {
+      position: absolute;
+      top: 65%;
+      font-family: 'Poppins', sans-serif;
+      text-transform: uppercase;
+      font-size: 1.3em;
+      letter-spacing: 3px;
+      text-align: center;
+      color: white;
+      display: flex;
+      gap: 0.6em;
+    }
+    .word {
+      opacity: 0;
+    }
+    .word:nth-child(1) {
+      animation: fadeIn 1s ease-in-out forwards 5s;
+    }
+    .word:nth-child(2) {
+      animation: fadeIn 1s ease-in-out forwards 5.5s;
+    }
+    .word:nth-child(3) {
+      animation: fadeIn 1s ease-in-out forwards 6s;
+    }
+    .word:nth-child(4) {
+      animation: fadeIn 1s ease-in-out forwards 6.5s;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    /* button that says get started */
+    .get-started-container {
+      position: absolute;
+      top: 80%;
+      opacity: 0;
+      animation: fadeInButton 1.5s ease-in-out forwards 7.5s;
+    }
+    @keyframes fadeInButton {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    button {
+      background-color: var(--background);
+      border-radius: 4px;
+      color: var(--text);
+      cursor: pointer;
+      padding: 15px 30px;
+      font-size: 18px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      border: none;
+      transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
+    }
+    button:hover {
+      background-image: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 50%, var(--accent) 75%, var(--primary) 100%);
+      animation: slidernbw 5s linear infinite;
+      color: #000;
+    }
+    @keyframes slidernbw {
+      to {
+        background-position: 20vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="blob-outer-container">
+    <div class="blob-inner-container">
+      <div class="blob"></div>
+    </div>
+  </div>
+  <svg class="svg-obj" width="600" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 400 120">
+    <g>
+      <path class="path" d="M 50,100 L 80,20 L 110,100 M 65,70 L 95,70" />
+      <path class="path" d="M 130,20 L 130,80 Q 130,100 150,100 L 170,100 Q 190,100 190,80 L 190,20" />
+      <path class="path" d="M 210,20 L 210,100 M 210,20 L 250,20 Q 270,20 270,40 L 270,50 Q 270,70 250,70 L 210,70 M 250,70 L 280,100" />
+      <path class="path" d="M 290,100 L 320,20 L 350,100 M 305,70 L 335,70" />
+    </g>
+  </svg>
+
+  <div class="reflective-text">
+    <span class="word">Adaptive</span>
+    <span class="word">User</span>
+    <span class="word">Reflective</span>
+    <span class="word">Assistant</span>
+  </div>
+
+  <div class="get-started-container">
+    <button onclick="window.location.href='login.html';">Get Started</button>
+  </div>
+
+</body>
+</html>
