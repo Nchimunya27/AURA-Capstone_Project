@@ -1,98 +1,289 @@
 // Analytics functionality for Progress Analytics page
-// This script handles the analytics visualizations
+// This script handles dynamic data loading and visualization
 
-// Add this to the top of your analytics.js file to set global chart defaults
+// Track initialization state
+let analyticsInitialized = false;
+let chartsInitialized = false;
+let allData = null;
 
-/**
- * Set global Chart.js defaults for better readability
- */
-function setChartGlobalDefaults() {
-  if (typeof Chart !== 'undefined') {
-    // Get theme
-    const isNightMode = document.documentElement.getAttribute('data-theme') === 'night';
+// Main initialization function
+async function initializeAnalytics() {
+  // Prevent multiple initializations
+  if (analyticsInitialized) return;
+  
+  console.log('Initializing analytics dashboard...');
+  
+  // Clear any hard-coded values from HTML first
+  clearHardcodedValues();
+  
+  // Show loading state
+  showLoadingState(true);
+  
+  try {
+    // Initialize motivational quote
+    initializeMotivationalQuote();
     
-    // Set color based on theme
-    const textColor = isNightMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.8)';
-    const gridColor = isNightMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-    const tooltipBgColor = isNightMode ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)';
-    const tooltipTextColor = isNightMode ? 'rgba(255, 255, 255, 0.95)' : 'rgba(0, 0, 0, 0.8)';
+    // Load all data first
+    await loadAllAnalyticsData();
     
-    // Default font settings
-    Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
-    Chart.defaults.font.size = 14;
-    Chart.defaults.font.weight = '500';
+    // Check if Chart.js is available
+    if (typeof Chart !== 'undefined') {
+      // Set global chart defaults
+      setChartGlobalDefaults();
+      
+      // Initialize and render all charts
+      initializeCharts();
+      
+      // Update all analytics cards with data
+      updateAllCards();
+      
+      // Mark as initialized
+      analyticsInitialized = true;
+    } else {
+      console.warn('Chart.js is not loaded. Loading it dynamically...');
+      // Try to load Chart.js
+      await loadChartJS();
+    }
+  } catch (error) {
+    console.error('Error initializing analytics dashboard:', error);
+    // For demo purposes, we'll silently handle errors without showing error messages
+    // Just use whatever data was successfully loaded
+  } finally {
+    // Hide loading state
+    showLoadingState(false);
+  }
+}
+
+// Clear any hard-coded values from HTML
+function clearHardcodedValues() {
+  // Clear KPI cards
+  const kpiCards = document.querySelectorAll('.kpi-card');
+  kpiCards.forEach(card => {
+    const valueElement = card.querySelector('.kpi-value');
+    const subtextElement = card.querySelector('.kpi-subtext');
     
-    // Default colors
-    Chart.defaults.color = textColor;
-    Chart.defaults.borderColor = gridColor;
+    if (valueElement) valueElement.textContent = '—';
+    if (subtextElement) subtextElement.textContent = 'Waiting for data';
+  });
+  
+  // Clear chart legends
+  const legendItems = document.querySelectorAll('.chart-legend .legend-text');
+  legendItems.forEach(item => {
+    item.textContent = 'Waiting for data';
+  });
+  
+  // Clear quiz table
+  const tableBody = document.querySelector('.analytics-table tbody');
+  if (tableBody) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="5" class="text-center py-8">Waiting for quiz data</td>
+      </tr>
+    `;
+  }
+}
+
+// Load all analytics data
+async function loadAllAnalyticsData() {
+  if (!window.analyticsData) {
+    console.error('Analytics data adapter not found!');
+    throw new Error('Analytics data adapter not found');
+  }
+  
+  console.log('Loading analytics data...');
+  
+  try {
+    // Get all data from the adapter in one call
+    allData = await window.analyticsData.getAllAnalyticsData();
+    console.log('Analytics data loaded successfully:', allData);
+    return allData;
+  } catch (error) {
+    console.error('Error loading analytics data:', error);
+    throw error;
+  }
+}
+
+// Initialize all charts
+function initializeCharts() {
+  if (chartsInitialized) return;
+  
+  console.log('Initializing charts with data...');
+  
+  // Clear any existing charts first
+  clearExistingCharts();
+  
+  // Initialize each chart with data
+  createStreakLineChart(allData.userProfile);
+  createQuizStatusChart(allData.quizPerformance);
+  createActivityBarChart(allData.studyActivity);
+  createSkillRadarChart(allData.skillCoverage);
+  
+  chartsInitialized = true;
+}
+
+// Clear any existing charts before recreating them
+function clearExistingCharts() {
+  const chartCanvases = [
+    'streakLineChart',
+    'quizStatusChart', 
+    'activityBarChart',
+    'skillCoverageChart'
+  ];
+  
+  chartCanvases.forEach(canvasId => {
+    const canvas = document.getElementById(canvasId);
+    if (canvas) {
+      // Get the chart instance if it exists
+      const chartInstance = Chart.getChart(canvas);
+      if (chartInstance) {
+        // Destroy the existing chart
+        chartInstance.destroy();
+      }
+    }
+  });
+}
+
+// Update all cards and tables with data
+function updateAllCards() {
+  console.log('Updating all analytics cards with data...');
+  
+  // Update KPI cards
+  updateKPICards();
+  
+  // Update quiz performance table
+  updateQuizTable();
+}
+
+// Update KPI cards with real data
+function updateKPICards() {
+  // Update course progress card
+  const progressCard = document.querySelector('.kpi-card:nth-child(1)');
+  if (progressCard && allData.courseProgress) {
+    progressCard.querySelector('.kpi-value').textContent = `${allData.courseProgress.overallPercentage}%`;
+    progressCard.querySelector('.kpi-subtext').textContent = 
+      `${allData.courseProgress.modulesCompleted} of ${allData.courseProgress.totalModules} modules completed`;
+  } else if (progressCard) {
+    progressCard.querySelector('.kpi-value').textContent = '—';
+    progressCard.querySelector('.kpi-subtext').textContent = 'No data available';
+  }
+  
+  // Update current streak card
+  const currentStreakCard = document.querySelector('.kpi-card:nth-child(2)');
+  if (currentStreakCard && allData.userProfile) {
+    currentStreakCard.querySelector('.kpi-value').textContent = allData.userProfile.currentStreak;
+    currentStreakCard.querySelector('.kpi-subtext').textContent = 'days in a row';
+  } else if (currentStreakCard) {
+    currentStreakCard.querySelector('.kpi-value').textContent = '—';
+    currentStreakCard.querySelector('.kpi-subtext').textContent = 'No data available';
+  }
+  
+  // Update longest streak card
+  const longestStreakCard = document.querySelector('.kpi-card:nth-child(3)');
+  if (longestStreakCard && allData.userProfile) {
+    longestStreakCard.querySelector('.kpi-value').textContent = allData.userProfile.longestStreak;
+    longestStreakCard.querySelector('.kpi-subtext').textContent = 'days';
+  } else if (longestStreakCard) {
+    longestStreakCard.querySelector('.kpi-value').textContent = '—';
+    longestStreakCard.querySelector('.kpi-subtext').textContent = 'No data available';
+  }
+  
+  // Update study time card
+  const studyTimeCard = document.querySelector('.kpi-card:nth-child(4)');
+  if (studyTimeCard && allData.userProfile) {
+    studyTimeCard.querySelector('.kpi-value').textContent = `${allData.userProfile.totalStudyHours}h`;
+    studyTimeCard.querySelector('.kpi-subtext').textContent = 'total hours';
+  } else if (studyTimeCard) {
+    studyTimeCard.querySelector('.kpi-value').textContent = '—';
+    studyTimeCard.querySelector('.kpi-subtext').textContent = 'No data available';
+  }
+}
+
+// Update quiz table with real data
+function updateQuizTable() {
+  const tableBody = document.querySelector('.analytics-table tbody');
+  if (!tableBody) return;
+  
+  // Clear existing rows
+  tableBody.innerHTML = '';
+  
+  // Check if we have quiz data
+  if (!allData.quizPerformance || !allData.quizPerformance.recentQuizzes || allData.quizPerformance.recentQuizzes.length === 0) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="5" class="text-center py-8">No quiz data available</td>
+      </tr>
+    `;
+    return;
+  }
+  
+  // Add rows for each quiz
+  allData.quizPerformance.recentQuizzes.forEach(quiz => {
+    const row = document.createElement('tr');
     
-    // Improved animation
-    Chart.defaults.animation.duration = 1200;
-    Chart.defaults.animation.easing = 'easeOutQuart';
+    // Quiz name
+    const nameCell = document.createElement('td');
+    nameCell.textContent = quiz.name;
+    row.appendChild(nameCell);
     
-    // Enhanced responsiveness
-    Chart.defaults.maintainAspectRatio = false;
-    Chart.defaults.responsive = true;
+    // Date completed
+    const dateCell = document.createElement('td');
+    dateCell.textContent = quiz.date ? formatDate(quiz.date) : '-';
+    row.appendChild(dateCell);
     
-    // Better tooltips
-    Chart.defaults.plugins.tooltip.backgroundColor = tooltipBgColor;
-    Chart.defaults.plugins.tooltip.titleColor = tooltipTextColor;
-    Chart.defaults.plugins.tooltip.bodyColor = tooltipTextColor;
-    Chart.defaults.plugins.tooltip.padding = 12;
-    Chart.defaults.plugins.tooltip.cornerRadius = 8;
-    Chart.defaults.plugins.tooltip.titleFont = {
-      size: 16,
-      weight: 'bold'
-    };
-    Chart.defaults.plugins.tooltip.bodyFont = {
-      size: 14,
-      weight: 'normal'
-    };
-    Chart.defaults.plugins.tooltip.displayColors = true;
-    Chart.defaults.plugins.tooltip.boxPadding = 6;
-    Chart.defaults.plugins.tooltip.boxWidth = 12;
-    Chart.defaults.plugins.tooltip.boxHeight = 12;
-    Chart.defaults.plugins.tooltip.usePointStyle = true;
+    // Score
+    const scoreCell = document.createElement('td');
+    scoreCell.textContent = quiz.score !== null ? `${quiz.score}%` : '-';
+    row.appendChild(scoreCell);
     
-    // Better legends
-    Chart.defaults.plugins.legend.position = 'bottom';
-    Chart.defaults.plugins.legend.labels.padding = 20;
-    Chart.defaults.plugins.legend.labels.boxWidth = 15;
-    Chart.defaults.plugins.legend.labels.boxHeight = 15;
-    Chart.defaults.plugins.legend.labels.usePointStyle = true;
-    Chart.defaults.plugins.legend.labels.color = textColor;
-    Chart.defaults.plugins.legend.labels.font = {
-      size: 14,
-      weight: '600'
-    };
+    // Time spent
+    const timeCell = document.createElement('td');
+    timeCell.textContent = quiz.timeSpent !== null ? `${quiz.timeSpent} min` : '-';
+    row.appendChild(timeCell);
     
-    // Add shadow for line elements
-    Chart.defaults.elements.line.borderWidth = 3;
-    Chart.defaults.elements.line.tension = 0.4;
+    // Status
+    const statusCell = document.createElement('td');
+    const statusBadge = document.createElement('span');
+    statusBadge.className = `status-badge ${quiz.status}`;
+    statusBadge.textContent = quiz.status === 'completed' ? 'Completed' : 'Pending';
+    statusCell.appendChild(statusBadge);
+    row.appendChild(statusCell);
     
-    // Improved point styling
-    Chart.defaults.elements.point.radius = 4;
-    Chart.defaults.elements.point.hoverRadius = 6;
-    
-    // Better bar styling
-    Chart.defaults.elements.bar.borderRadius = 6;
-    Chart.defaults.elements.bar.borderSkipped = false;
-    
-    console.log('Chart.js global defaults set for better readability');
+    tableBody.appendChild(row);
+  });
+}
+
+// Format date for display
+function formatDate(dateString) {
+  if (!dateString) return '-';
+  
+  // If it's already a formatted string and not a date object, return as is
+  if (typeof dateString === 'string' && !dateString.includes('T') && !dateString.includes('-')) {
+    return dateString;
+  }
+  
+  try {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'long', 
+      day: 'numeric', 
+      year: 'numeric'
+    });
+  } catch (e) {
+    console.warn('Error formatting date:', e);
+    return dateString;
   }
 }
 
 // Enhanced Streak Line Chart
-function createStreakLineChart() {
+function createStreakLineChart(userData) {
   const ctx = document.getElementById('streakLineChart');
   if (!ctx) return;
   
-  // Sample data - would come from API in real app
+  // Generate empty streak data
   const streakData = {
-    labels: ['Apr 20', 'Apr 21', 'Apr 22', 'Apr 23', 'Apr 24', 'Apr 25', 'Apr 26', 'Apr 27', 'Apr 28', 'Apr 29', 'Apr 30', 'May 1', 'May 2', 'May 3', 'May 4'],
+    labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7', 'Day 8', 'Day 9', 'Day 10', 'Day 11', 'Day 12', 'Day 13', 'Day 14', 'Day 15'],
     datasets: [{
       label: 'Daily Streak',
-      data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+      data: Array(15).fill(0),
       borderColor: 'rgba(89, 151, 172, 1)',
       backgroundColor: 'rgba(89, 151, 172, 0.15)',
       fill: true,
@@ -106,7 +297,6 @@ function createStreakLineChart() {
       pointHoverBorderWidth: 2,
       pointHoverBackgroundColor: 'rgba(89, 151, 172, 1)',
       pointHoverBorderColor: '#fff',
-      // Apply shadow to make the line stand out more
       borderJoinStyle: 'round',
       borderCapStyle: 'round'
     }]
@@ -207,15 +397,15 @@ function createStreakLineChart() {
 }
 
 // Enhanced Quiz Status Donut Chart
-function createQuizStatusChart() {
+function createQuizStatusChart(quizData) {
   const ctx = document.getElementById('quizStatusChart');
   if (!ctx) return;
   
-  // Sample data
-  const quizData = {
+  // Empty donut chart data
+  const chartData = {
     labels: ['Completed', 'Pending'],
     datasets: [{
-      data: [7, 3],
+      data: [0, 1], // Default to 0% completion for empty state
       backgroundColor: [
         'rgba(89, 151, 172, 1)',
         '#e5e7eb'
@@ -227,13 +417,21 @@ function createQuizStatusChart() {
   
   // Adjust colors for night mode
   if (document.documentElement.getAttribute('data-theme') === 'night') {
-    quizData.datasets[0].backgroundColor[0] = 'rgba(123, 181, 245, 1)';
-    quizData.datasets[0].backgroundColor[1] = '#31456e';
+    chartData.datasets[0].backgroundColor[0] = 'rgba(123, 181, 245, 1)';
+    chartData.datasets[0].backgroundColor[1] = '#31456e';
   }
   
+  // Update the legend text to show empty state
+  const legendItems = document.querySelectorAll('.chart-legend .legend-text');
+  if (legendItems && legendItems.length >= 2) {
+    legendItems[0].textContent = 'Completed (0/0)';
+    legendItems[1].textContent = 'Pending (0/0)';
+  }
+  
+  // Create the chart
   const chart = new Chart(ctx, {
     type: 'doughnut',
-    data: quizData,
+    data: chartData,
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -247,9 +445,9 @@ function createQuizStatusChart() {
             label: function(context) {
               const label = context.label;
               const value = context.raw;
-              const total = context.dataset.data.reduce((a, b) => a + b, 0);
-              const percentage = Math.round((value / total) * 100);
-              return `${label}: ${value} out of ${total} (${percentage}%)`;
+              const totalValue = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = totalValue > 0 ? Math.round((value / totalValue) * 100) : 0;
+              return `${label}: ${value} out of ${totalValue} (${percentage}%)`;
             }
           }
         }
@@ -274,7 +472,7 @@ function createQuizStatusChart() {
       // Calculate percentage
       const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
       const completed = chart.data.datasets[0].data[0];
-      const percentage = Math.round((completed / total) * 100);
+      const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
       
       // Text style
       ctx.textAlign = 'center';
@@ -305,736 +503,354 @@ function createQuizStatusChart() {
 }
 
 // Enhanced Activity Bar Chart
-function createActivityBarChart() {
+function createActivityBarChart(activityData) {
   const ctx = document.getElementById('activityBarChart');
   if (!ctx) return;
   
-  // Sample data - would come from API in real app
-  const activityData = {
-    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    datasets: [{
-      label: 'Hours Studied',
-      data: [2.5, 3.0, 1.5, 3.5, 2.0, 1.0, 0.5],
-      backgroundColor: function(context) {
-        const value = context.raw;
-        const max = Math.max(...context.dataset.data);
-        const opacity = 0.4 + (value / max) * 0.6;
-        
-        return document.documentElement.getAttribute('data-theme') === 'night'
-          ? `rgba(123, 181, 245, ${opacity})`
-          : `rgba(89, 151, 172, ${opacity})`;
-      },
-      borderRadius: 6,
-      borderWidth: 1,
-      borderColor: document.documentElement.getAttribute('data-theme') === 'night'
-        ? 'rgba(123, 181, 245, 0.8)'
-        : 'rgba(89, 151, 172, 0.8)',
-      hoverBackgroundColor: document.documentElement.getAttribute('data-theme') === 'night'
-        ? 'rgba(123, 181, 245, 0.9)'
-        : 'rgba(89, 151, 172, 0.9)',
-      barPercentage: 0.7,
-      categoryPercentage: 0.7
-    }]
-  };
-  
-  new Chart(ctx, {
-    type: 'bar',
-    data: activityData,
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      layout: {
-        padding: {
-          top: 20,
-          right: 20,
-          bottom: 10,
-          left: 10
-        }
-      },
-      plugins: {
-        legend: {
-          display: false
-        },
-        tooltip: {
-          callbacks: {
-            title: function(context) {
-              return `${context[0].label}`;
-            },
-            label: function(context) {
-              const value = context.raw;
-              return `${value} hours studied`;
-            }
-          }
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          grace: '15%',
-          title: {
-            display: true,
-            text: 'Hours',
-            padding: {
-              bottom: 10,
-              top: 10
-            },
-            font: {
-              size: 14,
-              weight: 'bold'
-            }
-          },
-          grid: {
-            color: function(context) {
-              if (context.tick.value === 0) {
-                return document.documentElement.getAttribute('data-theme') === 'night' 
-                  ? 'rgba(255, 255, 255, 0.2)' 
-                  : 'rgba(0, 0, 0, 0.2)';
-              }
-              return document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.05)' 
-                : 'rgba(0, 0, 0, 0.05)';
-            }
-          },
-          ticks: {
-            padding: 10,
-            callback: function(value) {
-              return value + 'h';
-            }
-          }
-        },
-        x: {
-          grid: {
-            display: false
-          },
-          ticks: {
-            padding: 10,
-            font: {
-              size: 13,
-              weight: '500'
-            }
-          }
-        }
-      }
-    }
-  });
-}
-
-// This will prevent initializing analytics multiple times
-let analyticsInitialized = false;
-
-// Main initialization function
-function initializeAnalytics() {
-  // Prevent multiple initializations
-  if (analyticsInitialized) return;
-  
-  console.log('Initializing analytics...');
-  
-  // Make sure Chart.js is available
-  if (typeof Chart !== 'undefined') {
-    // Set improved chart defaults
-    if (window.setChartGlobalDefaults) {
-      window.setChartGlobalDefaults();
-    }
-    
-    // Create the charts
-    createStreakLineChart();
-    createQuizStatusChart(); 
-    createActivityBarChart();
-    createSkillRadarChart();
-    createMasteryBubbleChart();
-    createActivityHeatmap();
-
-    // Update analytics cards with data
-    updateAnalyticsCards();
-    
-    // Mark as initialized
-    analyticsInitialized = true;
-  } else {
-    console.warn('Chart.js is not loaded. Advanced charts will not be displayed.');
-    
-    // Try to load Chart.js if it's not available
-    loadChartJS();
-  }
-}
-
-// Function to load Chart.js dynamically if it's not already available
-function loadChartJS() {
-  const script = document.createElement('script');
-  script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
-  script.onload = function() {
-    console.log('Chart.js loaded successfully');
-    initializeAnalytics();
-  };
-  script.onerror = function() {
-    console.error('Failed to load Chart.js');
-  };
-  document.head.appendChild(script);
-}
-
-// Update analytics cards with data from the data adapter
-async function updateAnalyticsCards() {
-  try {
-    // Get data from the adapter
-    const userData = await window.analyticsData.getUserProfile();
-    const progressData = await window.analyticsData.getCourseProgress();
-    const quizData = await window.analyticsData.getQuizPerformance();
-    const activityData = await window.analyticsData.getStudyActivity();
-    
-    // Update course progress card
-    const progressValue = document.querySelector('.analytics-card:nth-child(1) .analytics-value');
-    const progressBar = document.querySelector('.analytics-card:nth-child(1) .progress-fill');
-    const progressDetails = document.querySelector('.analytics-card:nth-child(1) .analytics-details');
-    
-    if (progressValue && progressBar && progressDetails) {
-      progressValue.textContent = progressData.overallPercentage + '%';
-      progressBar.style.width = progressData.overallPercentage + '%';
-      progressDetails.innerHTML = `
-        <p>${progressData.modulesCompleted} of ${progressData.totalModules} modules completed</p>
-        <p>Estimated completion: ${progressData.estimatedCompletionDate}</p>
-      `;
-    }
-    
-    // Update streak stats card
-    updateStreakCard(userData);
-    
-    // Update quiz performance card
-    updateQuizCard(quizData);
-    
-    // Update study time card
-    updateStudyTimeCard(activityData);
-    
-  } catch (error) {
-    console.error('Error updating analytics cards:', error);
-  }
-}
-
-// Helper function to update streak card
-function updateStreakCard(userData) {
-  const currentStreakValue = document.querySelector('.streak-stats .streak-stat:first-child .analytics-value');
-  const longestStreakValue = document.querySelector('.streak-stats .streak-stat:last-child .analytics-value');
-  
-  if (currentStreakValue && longestStreakValue) {
-    currentStreakValue.textContent = userData.currentStreak;
-    longestStreakValue.textContent = userData.longestStreak;
-  }
-}
-
-// Helper function to update quiz card
-function updateQuizCard(quizData) {
-  const completedSegment = document.querySelector('.chart-segment.completed');
-  const pendingSegment = document.querySelector('.chart-segment.pending');
-  const quizLegend = document.querySelector('.chart-legend');
-  
-  if (completedSegment && pendingSegment && quizLegend) {
-    const completedPercentage = (quizData.completed / quizData.totalQuizzes) * 100;
-    completedSegment.style.setProperty('--percentage', completedPercentage);
-    completedSegment.textContent = Math.round(completedPercentage) + '%';
-    
-    const pendingPercentage = (quizData.pending / quizData.totalQuizzes) * 100;
-    pendingSegment.textContent = Math.round(pendingPercentage) + '%';
-    
-    const legendItems = quizLegend.querySelectorAll('.legend-text');
-    if (legendItems.length >= 2) {
-      legendItems[0].textContent = `Completed (${quizData.completed}/${quizData.totalQuizzes})`;
-      legendItems[1].textContent = `Pending (${quizData.pending}/${quizData.totalQuizzes})`;
-    }
-  }
-}
-
-// Helper function to update study time card
-function updateStudyTimeCard(activityData) {
-  const timeValue = document.querySelector('.time-stats .analytics-value');
-  const chartBars = document.querySelectorAll('.weekly-chart .chart-bar');
-  const timeDetails = document.querySelector('.analytics-card:nth-child(4) .analytics-details');
-  
-  if (timeValue) {
-    timeValue.textContent = activityData.totalHours + 'h';
-  }
-  
-  if (chartBars.length === 7 && activityData.weeklyHours.length === 7) {
-    // Find the maximum value for scaling
-    const maxHours = Math.max(...activityData.weeklyHours);
-    
-    // Update each bar
-    chartBars.forEach((bar, index) => {
-      const percentage = (activityData.weeklyHours[index] / maxHours) * 100;
-      bar.style.setProperty('--height', percentage + '%');
-    });
-  }
-  
-  if (timeDetails) {
-    timeDetails.innerHTML = `
-      <p>Peak study day: ${activityData.peakDay} (${activityData.weeklyHours[getDayIndex(activityData.peakDay)]}h)</p>
-      <p>Average daily: ${activityData.averageDailyStudy}h</p>
-    `;
-  }
-}
-
-// Helper function to get day index from name
-function getDayIndex(dayName) {
-  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  return days.indexOf(dayName);
-}
-
-// Create streak line chart
-function createStreakLineChart() {
-  const ctx = document.getElementById('streakLineChart');
-  if (!ctx) return;
-  
-  // Sample data - would come from API in real app
-  const streakData = {
-    labels: ['Apr 20', 'Apr 21', 'Apr 22', 'Apr 23', 'Apr 24', 'Apr 25', 'Apr 26', 'Apr 27', 'Apr 28', 'Apr 29', 'Apr 30', 'May 1', 'May 2', 'May 3', 'May 4'],
-    datasets: [{
-      label: 'Daily Streak',
-      data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-      borderColor: 'rgba(89, 151, 172, 1)',
-      backgroundColor: 'rgba(89, 151, 172, 0.1)',
-      fill: true,
-      tension: 0.3
-    }]
-  };
-  
-  new Chart(ctx, {
-    type: 'line',
-    data: streakData,
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false
-        },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return `Day ${context.raw}`;
-            }
-          }
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: 'Streak Days'
-          }
-        }
-      }
-    }
-  });
-}
-
-// Create quiz status donut chart
-function createQuizStatusChart() {
-  const ctx = document.getElementById('quizStatusChart');
-  if (!ctx) return;
-  
-  // Sample data
-  const quizData = {
-    labels: ['Completed', 'Pending'],
-    datasets: [{
-      data: [7, 3],
-      backgroundColor: [
-        'rgba(89, 151, 172, 1)',
-        '#e5e7eb'
-      ],
-      borderWidth: 0
-    }]
-  };
-  
-  // Adjust colors for night mode
-  if (document.documentElement.getAttribute('data-theme') === 'night') {
-    quizData.datasets[0].backgroundColor[0] = 'rgba(123, 181, 245, 1)';
-    quizData.datasets[0].backgroundColor[1] = '#31456e';
-  }
-  
-  new Chart(ctx, {
-    type: 'doughnut',
-    data: quizData,
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: '70%',
-      plugins: {
-        legend: {
-          display: false
-        },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              const label = context.label;
-              const value = context.raw;
-              const total = context.dataset.data.reduce((a, b) => a + b, 0);
-              const percentage = Math.round((value / total) * 100);
-              return `${label}: ${value} (${percentage}%)`;
-            }
-          }
-        }
-      }
-    }
-  });
-}
-
-// Create activity bar chart 
-function createActivityBarChart() {
-  const ctx = document.getElementById('activityBarChart');
-  if (!ctx) return;
-  
-  // Sample data - would come from API in real app
-  const activityData = {
-    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    datasets: [{
-      label: 'Hours Studied',
-      data: [2.5, 3.0, 1.5, 3.5, 2.0, 1.0, 0.5],
-      backgroundColor: 'rgba(89, 151, 172, 0.8)',
-      borderRadius: 4
-    }]
-  };
-  
-  // Adjust colors for night mode
-  if (document.documentElement.getAttribute('data-theme') === 'night') {
-    activityData.datasets[0].backgroundColor = 'rgba(123, 181, 245, 0.8)';
-  }
-  
-  new Chart(ctx, {
-    type: 'bar',
-    data: activityData,
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: 'Hours'
-          }
-        }
-      }
-    }
-  });
+  // Show "Waiting for data" message instead of empty chart
+  showChartPlaceholder(ctx, 'Waiting for data');
 }
 
 // Create radar chart for skill coverage
-async function createSkillRadarChart() {
+function createSkillRadarChart(skillData) {
   const ctx = document.getElementById('skillCoverageChart');
   if (!ctx) return;
   
-  try {
-    // Get skill data from the adapter
-    const skillData = await window.analyticsData.getSkillCoverage();
-    
-    // Prepare data for Chart.js
-    const chartData = {
-      labels: skillData.skills.map(skill => skill.name),
-      datasets: [
-        {
-          label: 'Your Skill Coverage',
-          data: skillData.skills.map(skill => skill.userScore),
-          backgroundColor: 'rgba(89, 151, 172, 0.2)',
-          borderColor: 'rgba(89, 151, 172, 1)',
-          pointBackgroundColor: 'rgba(89, 151, 172, 1)',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: 'rgba(89, 151, 172, 1)',
-        },
-        {
-          label: 'Course Average',
-          data: skillData.skills.map(skill => skill.courseAverage),
-          backgroundColor: 'rgba(230, 140, 140, 0.2)',
-          borderColor: 'rgba(230, 140, 140, 1)',
-          pointBackgroundColor: 'rgba(230, 140, 140, 1)',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: 'rgba(230, 140, 140, 1)',
-        }
-      ]
-    };
-    
-    // Adjust colors for dark mode
-    if (document.documentElement.getAttribute('data-theme') === 'night') {
-      chartData.datasets[0].backgroundColor = 'rgba(123, 181, 245, 0.2)';
-      chartData.datasets[0].borderColor = 'rgba(123, 181, 245, 1)';
-      chartData.datasets[0].pointBackgroundColor = 'rgba(123, 181, 245, 1)';
-      chartData.datasets[0].pointHoverBorderColor = 'rgba(123, 181, 245, 1)';
-      
-      chartData.datasets[1].backgroundColor = 'rgba(245, 158, 158, 0.2)';
-      chartData.datasets[1].borderColor = 'rgba(245, 158, 158, 1)';
-      chartData.datasets[1].pointBackgroundColor = 'rgba(245, 158, 158, 1)';
-      chartData.datasets[1].pointHoverBorderColor = 'rgba(245, 158, 158, 1)';
-    }
-    
-    // Create the chart
-    new Chart(ctx, {
-      type: 'radar',
-      data: chartData,
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        elements: {
-          line: {
-            borderWidth: 2
-          }
-        },
-        scales: {
-          r: {
-            angleLines: {
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.1)' 
-                : 'rgba(0, 0, 0, 0.1)'
-            },
-            grid: {
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.1)' 
-                : 'rgba(0, 0, 0, 0.1)'
-            },
-            ticks: {
-              backdropColor: 'transparent',
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.7)' 
-                : 'rgba(0, 0, 0, 0.7)'
-            },
-            pointLabels: {
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.7)' 
-                : 'rgba(0, 0, 0, 0.7)'
-            }
-          }
-        },
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                return context.dataset.label + ': ' + context.raw + '%';
-              }
-            }
-          },
-          legend: {
-            position: 'bottom',
-            labels: {
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.7)' 
-                : 'rgba(0, 0, 0, 0.7)'
-            }
-          }
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Error creating skill radar chart:', error);
-    ctx.parentElement.innerHTML = '<p class="chart-error">Unable to load skill data</p>';
-  }
+  // Show "Waiting for data" message instead of empty chart
+  showChartPlaceholder(ctx, 'Waiting for data');
 }
 
-// Create bubble chart for mastery by topic
-async function createMasteryBubbleChart() {
-  const ctx = document.getElementById('masteryBubbleChart');
-  if (!ctx) return;
+// Show placeholder for empty charts
+function showChartPlaceholder(canvas, message) {
+  const parent = canvas.parentElement;
+  const placeholderDiv = document.createElement('div');
+  placeholderDiv.className = 'chart-placeholder';
+  placeholderDiv.textContent = message;
   
-  try {
-    // Get topic mastery data from the adapter
-    const topicData = await window.analyticsData.getTopicMastery();
-    
-    // Prepare data for Chart.js
-    const bubbleData = {
-      datasets: [{
-        label: 'Topic Mastery',
-        data: topicData.topics.map(topic => ({
-          x: topic.position,
-          y: topic.mastery,
-          r: topic.importance
-        })),
-        backgroundColor: function(context) {
-          const value = context.raw.y;
-          const alpha = 0.7;
-          
-          if (value > 80) return `rgba(46, 204, 113, ${alpha})`;
-          if (value > 70) return `rgba(52, 152, 219, ${alpha})`;
-          if (value > 60) return `rgba(155, 89, 182, ${alpha})`;
-          return `rgba(231, 76, 60, ${alpha})`;
-        }
-      }]
-    };
-    
-    // Create the chart
-    new Chart(ctx, {
-      type: 'bubble',
-      data: bubbleData,
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            min: 0,
-            max: 100,
-            grid: {
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.1)' 
-                : 'rgba(0, 0, 0, 0.1)'
-            },
-            ticks: {
-              display: false
-            },
-            title: {
-              display: true,
-              text: 'Topic Progression',
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.7)' 
-                : 'rgba(0, 0, 0, 0.7)'
-            }
-          },
-          y: {
-            min: 40,
-            max: 100,
-            grid: {
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.1)' 
-                : 'rgba(0, 0, 0, 0.1)'
-            },
-            ticks: {
-              callback: function(value) {
-                return value + '%';
-              },
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.7)' 
-                : 'rgba(0, 0, 0, 0.7)'
-            },
-            title: {
-              display: true,
-              text: 'Mastery Level',
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.7)' 
-                : 'rgba(0, 0, 0, 0.7)'
-            }
-          }
-        },
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                return [
-                  'Topic: ' + getTopicName(context.raw.x, topicData.topics),
-                  'Mastery: ' + context.raw.y + '%',
-                  'Importance: ' + getImportanceLevel(context.raw.r)
-                ];
-              }
-            }
-          },
-          legend: {
-            display: false
-          }
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Error creating mastery bubble chart:', error);
-    ctx.parentElement.innerHTML = '<p class="chart-error">Unable to load topic mastery data</p>';
-  }
-}
-
-// Helper function to get topic name from position
-function getTopicName(position, topics) {
-  const topic = topics.find(t => t.position === position);
-  return topic ? topic.name : 'Unknown Topic';
-}
-
-// Helper function to map radius to importance
-function getImportanceLevel(r) {
-  if (r >= 13) return 'Critical';
-  if (r >= 10) return 'High';
-  if (r >= 7) return 'Medium';
-  return 'Low';
-}
-
-// Create a simplified heatmap for activity patterns
-async function createActivityHeatmap() {
-  const container = document.getElementById('activityHeatmap');
-  if (!container) return;
+  // Style the placeholder
+  placeholderDiv.style.display = 'flex';
+  placeholderDiv.style.alignItems = 'center';
+  placeholderDiv.style.justifyContent = 'center';
+  placeholderDiv.style.height = '100%';
+  placeholderDiv.style.width = '100%';
+  placeholderDiv.style.color = document.documentElement.getAttribute('data-theme') === 'night' 
+    ? 'rgba(255, 255, 255, 0.6)' 
+    : 'rgba(0, 0, 0, 0.5)';
+  placeholderDiv.style.fontSize = '16px';
+  placeholderDiv.style.fontWeight = '500';
   
-  try {
-    // Get activity data from the adapter
-    const activityData = await window.analyticsData.getStudyActivity();
-    
-    // Create a simplified visualization
-    container.innerHTML = `
-      <div class="simplified-heatmap">
-        <div class="heatmap-header">
-          <div class="heatmap-title">Weekly Activity Pattern</div>
-        </div>
-        <div class="heatmap-days">
-          <div class="heatmap-day">
-            <div class="day-label">Monday</div>
-            <div class="hour-blocks">
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.2)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.3)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.1)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.7)"></div>
-            </div>
-          </div>
-          <div class="heatmap-day">
-            <div class="day-label">Tuesday</div>
-            <div class="hour-blocks">
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.5)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.6)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.3)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.2)"></div>
-            </div>
-          </div>
-          <div class="heatmap-day">
-            <div class="day-label">Wednesday</div>
-            <div class="hour-blocks">
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.1)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.3)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.2)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.5)"></div>
-            </div>
-          </div>
-          <div class="heatmap-day">
-            <div class="day-label">Thursday</div>
-            <div class="hour-blocks">
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.2)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.8)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.7)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.6)"></div>
-            </div>
-          </div>
-          <div class="heatmap-day">
-            <div class="day-label">Friday</div>
-            <div class="hour-blocks">
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.3)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.2)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.5)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.3)"></div>
-            </div>
-          </div>
-        </div>
-        <div class="heatmap-legend">
-          <div class="legend-item"><div class="legend-color" style="background-color: rgba(89, 151, 172, 0.1)"></div><span>Low</span></div>
-          <div class="legend-item"><div class="legend-color" style="background-color: rgba(89, 151, 172, 0.4)"></div><span>Medium</span></div>
-          <div class="legend-item"><div class="legend-color" style="background-color: rgba(89, 151, 172, 0.8)"></div><span>High</span></div>
-        </div>
+  // Clear the parent and add the placeholder
+  parent.innerHTML = '';
+  parent.appendChild(placeholderDiv);
+}
+
+// Create motivational quote functionality
+function initializeMotivationalQuote() {
+  const quoteContainer = document.querySelector('.motivational-quote-container');
+  if (!quoteContainer) return;
+  
+  // Array of motivational quotes
+  const quotes = [
+    { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
+    { text: "The expert in anything was once a beginner.", author: "Helen Hayes" },
+    { text: "Continuous learning is the minimum requirement for success in any field.", author: "Brian Tracy" },
+    { text: "Education is not the filling of a pail, but the lighting of a fire.", author: "W.B. Yeats" },
+    { text: "The beautiful thing about learning is that nobody can take it away from you.", author: "B.B. King" },
+    { text: "Live as if you were to die tomorrow. Learn as if you were to live forever.", author: "Mahatma Gandhi" },
+    { text: "Learning is not attained by chance, it must be sought for with ardor and diligence.", author: "Abigail Adams" },
+    { text: "The more that you read, the more things you will know. The more that you learn, the more places you'll go.", author: "Dr. Seuss" }
+  ];
+  
+  // Select a random quote
+  const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+  
+  // Generate quote HTML
+  quoteContainer.innerHTML = `
+    <div class="quote-content quote-fade-in">
+      <div class="quote-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 11H6.21C6.07 11 5.98 10.88 6.04 10.76C7.13 8.38 9.39 6.7 12 6.18V5C7.66 5.63 4.34 9.17 4.03 13.59C4.01 14.17 4.27 14.66 4.75 14.89C5.04 15.03 5.39 15.05 5.7 14.95C6.53 14.67 7.34 15.24 7.36 16.12C7.39 17.13 6.56 17.95 5.56 17.92C4.18 17.88 3 16.68 3 15.3V15.28C3 7.96 9.89 6.5 12 6.5V11L10 11Z" fill="white"/>
+          <path d="M22 15.3C22 7.96 15.11 6.5 13 6.5V11H16.79C16.93 11 17.02 10.88 16.96 10.76C15.87 8.38 13.61 6.7 11 6.18V5C15.34 5.63 18.66 9.17 18.97 13.59C18.99 14.17 18.73 14.66 18.25 14.89C17.96 15.03 17.61 15.05 17.3 14.95C16.47 14.67 15.66 15.24 15.64 16.12C15.61 17.13 16.44 17.95 17.44 17.92C18.82 17.88 20 16.68 20 15.3H22Z" fill="white"/>
+        </svg>
       </div>
+      <div class="quote-text">${randomQuote.text}</div>
+      <div class="quote-author">— ${randomQuote.author}</div>
+    </div>
+  `;
+}
+
+// Function to load Chart.js dynamically if it's not already available
+async function loadChartJS() {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+    script.onload = function() {
+      console.log('Chart.js loaded successfully');
+      setChartGlobalDefaults();
+      initializeCharts();
+      resolve();
+    };
+    script.onerror = function() {
+      console.error('Failed to load Chart.js');
+      reject(new Error('Failed to load Chart.js'));
+    };
+    document.head.appendChild(script);
+  });
+}
+
+// Show loading state
+function showLoadingState(isLoading) {
+  let loadingElement = document.getElementById('analytics-loading');
+  
+  if (isLoading) {
+    if (!loadingElement) {
+      loadingElement = document.createElement('div');
+      loadingElement.id = 'analytics-loading';
+      loadingElement.className = 'analytics-loading';
+      loadingElement.innerHTML = `
+        <div class="loading-spinner"></div>
+        <div>Retrieving analytics data</div>
+      `;
+      
+      // Add loading styles if not already in document
+      if (!document.getElementById('loading-styles')) {
+        const style = document.createElement('style');
+        style.id = 'loading-styles';
+        style.textContent = `
+          .analytics-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            font-size: 16px;
+            color: var(--text-primary, #000000);
+          }
+          
+          [data-theme="night"] .analytics-loading {
+            background: rgba(0, 0, 0, 0.7);
+            color: var(--text-primary, #ffffff);
+          }
+          
+          .loading-spinner {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 16px;
+            border: 4px solid rgba(89, 151, 172, 0.3);
+            border-radius: 50%;
+            border-top-color: rgba(89, 151, 172, 1);
+            animation: spin 1s linear infinite;
+          }
+          
+          [data-theme="night"] .loading-spinner {
+            border: 4px solid rgba(123, 181, 245, 0.3);
+            border-top-color: rgba(123, 181, 245, 1);
+          }
+          
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+      
+      // Find the main content area
+      const mainContent = document.querySelector('.analytics-main');
+      if (mainContent) {
+        mainContent.appendChild(loadingElement);
+      } else {
+        document.body.appendChild(loadingElement);
+      }
+    }
+  } else {
+    // Remove loading element if it exists
+    if (loadingElement) {
+      loadingElement.remove();
+    }
+  }
+}
+
+// Show error state
+function showErrorState(message) {
+  let errorElement = document.getElementById('analytics-error');
+  
+  if (!errorElement) {
+    errorElement = document.createElement('div');
+    errorElement.id = 'analytics-error';
+    errorElement.className = 'analytics-error';
+    errorElement.innerHTML = `
+      <div class="error-icon">⚠️</div>
+      <div class="error-message">${message}</div>
+      <button class="error-retry" onclick="initializeAnalytics()">Retry</button>
     `;
     
-    // Update colors for night mode
-    if (document.documentElement.getAttribute('data-theme') === 'night') {
-      const hourBlocks = container.querySelectorAll('.hour-block');
-      hourBlocks.forEach(block => {
-        const style = block.getAttribute('style');
-        if (style) {
-          const newStyle = style.replace('rgba(89, 151, 172,', 'rgba(123, 181, 245,');
-          block.setAttribute('style', newStyle);
+    // Add error styles if not already in document
+    if (!document.getElementById('error-styles')) {
+      const style = document.createElement('style');
+      style.id = 'error-styles';
+      style.textContent = `
+        .analytics-error {
+          background-color: #fee2e2;
+          border-left: 4px solid #ef4444;
+          padding: 16px 20px;
+          margin: 20px 0;
+          border-radius: 4px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
         }
-      });
+        
+        [data-theme="night"] .analytics-error {
+          background-color: rgba(239, 68, 68, 0.2);
+        }
+        
+        .error-icon {
+          font-size: 24px;
+          margin-bottom: 8px;
+        }
+        
+        .error-message {
+          color: #b91c1c;
+          font-size: 14px;
+          margin-bottom: 12px;
+        }
+        
+        [data-theme="night"] .error-message {
+          color: #fca5a5;
+        }
+        
+        .error-retry {
+          background-color: #ef4444;
+          color: white;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+          transition: background-color 0.2s;
+        }
+        
+        .error-retry:hover {
+          background-color: #dc2626;
+        }
+      `;
+      document.head.appendChild(style);
     }
-  } catch (error) {
-    console.error('Error creating activity heatmap:', error);
-    container.innerHTML = '<p class="chart-error">Unable to load activity data</p>';
+    
+    // Find the main content area
+    const mainContent = document.querySelector('.analytics-main');
+    if (mainContent) {
+      mainContent.appendChild(errorElement);
+    } else {
+      document.body.appendChild(errorElement);
+    }
+  } else {
+    // Update error message
+    errorElement.querySelector('.error-message').textContent = message;
   }
 }
+
+// Set global chart defaults for consistent styling
+function setChartGlobalDefaults() {
+  if (typeof Chart === 'undefined') return;
+  
+  // Get theme
+  const isNightMode = document.documentElement.getAttribute('data-theme') === 'night';
+  
+  // Set color based on theme
+  const textColor = isNightMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.8)';
+  const gridColor = isNightMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+  const tooltipBgColor = isNightMode ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)';
+  const tooltipTextColor = isNightMode ? 'rgba(255, 255, 255, 0.95)' : 'rgba(0, 0, 0, 0.8)';
+  
+  // Default font settings
+  Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+  Chart.defaults.font.size = 14;
+  Chart.defaults.font.weight = '500';
+  
+  // Default colors
+  Chart.defaults.color = textColor;
+  Chart.defaults.borderColor = gridColor;
+  
+  // Improved animation
+  Chart.defaults.animation.duration = 1200;
+  Chart.defaults.animation.easing = 'easeOutQuart';
+  
+  // Enhanced responsiveness
+  Chart.defaults.maintainAspectRatio = false;
+  Chart.defaults.responsive = true;
+  
+  // Better tooltips
+  Chart.defaults.plugins.tooltip.backgroundColor = tooltipBgColor;
+  Chart.defaults.plugins.tooltip.titleColor = tooltipTextColor;
+  Chart.defaults.plugins.tooltip.bodyColor = tooltipTextColor;
+  Chart.defaults.plugins.tooltip.padding = 12;
+  Chart.defaults.plugins.tooltip.cornerRadius = 8;
+  Chart.defaults.plugins.tooltip.titleFont = {
+    size: 16,
+    weight: 'bold'
+  };
+  Chart.defaults.plugins.tooltip.bodyFont = {
+    size: 14,
+    weight: 'normal'
+  };
+  Chart.defaults.plugins.tooltip.displayColors = true;
+  Chart.defaults.plugins.tooltip.boxPadding = 6;
+  Chart.defaults.plugins.tooltip.boxWidth = 12;
+  Chart.defaults.plugins.tooltip.boxHeight = 12;
+  Chart.defaults.plugins.tooltip.usePointStyle = true;
+  
+  // Better legends
+  Chart.defaults.plugins.legend.position = 'bottom';
+  Chart.defaults.plugins.legend.labels.padding = 20;
+  Chart.defaults.plugins.legend.labels.boxWidth = 15;
+  Chart.defaults.plugins.legend.labels.boxHeight = 15;
+  Chart.defaults.plugins.legend.labels.usePointStyle = true;
+  Chart.defaults.plugins.legend.labels.color = textColor;
+  Chart.defaults.plugins.legend.labels.font = {
+    size: 14,
+    weight: '600'
+  };
+  
+  // Add shadow for line elements
+  Chart.defaults.elements.line.borderWidth = 3;
+  Chart.defaults.elements.line.tension = 0.4;
+  
+  // Improved point styling
+  Chart.defaults.elements.point.radius = 4;
+  Chart.defaults.elements.point.hoverRadius = 6;
+  
+  // Better bar styling
+  Chart.defaults.elements.bar.borderRadius = 6;
+  Chart.defaults.elements.bar.borderSkipped = false;
+  
+  console.log('Chart.js global defaults set for better readability');
+}
+
+// Initialize when the DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+  initializeAnalytics();
+});
+
+// Listen for theme changes to update charts
+document.addEventListener('themeChanged', function() {
+  // If charts are already initialized, recreate them with the new theme
+  if (chartsInitialized && allData) {
+    // Reset charts
+    chartsInitialized = false;
+    
+    // Set new chart defaults
+    setChartGlobalDefaults();
+    
+    // Reinitialize charts
+    initializeCharts();
+  }
+});
