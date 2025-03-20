@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function() {
     // Check if we're on mycourses page
     const isMyCourses = document.querySelector('.courses-grid-container');
@@ -100,3 +99,103 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function createCourse() {
+    const courseName = document.getElementById('courseName').value;
+    const subjectArea = document.getElementById('subjectArea').value;
+    const examDate = document.getElementById('examDate').value;
+    const studyHours = document.getElementById('studyHours').value;
+    const knowledgeLevel = document.getElementById('knowledgeLevel').value;
+    
+    // Validating course name input
+    if (!courseName.trim()) {
+        alert('Please enter a course name');
+        return;
+    }
+
+    // Create a unique ID for each course
+    const courseId = Date.now().toString();
+    
+    // Create course object with timestamp
+    const course = {
+        id: courseId,
+        name: courseName,
+        subject: subjectArea,
+        examDate: examDate,
+        studyHours: studyHours,
+        knowledgeLevel: knowledgeLevel,
+        timestamp: Date.now() // Add timestamp for sorting
+    };
+    
+    // Add to courses array
+    courses.push(course);
+    
+    // Save to both cache and localStorage
+    saveCoursesToStorage(courses);
+    
+    // Add to the UI
+    addCourseToUI(course);
+    
+    // Close the modal
+    modal.style.display = 'none';
+}
+
+// Update the save function to use both storage methods
+function saveCoursesToStorage(courses) {
+    // Save to localStorage
+    localStorage.setItem('courses', JSON.stringify(courses));
+    
+    // Save to Cache API if available
+    if ('caches' in window) {
+        const coursesBlob = new Blob([JSON.stringify(courses)], { type: 'application/json' });
+        const coursesResponse = new Response(coursesBlob);
+        
+        caches.open('aura-courses-cache').then(cache => {
+            cache.put('/courses-data', coursesResponse);
+        }).catch(error => {
+            console.error('Error saving to cache:', error);
+        });
+    }
+}
+
+// Update the course update function
+function updateCourse(courseId) {
+    const courseIndex = courses.findIndex(course => course.id === courseId);
+    
+    if (courseIndex === -1) return;
+    
+    // Update the course details with new timestamp
+    courses[courseIndex] = {
+        ...courses[courseIndex],
+        name: document.getElementById('courseName').value,
+        subject: document.getElementById('subjectArea').value,
+        examDate: document.getElementById('examDate').value,
+        studyHours: document.getElementById('studyHours').value,
+        knowledgeLevel: document.getElementById('knowledgeLevel').value,
+        timestamp: Date.now() // Update timestamp when modified
+    };
+    
+    // Save to both storage methods
+    saveCoursesToStorage(courses);
+    
+    // Reload courses to refresh the UI
+    loadCourses();
+    
+    // Close the modal
+    modal.style.display = 'none';
+}
+
+// Update the delete function
+function deleteCourse(courseId) {
+    // Filter out the course with the specified ID
+    courses = courses.filter(course => course.id !== courseId);
+    
+    // Save updated courses array to both storage methods
+    saveCoursesToStorage(courses);
+    
+    // Remove the course card from the UI
+    const courseCard = document.querySelector(`.course-card[data-id="${courseId}"]`);
+    if (courseCard) {
+        courseCard.remove();
+    }
+}
