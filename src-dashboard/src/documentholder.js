@@ -133,46 +133,45 @@ document.addEventListener('DOMContentLoaded', function() {
       // Set up browse button
       const browseBtn = document.querySelector('.browse-btn');
       if (browseBtn && !listenersAttached.has('browse-btn')) {
-        console.log("Browse button found, adding event listener");
+        // Remove any existing listeners
+        const newBrowseBtn = browseBtn.cloneNode(true);
+        browseBtn.parentNode.replaceChild(newBrowseBtn, browseBtn);
         
-        browseBtn.addEventListener('click', function(e) {
+        newBrowseBtn.addEventListener('click', function(e) {
           console.log("Browse button clicked");
           // Prevent default to avoid any form submission
           e.preventDefault();
           e.stopPropagation();
           
-          // Create a file input element
+          // Remove any existing file inputs first
+          const existingInputs = document.querySelectorAll('input[type="file"]');
+          existingInputs.forEach(input => input.remove());
+          
+          // Create a new file input element
           const input = document.createElement('input');
           input.type = 'file';
           input.accept = '.pdf,.doc,.docx,.txt';
           input.style.display = 'none';
           
           // Add the change event listener before appending to DOM
-          input.onchange = function(e) {
-            console.log("File input change event fired");
+          input.addEventListener('change', function(e) {
+            e.stopPropagation();
             if (this.files && this.files.length > 0) {
               const file = this.files[0];
-              console.log("File selected:", file.name);
-              // Process the file right away
+              console.log("File selected from browse button:", file.name);
               handleFileUpload(file);
-              
-              // Remove the input element after selection
-              setTimeout(() => {
-                document.body.removeChild(input);
-              }, 100);
             }
-          };
+            // Remove the input element after selection
+            if (this.parentNode) {
+              this.parentNode.removeChild(this);
+            }
+          }, { once: true }); // Use once: true to ensure the listener is removed after first use
           
           // Append to body and trigger click
           document.body.appendChild(input);
-          
-          // Use a slight delay to ensure the input is fully added to DOM
-          setTimeout(() => {
-            input.click();
-          }, 50);
+          input.click();
         });
         
-        // Mark this element as having listeners
         listenersAttached.add('browse-btn');
       }
       
@@ -747,7 +746,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Also handle Upload button in header (if present)
     const uploadBtn = document.querySelector('.upload-btn');
     if (uploadBtn && !listenersAttached.has('upload-btn')) {
-      uploadBtn.addEventListener('click', function() {
+      // Remove any existing listeners
+      const newUploadBtn = uploadBtn.cloneNode(true);
+      uploadBtn.parentNode.replaceChild(newUploadBtn, uploadBtn);
+      
+      newUploadBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         console.log("Upload button clicked");
         
         // Show Notes tab
@@ -758,33 +763,33 @@ document.addEventListener('DOMContentLoaded', function() {
           notesBtn.click();
         }
         
-        // Create file input and trigger click
+        // Remove any existing file inputs first
+        const existingInputs = document.querySelectorAll('input[type="file"]');
+        existingInputs.forEach(input => input.remove());
+        
+        // Create new file input
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.pdf,.doc,.docx,.txt';
         input.style.display = 'none';
         
         // Add the change event listener before appending to DOM
-        input.onchange = function() {
+        input.addEventListener('change', function(e) {
+          e.stopPropagation();
           if (this.files && this.files.length > 0) {
             const file = this.files[0];
             console.log("File selected from upload button:", file.name);
             handleFileUpload(file);
-            
-            // Remove the input element after selection
-            setTimeout(() => {
-              document.body.removeChild(input);
-            }, 100);
           }
-        };
+          // Remove the input element after selection
+          if (this.parentNode) {
+            this.parentNode.removeChild(this);
+          }
+        }, { once: true }); // Use once: true to ensure the listener is removed after first use
         
         // Append to body and trigger click
         document.body.appendChild(input);
-        
-        // Use a slight delay to ensure the input is fully added to DOM
-        setTimeout(() => {
-          input.click();
-        }, 50);
+        input.click();
       });
       
       listenersAttached.add('upload-btn');

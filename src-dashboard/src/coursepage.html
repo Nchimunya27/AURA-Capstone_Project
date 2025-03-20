@@ -132,7 +132,10 @@
     <div class="recent-documents-panel">
       <h2 class="panel-title">Recent Documents</h2>
       <div class="documents-grid">
-        <!-- Documents will be dynamically added here -->
+        <div class="no-documents-message">
+          <i class="fas fa-folder-open"></i>
+          <p>No recent documents</p>
+        </div>
       </div>
     </div>
     
@@ -153,17 +156,166 @@
   <div class="course-documents-panel">
     <h2 class="panel-title">Course Documents</h2>
     <div class="document-list">
-      <!-- Course documents will be dynamically added here -->
+      <div class="no-documents-message">
+        <i class="fas fa-folder-open"></i>
+        <p>No course documents available</p>
+      </div>
     </div>
   </div>
 </div>
 
-        <div id="quizzes-tab" class="tab-content" style="display: none;">
+        <div id="flashcard-generator-container" class="flashcard-generator-section">
+          <p id="generation-status"></p>
+          <div id="loading-indicator" style="display: none;">
+            <i class="fas fa-spinner fa-spin"></i> Processing...
+          </div>
+        </div>
+
+                <!-- Flashcards Tab Content -->
+        <div class="tab-content" id="flashcards-tab" style="display: none;">
+          <div class="flashcard-actions">
+            <button class="action-btn timer-btn">
+              <i class="fas fa-stopwatch"></i>
+              Time Set
+            </button>
+            <button class="action-btn filter-btn">
+              <i class="fas fa-filter"></i>
+              Filter
+            </button>
+          </div>
           
+          <div class="flashcard-container">
+            <div class="flashcard-item">
+              <div class="flashcard-front">
+                <h3 class="flashcard-question">Loading flashcards...</h3>
+                
+                <div class="flashcard-controls">
+                  <button class="show-answer-btn">Show Answer</button>
+                  <button class="rotate-btn">
+                    <i class="fas fa-sync-alt"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="flashcard-back">
+                <h3 class="flashcard-answer">Please wait...</h3>
+
+                <div class="flashcard-controls">
+                  <button class="show-answer-btn">Show Question</button>
+                  <button class="rotate-btn">
+                    <i class="fas fa-sync-alt"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flashcard-nav">
+            <button class="nav-arrow prev-card">
+              <i class="fas fa-arrow-left"></i>
+            </button>
+            
+            <span class="card-count">0 / 0</span>
+            
+            <div class="nav-controls">
+              <button class="nav-arrow next-card">
+                <i class="fas fa-arrow-right"></i>
+              </button>
+              <button class="control-btn shuffle-btn">
+                <i class="fas fa-random"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="progress-section">
+            <div class="progress-grid">
+              <div class="progress-card">
+                <h4 class="progress-title">Today's Progress</h4>
+                <div class="progress-info">
+                  <div class="progress-icon">
+                    <i class="fas fa-clock"></i>
+                  </div>
+                  <div class="progress-number">0</div>
+                  <div class="progress-label">Cards Reviewed</div>
+                </div>
+              </div>
+              
+              <div class="progress-card">
+                <h4 class="progress-title">Next Review</h4>
+                <div class="next-review">
+                  <div class="time-info">
+                    <div class="clock-icon">
+                      <i class="far fa-clock"></i>
+                    </div>
+                    <span>Not scheduled</span>
+                  </div>
+                  <div class="arrow-btn">
+                    <i class="fas fa-arrow-right"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+                <!-- Notes Tab Content -->
+        <div class="tab-content" id="notes-tab" style="display: none;">
+          <div class="section-content">
+            <!-- Recent Documents Section -->
+            <div class="documents-section">
+              <h2 class="section-title">Recent Documents</h2>
+              
+              <div class="documents-grid">
+                <div class="document-card">
+                  <div class="document-icon pdf-icon">
+                    <i class="fas fa-file-pdf"></i>
+                  </div>
+                  <div class="document-info">
+                    <h3 class="document-title">Week 5 Notes.pdf</h3>
+                    <p class="document-date">Updated 2 days ago</p>
+                  </div>
+                </div>
+                
+                <div class="document-card">
+                  <div class="document-icon docx-icon">
+                    <i class="fas fa-file-word"></i>
+                  </div>
+                  <div class="document-info">
+                    <h3 class="document-title">Assignment 3.docx</h3>
+                    <p class="document-date">Updated 5 days ago</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Quick Upload Section -->
+            <div class="upload-section">
+              <h2 class="section-title">Quick Upload</h2>
+              
+              <div class="upload-area">
+                <div class="upload-icon">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <p class="upload-text">Drag and drop files here or</p>
+                <button class="browse-btn">Browse Files</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Course Documents Section -->
+          <div class="course-documents">
+            <h2 class="section-title">Course Documents</h2>        
+          </div>
+        </div>
+      </header>
+
+            <!-- Quizzes Tab Content -->
+      <div class="tab-content" id="quizzes-tab" style="display: none;">
           <div class="quizzes-grid">
             <!-- Next Quiz Section -->
             <div class="quiz-card next-quiz">
-              <h3 class="quiz-section-title">Today's Quiz</h3>
+              <h3 class="quiz-section-title">Next Quiz</h3>
               <div class="next-quiz-content">
                 <div class="quiz-icon">
                   <i class="fas fa-question-circle"></i>
@@ -242,238 +394,6 @@
             </div>
           </div>
         </div>
-
-        <div id="flashcard-generator-container" class="flashcard-generator-section">
-          <p id="generation-status"></p>
-          <div id="loading-indicator" style="display: none;">
-            <i class="fas fa-spinner fa-spin"></i> Processing...
-          </div>
-        </div>
-
-                <!-- Flashcards Tab Content -->
-        <div class="tab-content" id="flashcards-tab" style="display: none;">
-          <div class="flashcard-actions">
-            <button class="action-btn timer-btn">
-              <i class="fas fa-stopwatch"></i>
-              Time Set
-            </button>
-            <button class="action-btn filter-btn">
-              <i class="fas fa-filter"></i>
-              Filter
-            </button>
-          </div>
-          
-          <div class="flashcard-container">
-            <div class="flashcard-item">
-              <div class="flashcard-front">
-                <h3 class="flashcard-question">What does HTML Stand for?</h3>
-                
-                <div class="flashcard-controls">
-                  <button class="show-answer-btn">Show Answer</button>
-                  <button class="rotate-btn">
-                    <i class="fas fa-sync-alt"></i>
-                  </button>
-                </div>
-              </div>
-              <div class="flashcard-back">
-                <h3 class="flashcard-answer">HyperText Markup Language</h3>
-
-                <div class="flashcard-controls">
-                  <button class="show-answer-btn">Show Question</button>
-                  <button class="rotate-btn">
-                    <i class="fas fa-sync-alt"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="flashcard-nav">
-            <button class="nav-arrow">
-              <i class="fas fa-arrow-left"></i>
-            </button>
-            
-            <span class="card-count">7 / 85</span>
-            
-            <div class="nav-controls">
-              <button class="nav-arrow">
-                <i class="fas fa-arrow-right"></i>
-              </button>
-              <button class="control-btn">
-                <i class="fas fa-random"></i>
-              </button>
-            </div>
-          </div>
-          
-          <div class="progress-section">
-            <div class="progress-grid">
-              <div class="progress-card">
-                <h4 class="progress-title">Today's Progress</h4>
-                <div class="progress-info">
-                  <div class="progress-icon">
-                    <i class="fas fa-clock"></i>
-                  </div>
-                  <div class="progress-number">12</div>
-                  <div class="progress-label">Cards Reviewed</div>
-                </div>
-              </div>
-              
-              <div class="progress-card">
-                <h4 class="progress-title">Next Review</h4>
-                <div class="next-review">
-                  <div class="time-info">
-                    <div class="clock-icon">
-                      <i class="far fa-clock"></i>
-                    </div>
-                    <span>In 4 hours</span>
-                  </div>
-                  <div class="arrow-btn">
-                    <i class="fas fa-arrow-right"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-
-
-                <!-- Notes Tab Content -->
-        <div class="tab-content" id="notes-tab" style="display: none;">
-          <div class="section-content">
-            <!-- Recent Documents Section -->
-            <div class="documents-section">
-              <h2 class="section-title">Recent Documents</h2>
-              
-              <div class="documents-grid">
-                <div class="document-card">
-                  <div class="document-icon pdf-icon">
-                    <i class="fas fa-file-pdf"></i>
-                  </div>
-                  <div class="document-info">
-                    <h3 class="document-title">Week 5 Notes.pdf</h3>
-                    <p class="document-date">Updated 2 days ago</p>
-                  </div>
-                </div>
-                
-                <div class="document-card">
-                  <div class="document-icon docx-icon">
-                    <i class="fas fa-file-word"></i>
-                  </div>
-                  <div class="document-info">
-                    <h3 class="document-title">Assignment 3.docx</h3>
-                    <p class="document-date">Updated 5 days ago</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Quick Upload Section -->
-            <div class="upload-section">
-              <h2 class="section-title">Quick Upload</h2>
-              
-              <div class="upload-area">
-                <div class="upload-icon">
-                  <i class="fas fa-cloud-upload-alt"></i>
-                </div>
-                <p class="upload-text">Drag and drop files here or</p>
-                <button class="browse-btn">Browse Files</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Course Documents Section -->
-          <div class="course-documents">
-            <h2 class="section-title">Course Documents</h2>        
-          </div>
-        </div>
-      </header>
-
-            <!-- Quizzes Tab Content -->
-      <div class="tab-content" id="quizzes-tab" style="display: none;">
-          
-        <!-- Add the Next Quiz section here -->
-          <div class="quiz-card next-quiz">
-            <h3 class="quiz-section-title">Next Quiz</h3>
-            <div class="next-quiz-content">
-              <div class="quiz-icon">
-                <i class="fas fa-question-circle"></i>
-              </div>
-              <div class="quiz-info">
-                <h4 class="quiz-title">Arrays and Loops</h4>
-                <p class="quiz-date">Tomorrow at 10:00 AM</p>
-              </div>
-            </div>
-            <button class="practice-quiz-btn">Start Practice Quiz</button>
-          </div>
-          
-        <div class="quizzes-grid">
-          <!-- Upcoming Quizzes Section -->
-          <div class="quiz-card upcoming-quizzes">
-            <h3 class="quiz-section-title">Upcoming Quizzes</h3>
-            <div class="upcoming-list">
-              <div class="upcoming-item">
-                <div class="quiz-icon locked">
-                  <i class="fas fa-lock"></i>
-                </div>
-                <div class="quiz-info">
-                  <h4 class="quiz-title">Chapter 5 Quiz</h4>
-                  <p class="quiz-date">Tomorrow, 2:00 PM</p>
-                </div>
-                <div class="quiz-status pending">Pending</div>
-              </div>
-              
-              <div class="upcoming-item">
-                <div class="quiz-icon locked">
-                  <i class="fas fa-lock"></i>
-                </div>
-                <div class="quiz-info">
-                  <h4 class="quiz-title">Mid-term Review</h4>
-                  <p class="quiz-date">Next Week</p>
-                </div>
-                <div class="quiz-status scheduled">Scheduled</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Past Quizzes Section -->
-        <div class="past-quizzes">
-          <h3 class="quiz-section-title">Past Quizzes</h3>
-          
-          <div class="past-quiz-list">
-            <div class="past-quiz-item">
-              <div class="quiz-left">
-                <div class="quiz-icon locked">
-                  <i class="fas fa-lock"></i>
-                </div>
-                <div class="quiz-info">
-                  <h4 class="quiz-title">Quiz 1</h4>
-                  <p class="quiz-subject">Chapter 5: Binary Trees</p>
-                </div>
-              </div>
-              <div class="quiz-right">
-                <p class="quiz-date">Tomorrow<br>10:00 AM</p>
-              </div>
-            </div>
-            
-            <div class="past-quiz-item">
-              <div class="quiz-left">
-                <div class="quiz-icon question">
-                  <i class="fas fa-question-circle"></i>
-                </div>
-                <div class="quiz-info">
-                  <h4 class="quiz-title">Quiz 2</h4>
-                  <p class="quiz-subject">Advanced Mathematics</p>
-                </div>
-              </div>
-              <div class="quiz-right">
-                <p class="quiz-date">Wed, Mar 15<br>2:30 PM</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
   
       <section class="progress-section">
         <div class="progress-grid">

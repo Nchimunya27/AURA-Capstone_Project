@@ -482,6 +482,13 @@
           taskStore.createIndex("completed", "completed", { unique: false });
           console.log("Tasks store created");
         }
+
+        // Create a store for flashcards
+        if (!db.objectStoreNames.contains("flashcards")) {
+          const flashcardStore = db.createObjectStore("flashcards", { keyPath: "id" });
+          flashcardStore.createIndex("timestamp", "timestamp", { unique: false });
+          console.log("Flashcards store created");
+        }
       };
     });
   }
@@ -1630,57 +1637,59 @@ function showAllDocumentsModal() {
     }
   }
 
-  // Cache a document to IndexedDB
-  function cacheDocument(file) {
-    return new Promise((resolve, reject) => {
+
+ // Cache a document to IndexedDB
+function cacheDocument(file) {
+  return new Promise((resolve, reject) => {
       if (!db) {
-        return reject("Database not initialized");
+          return reject("Database not initialized");
       }
-      
+
       // Read the file data
       const reader = new FileReader();
       reader.onload = function(event) {
-        try {
-          const docId = `doc_${Date.now()}_${file.name.replace(/[^a-z0-9]/gi, '_')}`;
-          const transaction = db.transaction(["documents"], "readwrite");
-          const store = transaction.objectStore("documents");
-          
-          const docData = {
-            id: docId,
-            name: file.name,
-            type: file.type,
-            size: file.size,
-            timestamp: Date.now(),
-            courseId: "web-development-intro", // This would be dynamic in a real app
-            content: event.target.result
-          };
-          
-          const request = store.add(docData);
-          
-          request.onsuccess = () => {
-            console.log(`Document ${file.name} cached successfully`);
-            resolve(docData);
-          };
-          
-          request.onerror = (event) => {
-            console.error("Error caching document:", event.target.error);
-            reject("Error caching document");
-          };
-        } catch (error) {
-          console.error("Error processing file:", error);
-          reject(error);
-        }
+          try {
+              const docId = `doc_${Date.now()}_${file.name.replace(/[^a-z0-9]/gi, '_')}`;
+              const transaction = db.transaction(["documents"], "readwrite");
+              const store = transaction.objectStore("documents");
+
+              const docData = {
+                  id: docId,
+                  name: file.name,
+                  type: file.type,
+                  size: file.size,
+                  timestamp: Date.now(),
+                  courseId: "web-development-intro", // This would be dynamic in a real app
+                  content: event.target.result
+              };
+
+              const request = store.add(docData);
+
+              request.onsuccess = () => {
+                  console.log(`Document ${file.name} cached successfully`);
+                  generateFlashcards(docData); // Trigger flashcard generation
+                  resolve(docData);
+              };
+
+              request.onerror = (event) => {
+                  console.error("Error caching document:", event.target.error);
+                  reject("Error caching document");
+              };
+          } catch (error) {
+              console.error("Error processing file:", error);
+              reject(error);
+          }
       };
-      
+
       reader.onerror = (error) => {
-        console.error("Error reading file:", error);
-        reject(error);
+          console.error("Error reading file:", error);
+          reject(error);
       };
-      
+
       // Read the file as array buffer
       reader.readAsArrayBuffer(file);
-    });
-  }
+  });
+}
   
   // Load documents from IndexedDB
   function loadCachedDocuments() {
@@ -1872,7 +1881,161 @@ function showAllDocumentsModal() {
       }
     }
   }
-  
+
+  // First, let's create the flashcard dictionary
+  const webDevFlashcards = [
+    {
+      question: "HTML",
+      answer: "HyperText Markup Language - The standard markup language used to create and structure content on the web"
+    },
+    {
+      question: "CSS",
+      answer: "Cascading Style Sheets - A style sheet language used for describing the presentation of a document written in HTML"
+    },
+    {
+      question: "JavaScript",
+      answer: "A programming language that enables interactive web pages and is an essential part of web applications"
+    },
+    {
+      question: "DOM",
+      answer: "Document Object Model - A programming interface for HTML documents that represents the page as a tree-like hierarchy of objects"
+    },
+    {
+      question: "API",
+      answer: "Application Programming Interface - A set of rules and protocols for building and interacting with software applications"
+    },
+    {
+      question: "Responsive Design",
+      answer: "An approach to web design that makes web pages render well on a variety of devices and window or screen sizes"
+    },
+    {
+      question: "HTTP",
+      answer: "HyperText Transfer Protocol - The foundation of data communication for the World Wide Web"
+    },
+    {
+      question: "HTTPS",
+      answer: "HTTP Secure - An extension of HTTP used for secure communication over a computer network, encrypted using TLS or SSL"
+    },
+    {
+      question: "Frontend",
+      answer: "The client-side and user interface of a website that users interact with directly in their web browser"
+    },
+    {
+      question: "Backend",
+      answer: "The server-side of a website that processes requests, interacts with databases, and sends responses to the frontend"
+    },
+    {
+      question: "Database",
+      answer: "An organized collection of structured information or data typically stored electronically in a computer system"
+    },
+    {
+      question: "Framework",
+      answer: "A pre-built structure of code that provides a foundation for developing software applications"
+    },
+    {
+      question: "Git",
+      answer: "A distributed version control system for tracking changes in source code during software development"
+    },
+    {
+      question: "SEO",
+      answer: "Search Engine Optimization - The process of improving a website to increase its visibility in search engines"
+    },
+    {
+      question: "Cache",
+      answer: "A hardware or software component that stores data so future requests for that data can be served faster"
+    }
+  ];
+
+  // Modify the generateFlashcards function to use this dictionary instead of AI
+  async function generateFlashcards(docData) {
+    try {
+      // Save flashcards to IndexedDB
+      await saveFlashcards(webDevFlashcards);
+      
+      // Update the flashcard display
+      const flashcardItem = document.querySelector(".flashcard-item");
+      if (flashcardItem) {
+        const frontContent = flashcardItem.querySelector('.flashcard-front');
+        const backContent = flashcardItem.querySelector('.flashcard-back');
+        
+        if (frontContent && backContent) {
+          frontContent.innerHTML = `
+            <h3 class="flashcard-question">${webDevFlashcards[0].question}</h3>
+            <div class="flashcard-controls">
+              <button class="show-answer-btn">Show Answer</button>
+              <button class="rotate-btn">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+          `;
+          
+          backContent.innerHTML = `
+            <h3 class="flashcard-answer">${webDevFlashcards[0].answer}</h3>
+            <div class="flashcard-controls">
+              <button class="show-answer-btn">Show Question</button>
+              <button class="rotate-btn">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+          `;
+          
+          // Re-attach event listeners to new buttons
+          const newShowAnswerBtns = flashcardItem.querySelectorAll('.show-answer-btn');
+          const newRotateBtns = flashcardItem.querySelectorAll('.rotate-btn');
+          
+          function toggleFlashcard() {
+            flashcardItem.classList.toggle("flipped");
+          }
+          
+          newShowAnswerBtns.forEach(btn => {
+            btn.addEventListener("click", function(e) {
+              e.stopPropagation();
+              toggleFlashcard();
+            });
+          });
+          
+          newRotateBtns.forEach(btn => {
+            btn.addEventListener("click", function(e) {
+              e.stopPropagation();
+              toggleFlashcard();
+            });
+          });
+          
+          // Update card count
+          const cardCount = document.querySelector("#flashcards-tab .card-count");
+          if (cardCount) {
+            cardCount.textContent = `1 / ${webDevFlashcards.length}`;
+          }
+        }
+      }
+      
+      return webDevFlashcards;
+    } catch (error) {
+      console.error('Error generating flashcards:', error);
+      throw error;
+    }
+  }
+
+  function displayFlashcards(flashcards) {
+    const flashcardContainer = document.querySelector('.flashcard-container');
+    flashcardContainer.innerHTML = '';
+
+    if (flashcards.length === 0) {
+        flashcardContainer.innerHTML = '<p>No flash cards available</p>';
+        return;
+    }
+
+    flashcards.forEach(card => {
+        const flashcardElement = document.createElement('div');
+        flashcardElement.className = 'flashcard';
+        flashcardElement.innerHTML = `
+            <div class="flashcard-front">${card.front}</div>
+            <div class="flashcard-back">${card.back}</div>
+        `;
+        flashcardContainer.appendChild(flashcardElement);
+    });
+  }
+
   // Helper function to set up download handlers
   function setupDownloadHandler(element) {
     const downloadBtn = element.querySelector(".document-download");
@@ -2028,16 +2191,17 @@ function showAllDocumentsModal() {
   // Flashcard tab functionality
   function initializeFlashcardTab() {
     const flashcardItem = document.querySelector(".flashcard-item");
-    const showAnswerBtns = document.querySelectorAll("#flashcards-tab .show-answer-btn");
-    const rotateBtns = document.querySelectorAll("#flashcards-tab .rotate-btn");
     const prevBtn = document.querySelector("#flashcards-tab .nav-arrow:first-child");
     const nextBtn = document.querySelector("#flashcards-tab .nav-controls .nav-arrow");
     const cardCount = document.querySelector("#flashcards-tab .card-count");
     const shuffleBtn = document.querySelector("#flashcards-tab .fa-random")?.parentElement;
     
     // Current card tracking
-    let currentCard = 7;
-    const totalCards = 85;
+    let currentCard = 1;
+    const totalCards = webDevFlashcards.length;
+
+    // Initialize the first flashcard
+    updateFlashcardContent();
 
     // Flip flashcard function
     function toggleFlashcard() {
@@ -2046,20 +2210,68 @@ function showAllDocumentsModal() {
       }
     }
 
-    // Attach event listeners to buttons
-    showAnswerBtns.forEach(btn => {
-      btn.addEventListener("click", function(e) {
-        e.stopPropagation();
-        toggleFlashcard();
+    // Make the entire flashcard clickable
+    if (flashcardItem) {
+      flashcardItem.addEventListener("click", function(e) {
+        // Only toggle if the click is directly on the flashcard (not on a button)
+        if (e.target === flashcardItem || 
+            e.target === flashcardItem.querySelector('.flashcard-front') || 
+            e.target === flashcardItem.querySelector('.flashcard-back') ||
+            e.target === flashcardItem.querySelector('.flashcard-question') || 
+            e.target === flashcardItem.querySelector('.flashcard-answer')) {
+          toggleFlashcard();
+        }
       });
-    });
-    
-    rotateBtns.forEach(btn => {
-      btn.addEventListener("click", function(e) {
-        e.stopPropagation();
-        toggleFlashcard();
-      });
-    });
+    }
+
+    // Update flashcard content
+    function updateFlashcardContent() {
+      if (!flashcardItem || !webDevFlashcards.length) return;
+      
+      const currentFlashcard = webDevFlashcards[currentCard - 1];
+      const frontContent = flashcardItem.querySelector('.flashcard-front');
+      const backContent = flashcardItem.querySelector('.flashcard-back');
+      
+      if (frontContent && backContent) {
+        frontContent.innerHTML = `
+          <h3 class="flashcard-question">${currentFlashcard.question}</h3>
+          <div class="flashcard-controls">
+            <button class="show-answer-btn">Show Answer</button>
+            <button class="rotate-btn">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+        `;
+        
+        backContent.innerHTML = `
+          <h3 class="flashcard-answer">${currentFlashcard.answer}</h3>
+          <div class="flashcard-controls">
+            <button class="show-answer-btn">Show Question</button>
+            <button class="rotate-btn">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+        `;
+        
+        // Re-attach event listeners to new buttons
+        const newShowAnswerBtns = flashcardItem.querySelectorAll('.show-answer-btn');
+        const newRotateBtns = flashcardItem.querySelectorAll('.rotate-btn');
+        
+        newShowAnswerBtns.forEach(btn => {
+          btn.addEventListener("click", function(e) {
+            e.stopPropagation();
+            toggleFlashcard();
+          });
+        });
+        
+        newRotateBtns.forEach(btn => {
+          btn.addEventListener("click", function(e) {
+            e.stopPropagation();
+            toggleFlashcard();
+          });
+        });
+      }
+    }
 
     // Navigation functionality
     if (prevBtn) {
@@ -2068,6 +2280,7 @@ function showAllDocumentsModal() {
           currentCard--;
           updateCardCount();
           resetCard();
+          updateFlashcardContent();
         }
       });
     }
@@ -2078,6 +2291,7 @@ function showAllDocumentsModal() {
           currentCard++;
           updateCardCount();
           resetCard();
+          updateFlashcardContent();
         }
       });
     }
@@ -2097,7 +2311,7 @@ function showAllDocumentsModal() {
     // Shuffle functionality
     if (shuffleBtn) {
       shuffleBtn.addEventListener("click", function() {
-        if (flashcardItem) {
+        if (flashcardItem && webDevFlashcards.length) {
           flashcardItem.style.transition = "transform 0.4s";
           flashcardItem.style.transform = "translateX(10px) rotate(5deg)";
           
@@ -2112,11 +2326,72 @@ function showAllDocumentsModal() {
               resetCard();
               currentCard = Math.floor(Math.random() * totalCards) + 1;
               updateCardCount();
+              updateFlashcardContent();
             }, 200);
           }, 200);
         }
       });
     }
+
+    // Set initial card count
+    updateCardCount();
+  }
+
+  // Function to load flashcards from IndexedDB
+  function loadFlashcards() {
+    return new Promise((resolve, reject) => {
+      if (!db) {
+        return reject("Database not initialized");
+      }
+      
+      const transaction = db.transaction(["flashcards"], "readonly");
+      const store = transaction.objectStore("flashcards");
+      const request = store.getAll();
+      
+      request.onsuccess = () => {
+        const flashcards = request.result || [];
+        resolve(flashcards);
+      };
+      
+      request.onerror = (event) => {
+        console.error("Error loading flashcards:", event.target.error);
+        reject("Error loading flashcards");
+      };
+    });
+  }
+
+  // Function to save flashcards to IndexedDB
+  function saveFlashcards(flashcards) {
+    return new Promise((resolve, reject) => {
+      if (!db) {
+        return reject("Database not initialized");
+      }
+      
+      const transaction = db.transaction(["flashcards"], "readwrite");
+      const store = transaction.objectStore("flashcards");
+      
+      // Clear existing flashcards
+      store.clear();
+      
+      // Add new flashcards
+      flashcards.forEach((card, index) => {
+        store.add({
+          id: `flashcard_${Date.now()}_${index}`,
+          ...card,
+          timestamp: Date.now()
+        });
+      });
+      
+      transaction.oncomplete = () => {
+        console.log("Flashcards saved successfully");
+        resolve();
+      };
+      
+      transaction.onerror = (event) => {
+        console.error("Error saving flashcards:", event.target.error);
+        reject("Error saving flashcards");
+      };
+    });
   }
 
   // Render cached documents to UI
@@ -2142,7 +2417,7 @@ function showAllDocumentsModal() {
         
         // Add each document to the appropriate lists
         documents.forEach(doc => {
-          // Create document item for lists
+                    // Create document item for lists
           const docItem = createDocumentElement(doc, 'list');
           
           // Add to notes list (max 4)
@@ -2433,4 +2708,83 @@ element.innerHTML = `
         setupViewAllButtons();
       });
   });
+
+  // Function to update document display
+  function updateDocumentDisplay(documents, container, isRecent = false) {
+    const noDocumentsMessage = container.querySelector('.no-documents-message');
+    const documentGrid = container.querySelector('.documents-grid') || container.querySelector('.document-list');
+    
+    // Clear existing content
+    documentGrid.innerHTML = '';
+    
+    if (!documents || documents.length === 0) {
+      // Show no documents message
+      if (!noDocumentsMessage) {
+        const message = document.createElement('div');
+        message.className = 'no-documents-message';
+        message.innerHTML = `
+          <i class="fas fa-folder-open"></i>
+          <p>${isRecent ? 'No recent documents' : 'No course documents available'}</p>
+        `;
+        documentGrid.appendChild(message);
+      }
+      return;
+    }
+    
+    // Hide no documents message if it exists
+    if (noDocumentsMessage) {
+      noDocumentsMessage.remove();
+    }
+    
+    // Add documents to the grid
+    documents.forEach(doc => {
+      const docElement = createDocumentElement(doc, doc.type);
+      documentGrid.appendChild(docElement);
+    });
+  }
+
+  // Update the loadCachedDocuments function
+  function loadCachedDocuments() {
+    const transaction = db.transaction(['documents'], 'readonly');
+    const store = transaction.objectStore('documents');
+    const request = store.getAll();
+
+    request.onsuccess = function(event) {
+      const documents = event.target.result;
+      
+      // Sort documents by timestamp (most recent first)
+      documents.sort((a, b) => b.timestamp - a.timestamp);
+      
+      // Get recent documents (last 5)
+      const recentDocuments = documents.slice(0, 5);
+      
+      // Update recent documents panel
+      const recentDocumentsPanel = document.querySelector('.recent-documents-panel .documents-grid');
+      updateDocumentDisplay(recentDocuments, recentDocumentsPanel, true);
+      
+      // Update course documents panel
+      const courseDocumentsPanel = document.querySelector('.course-documents-panel .document-list');
+      updateDocumentDisplay(documents, courseDocumentsPanel, false);
+    };
+
+    request.onerror = function(event) {
+      console.error('Error loading documents:', event.target.error);
+    };
+  }
+
+  // Update the addDocumentToList function
+  function addDocumentToList(file, targetSection) {
+    // ... existing code ...
+    
+    // After successfully adding the document
+    loadCachedDocuments(); // Reload all documents to update the display
+  }
+
+  // Update the deleteDocument function
+  function deleteDocument(docId) {
+    // ... existing code ...
+    
+    // After successfully deleting the document
+    loadCachedDocuments(); // Reload all documents to update the display
+  }
 })();

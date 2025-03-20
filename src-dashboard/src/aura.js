@@ -754,10 +754,3 @@ document.addEventListener('DOMContentLoaded', function() {
       }, 300); // Allow time for dashboard to initialize
     }
 });
-
-// Add this HTML fix
-const getStartedHtml = `
-<div class="get-started-container">
-    <button onclick="window.location.href='../../../aura-login/login.html';">Get Started</button>
-</div>
-`;
