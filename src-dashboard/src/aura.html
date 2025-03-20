@@ -7,6 +7,20 @@
   <link rel="stylesheet" href="aura.css">
   <link rel="stylesheet" href="profile-picture-styler.css">
 
+  <style>
+    /* Initially set opacity low but not completely hidden */
+    .user-name, .welcome-text {
+      opacity: 0.1; /* Almost invisible but not completely hidden */
+      transition: opacity 0.3s ease;
+    }
+    
+    /* This class will be added by JavaScript when the real username is ready */
+    .username-loaded {
+      opacity: 1;
+    }
+  </style>
+
+
   <script src="theme-init.js"></script>
 
 </head>
@@ -187,25 +201,68 @@
   <script src="profile-picture-manager.js"></script>
 
 
-  // Add this to your aura.js file or to a script tag at the end of aura.html
-<script>document.addEventListener('DOMContentLoaded', function() {
-  // Get username from localStorage
-  const username = localStorage.getItem('currentUsername');
-  
-  if (username) {
-    // Update welcome message
-    const welcomeTextElement = document.querySelector('.welcome-text');
-    if (welcomeTextElement) {
-      welcomeTextElement.textContent = `Welcome back, ${username}!`;
+<script>
+  // Updated script to handle the case where no username shows
+  (function() {
+    function updateUsername() {
+      console.log("Username update running...");
+      
+      // Get username from localStorage
+      const username = localStorage.getItem('currentUsername');
+      console.log("Username from localStorage:", username);
+      
+      // Get the elements
+      const userNameElement = document.querySelector('.user-name');
+      const welcomeTextElement = document.querySelector('.welcome-text');
+      
+      if (userNameElement) {
+        console.log("Found user-name element:", userNameElement.textContent);
+        
+        // Always update and show, even if no username
+        if (username) {
+          userNameElement.textContent = username;
+        }
+        userNameElement.classList.add('username-loaded');
+      } else {
+        console.log("Could not find .user-name element");
+      }
+      
+      if (welcomeTextElement) {
+        console.log("Found welcome-text element:", welcomeTextElement.textContent);
+        
+        // Always update and show, even if no username
+        if (username) {
+          welcomeTextElement.textContent = `Welcome back, ${username}!`;
+        } else {
+          welcomeTextElement.textContent = "Welcome back!";
+        }
+        welcomeTextElement.classList.add('username-loaded');
+      } else {
+        console.log("Could not find .welcome-text element");
+      }
+      
+      // If we still don't see anything, try forcing visibility
+      setTimeout(function() {
+        if (userNameElement) {
+          userNameElement.style.opacity = "1";
+          userNameElement.style.visibility = "visible";
+        }
+        if (welcomeTextElement) {
+          welcomeTextElement.style.opacity = "1";  
+          welcomeTextElement.style.visibility = "visible";
+        }
+      }, 500);
     }
     
-    // Also update username in sidebar
-    const userNameElement = document.querySelector('.user-name');
-    if (userNameElement) {
-      userNameElement.textContent = username;
-    }
-  }
-});
+    // Run immediately
+    updateUsername();
+    
+    // Run again after DOM has had time to load
+    setTimeout(updateUsername, 100);
+    
+    // Run one more time after full page load
+    window.addEventListener('load', updateUsername);
+  })();
 </script>
 
 

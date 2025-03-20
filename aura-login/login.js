@@ -192,8 +192,40 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Store user ID for verification
                 localStorage.setItem('user_id', data.user.id);
                 
-                // Store the username in localStorage for dashboard display
-                localStorage.setItem('currentUsername', username);
+                // Get the complete profile data from Supabase to retrieve proper username/name
+                try {
+                    // Get full profile data to get additional user info
+                    const { data: fullProfile, error: profileFetchError } = await supabaseClient
+                        .from('profiles')
+                        .select('*')  // select all fields
+                        .eq('id', data.user.id)
+                        .single();
+                    
+                    if (profileFetchError) {
+                        console.error('Error fetching profile:', profileFetchError);
+                        // Still store the basic username as fallback
+                        localStorage.setItem('currentUsername', username);
+                    } else {
+                        // Store the full name or preferred display name from profile
+                        // Adjust these field names if needed to match your Supabase profiles table
+                        if (fullProfile.full_name) {
+                            localStorage.setItem('currentUsername', fullProfile.full_name);
+                        } else if (fullProfile.username) {
+                            localStorage.setItem('currentUsername', fullProfile.username);
+                        } else {
+                            // Fallback to login username
+                            localStorage.setItem('currentUsername', username);
+                        }
+                        
+                        // Store other user data
+                        if (fullProfile.first_name) localStorage.setItem('user_firstName', fullProfile.first_name);
+                        if (fullProfile.last_name) localStorage.setItem('user_lastName', fullProfile.last_name);
+                    }
+                } catch (profileError) {
+                    console.error('Profile fetch exception:', profileError);
+                    // Fallback to login username
+                    localStorage.setItem('currentUsername', username);
+                }
                 
                 showStatusMessage('Login successful!');
                 
@@ -232,6 +264,8 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('redirect_loop_protection');
             // Also clear the username
             localStorage.removeItem('currentUsername');
+            localStorage.removeItem('user_firstName');
+            localStorage.removeItem('user_lastName');
             
             showStatusMessage('Logged out successfully!');
             
