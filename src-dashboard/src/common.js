@@ -23,14 +23,58 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Update username in sidebar if available
     const updateUserInfo = () => {
-        const firstName = localStorage.getItem('user_firstName');
-        const lastName = localStorage.getItem('user_lastName');
+        // First priority: Check for username from login
+        const username = localStorage.getItem('currentUsername');
         
-        if (firstName && lastName) {
+        if (username) {
+            // Update sidebar username
             const userNameElement = document.querySelector('.user-name');
             if (userNameElement) {
-                userNameElement.textContent = firstName + ' ' + lastName;
+                userNameElement.textContent = username;
             }
+            
+            // Update welcome message if it exists
+            const welcomeTextElement = document.querySelector('.welcome-text');
+            if (welcomeTextElement) {
+                welcomeTextElement.textContent = `Welcome back, ${username}!`;
+            }
+        } 
+        // Fallback to first name + last name if username not found
+        else {
+            const firstName = localStorage.getItem('user_firstName');
+            const lastName = localStorage.getItem('user_lastName');
+            
+            if (firstName && lastName) {
+                const userNameElement = document.querySelector('.user-name');
+                if (userNameElement) {
+                    userNameElement.textContent = firstName + ' ' + lastName;
+                }
+                
+                // Update welcome message if it exists
+                const welcomeTextElement = document.querySelector('.welcome-text');
+                if (welcomeTextElement) {
+                    welcomeTextElement.textContent = `Welcome back, ${firstName}!`;
+                }
+            }
+        }
+    };
+    
+    // Setup logout functionality
+    const setupLogout = () => {
+        const logoutButton = document.getElementById('logoutButton');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', function() {
+                // Clear username
+                localStorage.removeItem('currentUsername');
+                
+                // Clear auth data
+                localStorage.removeItem('supabase.auth.token');
+                localStorage.removeItem('user_id');
+                localStorage.removeItem('redirect_loop_protection');
+                
+                // Redirect to login page
+                window.location.href = '../../aura-login/login.html';
+            });
         }
     };
     
@@ -38,4 +82,5 @@ document.addEventListener('DOMContentLoaded', function() {
     loadProfilePicture();
     applyCurrentTheme();
     updateUserInfo();
+    setupLogout();
 });

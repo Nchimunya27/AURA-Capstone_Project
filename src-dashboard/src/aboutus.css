@@ -235,7 +235,7 @@
 /* Main Content Styles */
 .main-content-column {
     flex: 1;
-    background-color: var(--background-primary);
+    background-color: var(--background-tertiary);
     overflow-y: auto;
     position: relative;
     padding-left: 10px;
