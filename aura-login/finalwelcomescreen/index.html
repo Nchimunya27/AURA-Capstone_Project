@@ -80,12 +80,81 @@
       stroke-linecap: round;
       stroke-dasharray: 1200;
       stroke-dashoffset: 1200;
-      animation: draw 20s ease-out forwards;
+      animation: draw 12s ease-out forwards; /* Increased from 9s to 12s */
     }
     @keyframes draw {
       0% { stroke-dashoffset: 1200; }
       100% { stroke-dashoffset: 0; }
     }
+    
+    /* R tear effect */
+    .tear-line {
+      stroke: white;
+      stroke-width: 2;
+      stroke-dasharray: 15;
+      stroke-dashoffset: 15;
+      opacity: 0;
+      animation: tearAppear 0.3s ease-out forwards 13.4s, tearDisappear 0.2s ease-out forwards 13.7s; /* Updated from 10.4s to 13.4s */
+    }
+    
+    @keyframes tearAppear {
+      0% { opacity: 0; stroke-dashoffset: 15; }
+      100% { opacity: 1; stroke-dashoffset: 0; }
+    }
+    
+    @keyframes tearDisappear {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    
+    .bear-logo {
+      opacity: 0;
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.7));
+      transform-origin: 240px 50px;
+      animation: bearAppear 0.3s ease-out forwards 13.4s, /* Updated from 10.4s to 13.4s */
+                 bearBounce 2s ease-out forwards 13.4s, /* Updated from 10.4s to 13.4s */
+                 bearPulse 3s ease-in-out infinite 15.6s; /* Updated from 12.6s to 15.6s */
+    }
+    
+    @keyframes bearAppear {
+      0% { opacity: 0; transform: scale(0); }
+      50% { opacity: 0.7; transform: scale(0.7); }
+      80% { opacity: 1; transform: scale(0.65); }
+      100% { opacity: 1; transform: scale(0.6); }
+    }
+    
+    @keyframes bearBounce {
+        0%   { opacity: 0; transform: scale(0, 0) translateY(0); }
+        15%  { opacity: 0.7; transform: scale(0.66, 0.54) translateY(0); }
+        30%  { opacity: 1; transform: scale(0.54, 0.66) translateY(-25px); }
+        45%  { opacity: 1; transform: scale(0.63, 0.57) translateY(0); }
+        60%  { opacity: 1; transform: scale(0.54, 0.66) translateY(-15px); }
+        75%  { opacity: 1; transform: scale(0.63, 0.57) translateY(0); }
+        90%  { opacity: 1; transform: scale(0.58, 0.62) translateY(-5px); }
+        100% { opacity: 1; transform: scale(0.6, 0.6) translateY(0); }
+    }
+    
+    @keyframes bearPulse {
+      0% { opacity: 0.9; transform: translate(0, 0) scale(0.6); filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.7)); }
+      50% { opacity: 1; transform: translate(0, 0) scale(0.63); filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.9)); }
+      100% { opacity: 0.9; transform: translate(0, 0) scale(0.6); filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.7)); }
+    }
+    
+    .r-tear {
+      animation: rTear 2s ease-in-out forwards 13.1s; /* Updated from 10.1s to 13.1s */
+    }
+    
+    @keyframes rTear {
+      0% { transform: translate(0, 0); }
+      15% { transform: translate(2px, -2px) rotate(1.5deg); }
+      30% { transform: translate(-3px, 1px) rotate(-2.5deg); }
+      45% { transform: translate(4px, -3px) rotate(3deg); }
+      60% { transform: translate(-4px, 2px) rotate(-3.5deg); }
+      75% { transform: translate(3px, -1px) rotate(2deg); }
+      90% { transform: translate(-2px, 1px) rotate(-1deg); }
+      100% { transform: translate(0, 0); }
+    }
+    
     /* subtitle (adaptive user reflective assistant) */
     .reflective-text {
       position: absolute;
@@ -103,16 +172,16 @@
       opacity: 0;
     }
     .word:nth-child(1) {
-      animation: fadeIn 1s ease-in-out forwards 5s;
+      animation: fadeIn 0.6s ease-in-out forwards 12.05s; /* Updated from 9.05s to 12.05s */
     }
     .word:nth-child(2) {
-      animation: fadeIn 1s ease-in-out forwards 5.5s;
+      animation: fadeIn 0.6s ease-in-out forwards 12.15s; /* Updated from 9.35s to 12.15s - faster gap between words */
     }
     .word:nth-child(3) {
-      animation: fadeIn 1s ease-in-out forwards 6s;
+      animation: fadeIn 0.6s ease-in-out forwards 12.25s; /* Updated from 9.65s to 12.25s - faster gap between words */
     }
     .word:nth-child(4) {
-      animation: fadeIn 1s ease-in-out forwards 6.5s;
+      animation: fadeIn 0.6s ease-in-out forwards 12.35s; /* Updated from 9.95s to 12.35s - faster gap between words */
     }
     @keyframes fadeIn {
       0% { opacity: 0; }
@@ -124,7 +193,7 @@
       position: absolute;
       top: 80%;
       opacity: 0;
-      animation: fadeInButton 1.5s ease-in-out forwards 7.5s;
+      animation: fadeInButton 1.5s ease-in-out forwards 16.0s; /* Updated from 13.0s to 16.0s */
     }
     @keyframes fadeInButton {
       0% { opacity: 0; transform: translateY(10px); }
@@ -161,10 +230,36 @@
     </div>
   </div>
   <svg class="svg-obj" width="600" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 400 120">
+    <defs>
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+    </defs>
     <g>
       <path class="path" d="M 50,100 L 80,20 L 110,100 M 65,70 L 95,70" />
       <path class="path" d="M 130,20 L 130,80 Q 130,100 150,100 L 170,100 Q 190,100 190,80 L 190,20" />
-      <path class="path" d="M 210,20 L 210,100 M 210,20 L 250,20 Q 270,20 270,40 L 270,50 Q 270,70 250,70 L 210,70 M 250,70 L 280,100" />
+      
+      <!-- Modified R with tear point -->
+      <g class="r-tear">
+        <path class="path" d="M 210,20 L 210,100 M 210,20 L 250,20 Q 270,20 270,40 L 270,50 Q 270,70 250,70 L 210,70" />
+        <path class="path" d="M 250,70 L 280,100" />
+      </g>
+      
+      <!-- Tear lines -->
+      <path class="tear-line" d="M 235,57 L 245,63" filter="url(#glow)" />
+      <path class="tear-line" d="M 238,55 L 242,65" filter="url(#glow)" />
+      <path class="tear-line" d="M 232,60 L 248,60" filter="url(#glow)" />
+      
+      <!-- Bear logo image - adjusted size and position -->
+      <image
+        class="bear-logo"
+        x="200" 
+        y="15"
+        width="80"
+        height="80"
+        href="bear-logo.PNG" />
+      
       <path class="path" d="M 290,100 L 320,20 L 350,100 M 305,70 L 335,70" />
     </g>
   </svg>

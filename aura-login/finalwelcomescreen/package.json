@@ -1,0 +1,13 @@
+{
+    "name": "aura-app",
+    "version": "1.0.0",
+    "description": "AURA - Adaptive User Reflection Assistant",
+    "main": "main.js",
+    "scripts": {
+      "start": "electron ."
+    },
+    "dependencies": {
+      "electron": "^27.0.0"
+    }
+  }
+  
