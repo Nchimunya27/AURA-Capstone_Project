@@ -368,6 +368,123 @@
   <script src="profile-picture-manager.js"></script>
 
 
+  <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        // Initialize Supabase client
+        const supabaseClient = supabase.createClient(
+            'https://uumdfsnboqkounadxijq.supabase.co', //URL
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1bWRmc25ib3Frb3VuYWR4aWpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIzNDc5NzMsImV4cCI6MjA1NzkyMzk3M30.s3IDgE3c4kpaiRhCpaKATKdaZzdlTb91heIhrwDZrU0' //anon key
+        );
+        
+        console.log('Dashboard page loaded');
+        
+        // Try to authenticate user
+        try {
+            // First try normal session
+            const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+            
+            // Log authentication results
+            console.log('Auth session check:', session ? 'Session found' : 'No session found');
+            if (sessionError) console.error('Session error:', sessionError);
+            
+            let isAuthenticated = false;
+            let userId = null;
+            
+            if (session && session.user) {
+                // Normal session exists
+                console.log('Normal session found:', session.user.id);
+                isAuthenticated = true;
+                userId = session.user.id;
+            } else {
+                // Try to restore session from stored token
+                const storedToken = localStorage.getItem('supabase.auth.token');
+                const storedUserId = localStorage.getItem('user_id');
+                
+                if (storedToken && storedUserId) {
+                    console.log('Found stored authentication data');
+                    
+                    try {
+                        // Parse stored token
+                        const tokenData = JSON.parse(storedToken);
+                        
+                        if (tokenData.access_token && tokenData.refresh_token) {
+                            // Attempt to set session with stored tokens
+                            const { data, error } = await supabaseClient.auth.setSession({
+                                access_token: tokenData.access_token,
+                                refresh_token: tokenData.refresh_token
+                            });
+                            
+                            if (error) {
+                                console.error('Failed to restore session:', error);
+                            } else if (data.session) {
+                                console.log('Session restored successfully');
+                                isAuthenticated = true;
+                                userId = data.user.id;
+                            }
+                        }
+                    } catch (tokenError) {
+                        console.error('Error restoring session:', tokenError);
+                    }
+                }
+            }
+            
+            if (!isAuthenticated) {
+                console.log('User is not authenticated, redirecting to login');
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            // At this point, user is authenticated
+            console.log('User is authenticated, initializing dashboard');
+            
+            // Get user profile
+            try {
+                const { data: profile, error: profileError } = await supabaseClient
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+                    
+                if (profileError) {
+                    console.error('Error loading profile:', profileError);
+                } else {
+                    console.log('Profile loaded:', profile);
+                    
+                    // Update UI with profile data
+                    const usernameElement = document.getElementById('username-display');
+                    if (usernameElement) {
+                        usernameElement.textContent = profile.username || 'User';
+                    }
+                    
+                    // More UI updates as needed...
+                }
+            } catch (profileError) {
+                console.error('Profile fetch exception:', profileError);
+            }
+            
+            // Initialize other dashboard components...
+            
+        } catch (error) {
+            console.error('Dashboard initialization error:', error);
+            alert('An error occurred while loading the dashboard. See console for details.');
+        }
+        
+        // Global logout function
+        window.logout = async function() {
+            try {
+                await supabaseClient.auth.signOut();
+                localStorage.removeItem('supabase.auth.token');
+                localStorage.removeItem('user_id');
+                window.location.href = '/login.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+                alert('Error during logout: ' + error.message);
+            }
+        };
+    });
+    </script>
+
+
 
 
 </body>

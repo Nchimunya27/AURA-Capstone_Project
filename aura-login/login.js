@@ -1,3 +1,4 @@
+// login.js - Complete file
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize Supabase client 
     const supabaseClient = supabase.createClient(
@@ -41,21 +42,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
     
-    // Check if user is already logged in
-    async function checkLoginStatus() {
-        try {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            
-            if (session) {
-                console.log('User is already logged in:', session.user.id);
-                // Don't auto-redirect, just show a message
-                showStatusMessage('You are already logged in');
-            }
-        } catch (error) {
-            console.error('Error checking login status:', error);
-        }
-    }
-    
+    // Clear any redirect loop protection
+    localStorage.removeItem('redirect_loop_protection');
     
     // Create Account Form Submission
     const createAccountForm = document.getElementById('signupForm');
@@ -190,11 +178,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 console.log('Login successful:', data);
+                
+                // Store auth data manually for better persistence
+                localStorage.setItem('supabase.auth.token', JSON.stringify({
+                    access_token: data.session.access_token,
+                    refresh_token: data.session.refresh_token,
+                    expires_at: new Date().getTime() + (data.session.expires_in * 1000)
+                }));
+                
+                // Store user ID for verification
+                localStorage.setItem('user_id', data.user.id);
+                
                 showStatusMessage('Login successful!');
                 
-                // Redirect to dashboard after successful login
+                // Clear any redirect loop protection
+                localStorage.removeItem('redirect_loop_protection');
+                
+                // Redirect after successful login using full URL path
                 setTimeout(() => {
-                    window.location.href = '../../src-dashboard/src/aura.html';
+                    // Build the full URL based on the current domain
+                    const dashboardUrl = window.location.origin + '/src-dashboard/src/aura.html';
+                    console.log('Redirecting to dashboard:', dashboardUrl);
+                    window.location.href = dashboardUrl;
                 }, 1500);
             } catch (error) {
                 console.error('Login error:', error);
@@ -207,11 +212,27 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Expose the logout function
     window.logout = async function() {
-        await supabaseClient.auth.signOut();
-        showStatusMessage('Logged out successfully!');
-        
-        setTimeout(() => {
-            window.location.href = 'login.html';
-        }, 1500);
+        try {
+            const { error } = await supabaseClient.auth.signOut();
+            if (error) {
+                console.error('Logout error:', error);
+                showStatusMessage(`Error logging out: ${error.message}`, true);
+                return;
+            }
+            
+            // Clear auth data
+            localStorage.removeItem('supabase.auth.token');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('redirect_loop_protection');
+            
+            showStatusMessage('Logged out successfully!');
+            
+            setTimeout(() => {
+                window.location.href = '/login.html';
+            }, 1500);
+        } catch (error) {
+            console.error('Logout exception:', error);
+            showStatusMessage(`Error: ${error.message}`, true);
+        }
     };
 });
