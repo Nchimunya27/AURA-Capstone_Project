@@ -1,0 +1,201 @@
+/* Add these styles to your quiz.css or create a new file */
+
+/* Upload Card Styles */
+.upload-card {
+  background-color: var(--background-secondary, white);
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: var(--card-shadow, 0 4px 20px rgba(0, 0, 0, 0.1));
+  margin-bottom: 2rem;
+  width: 90%;
+  max-width: 800px;
+  margin: 2rem auto;
+}
+
+.upload-instruction {
+  margin-bottom: 2rem;
+  color: var(--text-tertiary, #555);
+}
+
+.upload-instruction p {
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.file-input-container {
+  margin-bottom: 2rem;
+}
+
+.file-input-label {
+  display: inline-block;
+  padding: 12px 20px;
+  background-color: var(--brand-color, #af5166);
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.file-input-label:hover {
+  background-color: var(--primary-color, #5997ac);
+}
+
+#file-input {
+  display: none;
+}
+
+.file-name {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: var(--text-tertiary, #555);
+}
+
+.upload-settings {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.upload-settings label {
+  color: var(--text-primary, #333);
+  font-weight: 500;
+}
+
+.upload-settings select {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 4px;
+  background-color: var(--background-primary, #f9fafb);
+  color: var(--text-primary, #333);
+  font-size: 14px;
+}
+
+.upload-form .submit-button {
+  background-color: var(--brand-color, #af5166);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.upload-form .submit-button:hover {
+  background-color: var(--primary-color, #5997ac);
+}
+
+.upload-form .submit-button:disabled {
+  background-color: var(--text-tertiary, #cccccc);
+  cursor: not-allowed;
+}
+
+.loading-indicator {
+  text-align: center;
+  margin-top: 2rem;
+  color: var(--text-tertiary, #555);
+}
+
+.spinner {
+  border: 4px solid var(--background-primary, #f3f3f3);
+  border-top: 4px solid var(--brand-color, #af5166);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 2s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Text Preview Container */
+.text-preview-container {
+  margin: 15px 0;
+  padding: 15px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 8px;
+  background-color: var(--background-primary, #f9fafb);
+}
+
+.text-preview-container h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: var(--text-primary, #333);
+  font-weight: 600;
+}
+
+.text-preview-content {
+  max-height: 150px;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  background-color: var(--background-secondary, white);
+  padding: 15px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color, #eee);
+}
+
+.error-message {
+  color: var(--error-color, #ff3333);
+  margin-top: 8px;
+  font-size: 14px;
+  padding: 8px;
+  background-color: rgba(255, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+/* Night mode compatibility */
+[data-theme="night"] .upload-card {
+  background-color: #31456e;
+}
+
+[data-theme="night"] .upload-instruction,
+[data-theme="night"] .file-name {
+  color: #cbd5e1;
+}
+
+[data-theme="night"] .upload-settings select {
+  background-color: #31456e;
+  border-color: #4a5b82;
+  color: #e2e8f0;
+}
+
+[data-theme="night"] .text-preview-container {
+  background-color: #273555;
+  border-color: #4a5b82;
+}
+
+[data-theme="night"] .text-preview-content {
+  background-color: #31456e;
+  border-color: #4a5b82;
+  color: #e2e8f0;
+}
+
+[data-theme="night"] .error-message {
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .upload-card {
+    width: 95%;
+    padding: 1.5rem;
+  }
+  
+  .upload-settings {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .upload-form .submit-button {
+    width: 100%;
+  }
+}

@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const loadingIndicator = document.getElementById("loading");
     const submitButton = document.querySelector(".submit-button");
     // TODO: add your own API key
-    const OPENAI_API_KEY = "open_ai_api_key";
+    const OPENAI_API_KEY = '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';
   
     // Initially disable the submit button until we have valid content
     submitButton.disabled = true;

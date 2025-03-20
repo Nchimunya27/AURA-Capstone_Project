@@ -234,8 +234,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Redirect after successful login using full URL path
                 setTimeout(() => {
-                    // Build the full URL based on the current domain
-                    const dashboardUrl = window.location.origin + '/src-dashboard/src/aura.html';
+                    // Use relative path instead of absolute path
+                    const dashboardUrl = '../src-dashboard/src/aura.html';
                     console.log('Redirecting to dashboard:', dashboardUrl);
                     window.location.href = dashboardUrl;
                 }, 1500);
@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showStatusMessage('Logged out successfully!');
             
             setTimeout(() => {
-                window.location.href = '/login.html';
+                window.location.href = 'login.html';
             }, 1500);
         } catch (error) {
             console.error('Logout exception:', error);

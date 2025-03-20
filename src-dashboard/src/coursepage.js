@@ -1396,7 +1396,8 @@ function initializeAddTaskFeature() {
     
     practiceQuizBtns.forEach(button => {
       button.addEventListener("click", function() {
-        this.textContent = "Loading quiz...";
+        // this.textContent = "Loading quiz...";
+        window.location.href = 'upload.html';
         setTimeout(() => {
           this.textContent = "Start Practice Quiz";
         }, 1500);

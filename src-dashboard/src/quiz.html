@@ -13,6 +13,7 @@
 
 </head>
 <body>
+    <div class="quiz-container">
     <div class="dashboard">
         <div class="body">
           <div class="content-wrapper">
@@ -92,236 +93,46 @@
                   </nav>
                 </aside>
               </div>
-              <div class="progress-analytics-page" style="display: none;">
-                <div class="main-content-column">
-                  <div class="main-content">
-                    <main class="analytics-main">
-                      <header class="dashboard-header">
-                        <div class="header-content">
-                          <div class="welcome-section">
-                            <div class="welcome-text">Progress Analytics</div>
-                          </div>
-                        </div>
-                      </header>
-                      
-                      <!-- Analytics Content (moved from settings page) -->
-                      <!-- Motivational Quote Section -->
-                      <div class="motivational-quote-container">
-                        <!-- Will be populated by JavaScript -->
-                      </div>
-                      
-                      <section class="analytics-section">
-                        <h2 class="analytics-heading">Overall Course Analytics</h2>
-                        
-                        <!-- KPI Metrics Row -->
-                        <div class="analytics-kpi-row">
-                          <div class="kpi-card">
-                            <div class="kpi-title">Course Progress</div>
-                            <div class="kpi-value">75%</div>
-                            <div class="kpi-subtext">6 of 8 modules completed</div>
-                          </div>
-                          
-                          <div class="kpi-card">
-                            <div class="kpi-title">Current Streak</div>
-                            <div class="kpi-value">15</div>
-                            <div class="kpi-subtext">days in a row</div>
-                          </div>
-                          
-                          <div class="kpi-card">
-                            <div class="kpi-title">Longest Streak</div>
-                            <div class="kpi-value">32</div>
-                            <div class="kpi-subtext">days</div>
-                          </div>
-                          
-                          <div class="kpi-card">
-                            <div class="kpi-title">Study Time</div>
-                            <div class="kpi-value">24h</div>
-                            <div class="kpi-subtext">total hours</div>
-                          </div>
-                        </div>
-                        
-                        <!-- Charts Row -->
-                        <div class="analytics-charts-row">
-                          <!-- Streak Over Time Chart -->
-                          <div class="chart-card">
-                            <div class="chart-header">
-                              <h3>Streak Over Time</h3>
-                            </div>
-                            <div class="chart-container">
-                              <canvas id="streakLineChart"></canvas>
-                            </div>
-                          </div>
-                          
-                          <!-- Quiz Status Chart -->
-                          <div class="chart-card">
-                            <div class="chart-header">
-                              <h3>Quiz Status</h3>
-                            </div>
-                            <div class="chart-container" style="display: flex; justify-content: center; align-items: center;">
-                              <canvas id="quizStatusChart" style="max-width: 200px; max-height: 200px;"></canvas>
-                            </div>
-                            <div class="chart-legend" style="margin-top: 10px; text-align: center;">
-                              <div class="legend-item">
-                                <span class="legend-color" style="background-color: var(--accent-color);"></span>
-                                <span class="legend-text">Completed (7/10)</span>
-                              </div>
-                              <div class="legend-item">
-                                <span class="legend-color" style="background-color: #e5e7eb;"></span>
-                                <span class="legend-text">Pending (3/10)</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <!-- Second Row of Charts -->
-                        <div class="analytics-charts-row">
-                          <!-- Activity by Day Chart -->
-                          <div class="chart-card">
-                            <div class="chart-header">
-                              <h3>Activity by Day of Week</h3>
-                            </div>
-                            <div class="chart-container">
-                              <canvas id="activityBarChart"></canvas>
-                            </div>
-                          </div>
-                          
-                          <!-- Skill Coverage Chart -->
-                          <div class="chart-card">
-                            <div class="chart-header">
-                              <h3>Skill Coverage</h3>
-                            </div>
-                            <div class="chart-container">
-                              <canvas id="skillCoverageChart"></canvas>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <!-- Recent Quizzes Table -->
-                        <div class="chart-card full-width">
-                          <div class="chart-header">
-                            <h3>Recent Quiz Performance</h3>
-                          </div>
-                          <table class="analytics-table">
-                            <thead>
-                              <tr>
-                                <th>Quiz Name</th>
-                                <th>Date Completed</th>
-                                <th>Score</th>
-                                <th>Time Spent</th>
-                                <th>Status</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                <td>Variables Quiz</td>
-                                <td>April 1, 2025</td>
-                                <td>90%</td>
-                                <td>15 min</td>
-                                <td><span class="status-badge completed">Completed</span></td>
-                              </tr>
-                              <tr>
-                                <td>Functions Quiz</td>
-                                <td>April 3, 2025</td>
-                                <td>85%</td>
-                                <td>20 min</td>
-                                <td><span class="status-badge completed">Completed</span></td>
-                              </tr>
-                              <tr>
-                                <td>Loops Quiz</td>
-                                <td>April 6, 2025</td>
-                                <td>75%</td>
-                                <td>25 min</td>
-                                <td><span class="status-badge completed">Completed</span></td>
-                              </tr>
-                              <tr>
-                                <td>Arrays Quiz</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td><span class="status-badge pending">Pending</span></td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                      </section>
-                    </main>
-                  </div>
-                </div>
-              </div>
-              
               <div class="main-content">
-                <h1 class="page-title">Quiz Page</h1>
+                <h1 class="page-title">Upload Course Notes</h1>
         
-                <div class="quiz-card">
-                  <div class="quiz-header">
-                    <a href="#" class="back-button">
-                      <i class="fas fa-arrow-left"></i>
-                      Web Developmemnt Quiz #3
-                    </a>
-        
-                    <div class="progress-container">
-                      <span class="progress-text">Question 12 of 20</span>
-                      <div class="progress-bar">
-                        <div class="progress-fill" style="width: 60%"></div>
-                      </div>
-                    </div>
+                <div class="upload-card">
+                  <div class="upload-instruction">
+                    <p>
+                      Upload your course notes to generate quiz questions automatically.
+                    </p>
+                    <p>Supported formats: PDF, TXT, DOCX</p>
                   </div>
         
-                  <div class="question-container">
-                    <h2 class="question-text">
-                      Which of the following is NOT a type of database index?
-                    </h2>
-        
-                    <div class="options-container">
-                      <label class="option-item">
-                        <input type="radio" name="answer" value="b-tree" />
-                        <span class="option-text">B-tree Index</span>
+                  <form id="upload-form" class="upload-form">
+                    <div class="file-input-container">
+                      <input type="file" id="file-input" accept=".pdf,.txt,.docx" />
+                      <label for="file-input" class="file-input-label">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Choose a file</span>
                       </label>
-        
-                      <label class="option-item">
-                        <input type="radio" name="answer" value="hash" />
-                        <span class="option-text">Hash Index</span>
-                      </label>
-        
-                      <label class="option-item">
-                        <input type="radio" name="answer" value="circle" checked />
-                        <span class="option-text">Circle Index</span>
-                      </label>
-        
-                      <label class="option-item">
-                        <input type="radio" name="answer" value="bitmap" />
-                        <span class="option-text">Bitmap Index</span>
-                      </label>
-                    </div>
-                  </div>
-        
-                  <div class="quiz-footer">
-                    <div class="navigation-buttons">
-                      <button class="nav-button prev-button">
-                        <i class="fas fa-chevron-left"></i>
-                        Previous
-                      </button>
-        
-                      <button class="nav-button next-button">
-                        Next
-                        <i class="fas fa-chevron-right"></i>
-                      </button>
+                      <div id="file-name" class="file-name"></div>
                     </div>
         
-                    <div class="action-buttons">
-                      <button class="flag-button">
-                        <i class="fas fa-flag"></i>
-                        Flag Question
-                      </button>
-        
-                      <button class="submit-button">Submit Quiz</button>
+                    <div class="upload-settings">
+                      <label for="num-questions">Number of questions:</label>
+                      <select id="num-questions">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                      </select>
                     </div>
+        
+                    <button type="submit" class="submit-button">Generate Quiz</button>
+                  </form>
+        
+                  <div id="loading" class="loading-indicator" style="display: none">
+                    <div class="spinner"></div>
+                    <p>Generating questions... This may take a minute.</p>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>

@@ -3,12 +3,6 @@
  * Handles all interactive functionality for the learning dashboard
  */
 
-// Initialize Supabase client for dashboard
-const supabaseClient = supabase.createClient(
-    'https://uumdfsnboqkounadxijq.supabase.co', //URL
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1bWRmc25ib3Frb3VuYWR4aWpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIzNDc5NzMsImV4cCI6MjA1NzkyMzk3M30.s3IDgE3c4kpaiRhCpaKATKdaZzdlTb91heIhrwDZrU0' //anon key
-);
-
 class Dashboard {
     constructor() {
         // Cache DOM elements
@@ -22,10 +16,7 @@ class Dashboard {
             tasksList: document.querySelector('.tasks-list'),
             achievementsList: document.querySelector('.achievements-list'),
             statsGrid: document.querySelector('.stats-grid'),
-            recentCoursesGrid: document.querySelector('.courses-grid'),
-            // Add elements for username display
-            userNameElement: document.querySelector('.user-name'),
-            welcomeTextElement: document.querySelector('.welcome-text')
+            recentCoursesGrid: document.querySelector('.courses-grid')
         };
 
         // Initialize state
@@ -41,9 +32,7 @@ class Dashboard {
                 completedQuizzes: 0,
                 flashcardsMastered: 0,
                 averageScore: 0
-            },
-            // Add username to state with a default value
-            username: 'User'
+            }
         };
 
         // Bind methods
@@ -55,9 +44,6 @@ class Dashboard {
         this.loadTasks = this.loadTasks.bind(this);
         this.loadAchievements = this.loadAchievements.bind(this);
         this.loadStats = this.loadStats.bind(this);
-        // Bind new methods for username handling
-        this.getUsernameFromSupabase = this.getUsernameFromSupabase.bind(this);
-        this.updateUsernameDisplay = this.updateUsernameDisplay.bind(this);
 
         // Initialize the dashboard
         this.init();
@@ -65,10 +51,6 @@ class Dashboard {
 
     async init() {
         this.updateDate();
-        
-        // Get and display username from Supabase
-        await this.getUsernameFromSupabase();
-        
         await Promise.all([
             this.loadRecentCourses(),
             this.loadTasks(),
@@ -81,91 +63,6 @@ class Dashboard {
         this.updateStreak();
         this.setupPeriodicUpdates();
         this.setupLogoutButton();
-    }
-
-    // New method to fetch username from Supabase
-    async getUsernameFromSupabase() {
-        try {
-            // First check if we have a valid session
-            const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
-            
-            if (sessionError || !session) {
-                console.log('No active session, using localStorage username');
-                // Use localStorage as fallback
-                const storedUsername = localStorage.getItem('currentUsername');
-                if (storedUsername) {
-                    this.state.username = storedUsername;
-                    this.updateUsernameDisplay();
-                }
-                return;
-            }
-            
-            // We have a session, get the user profile from Supabase
-            const userId = session.user.id;
-            const { data: profile, error: profileError } = await supabaseClient
-                .from('profiles')
-                .select('*')
-                .eq('id', userId)
-                .single();
-            
-            if (profileError || !profile) {
-                console.error('Error fetching profile:', profileError);
-                // Use localStorage as fallback
-                const storedUsername = localStorage.getItem('currentUsername');
-                if (storedUsername) {
-                    this.state.username = storedUsername;
-                    this.updateUsernameDisplay();
-                }
-                return;
-            }
-            
-            // Determine display name from profile data
-            let displayName;
-            
-            if (profile.full_name) {
-                displayName = profile.full_name;
-            } else if (profile.first_name && profile.last_name) {
-                displayName = `${profile.first_name} ${profile.last_name}`;
-            } else if (profile.username) {
-                displayName = profile.username;
-            } else {
-                // Fallback to localStorage
-                displayName = localStorage.getItem('currentUsername') || 'User';
-            }
-            
-            // Update state and display
-            this.state.username = displayName;
-            this.updateUsernameDisplay();
-            
-            // Also update localStorage for other pages
-            localStorage.setItem('currentUsername', displayName);
-            
-        } catch (error) {
-            console.error('Error getting username from Supabase:', error);
-            // Use localStorage as fallback
-            const storedUsername = localStorage.getItem('currentUsername');
-            if (storedUsername) {
-                this.state.username = storedUsername;
-                this.updateUsernameDisplay();
-            }
-        }
-    }
-
-    // New method to update username display
-    updateUsernameDisplay() {
-        try {
-            // Update sidebar username
-            if (this.elements.userNameElement) {
-                this.elements.userNameElement.textContent = this.state.username;
-            }
-            
-            // Update welcome message
-            if (this.elements.welcomeTextElement) {
-                this.elements.welcomeTextElement.textContent = `Welcome back, ${this.state.username}!`;
-            }
-        } catch (error) {
-            console.error('Error updating username display:', error);
-        }
     }
 
     async loadTasks() {
@@ -387,7 +284,8 @@ class Dashboard {
     }
 
     /**
-     * Handle navigation item clicks
+     * Handle navigation item clicks,
+     * EDIT ADDED: Additions made to work with the settings page
      */
     handleNavigation(event) {
         const clickedItem = event.currentTarget;
@@ -566,31 +464,54 @@ class Dashboard {
         }
     }
 
-    // Modified handleLogout to use Supabase
     async handleLogout() {
         try {
-            // Sign out from Supabase
-            const { error } = await supabaseClient.auth.signOut();
-            if (error) {
-                console.error('Supabase logout error:', error);
-            }
+            console.log('Logging out user...');
+            
+            // Clear user data from localStorage
+            localStorage.removeItem('currentUsername');
+            localStorage.removeItem('user_firstName');
+            localStorage.removeItem('user_lastName');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('supabase.auth.token');
+            localStorage.removeItem('redirect_loop_protection');
             
             // Remove current user from session storage
             sessionStorage.removeItem('currentUser');
             
-            // Clear localStorage items
-            localStorage.removeItem('currentUsername');
-            localStorage.removeItem('user_firstName');
-            localStorage.removeItem('user_lastName');
-            localStorage.removeItem('supabase.auth.token');
-            localStorage.removeItem('user_id');
-            localStorage.removeItem('redirect_loop_protection');
+            // Check if user was remembered
+            let savedUser = null;
+            
+            try {
+                const cache = await caches.open('aura-user-cache');
+                const response = await cache.match('/currentUser');
+                
+                if (response) {
+                    savedUser = await response.json();
+                }
+            } catch (error) {
+                console.log('Cache retrieval failed, using localStorage', error);
+                const localData = localStorage.getItem('currentUser');
+                savedUser = localData ? JSON.parse(localData) : null;
+            }
+            
+            // Only remove from cache/localStorage if user is not "remembered"
+            if (savedUser && !savedUser.remembered) {
+                try {
+                    const cache = await caches.open('aura-user-cache');
+                    await cache.delete('/currentUser');
+                } catch (error) {
+                    console.log('Cache deletion failed', error);
+                }
+                localStorage.removeItem('currentUser');
+            }
+            
+            console.log('Logout completed, redirecting to login page');
             
             // Redirect to login page
             window.location.href = '../../aura-login/login.html';
         } catch (error) {
             console.error('Error during logout:', error);
-            this.showErrorMessage('Error logging out. Please try again.');
         }
     }
 }
@@ -811,44 +732,37 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       }
     });
-
+    
     // Override the Dashboard.handleNavigation for Progress Analytics
     setTimeout(function() {
-        if (window.dashboard && typeof dashboard.handleNavigation === 'function') {
-          const originalHandleNavigation = dashboard.handleNavigation;
-          
-          dashboard.handleNavigation = function(event) {
-            const clickedItem = event.currentTarget;
-            const navText = clickedItem.querySelector('.nav-text').textContent.trim();
-            
-            // Only call original handler if NOT Progress Analytics
-            if (navText !== 'Progress Analytics') {
-              originalHandleNavigation.call(dashboard, event);
-            }
-          };
-          
-          console.log('Dashboard navigation handler modified');
-        }
-      }, 200);
-      
-      // Check if we need to show analytics based on localStorage flag
-      // This handles navigation from other pages
-      if (localStorage.getItem('showProgressAnalytics') === 'true' && dashboardContent) {
-        console.log('Found flag to show Progress Analytics');
-        localStorage.removeItem('showProgressAnalytics');
+      if (window.dashboard && typeof dashboard.handleNavigation === 'function') {
+        const originalHandleNavigation = dashboard.handleNavigation;
         
-        setTimeout(function() {
-          if (progressAnalyticsItem) {
-            // Simulate click on Progress Analytics
-            progressAnalyticsItem.click();
+        dashboard.handleNavigation = function(event) {
+          const clickedItem = event.currentTarget;
+          const navText = clickedItem.querySelector('.nav-text').textContent.trim();
+          
+          // Only call original handler if NOT Progress Analytics
+          if (navText !== 'Progress Analytics') {
+            originalHandleNavigation.call(dashboard, event);
           }
-        }, 300); // Allow time for dashboard to initialize
+        };
+        
+        console.log('Dashboard navigation handler modified');
       }
-  });
-  
-  // Add this HTML fix
-  const getStartedHtml = `
-  <div class="get-started-container">
-      <button onclick="window.location.href='../../../aura-login/login.html';">Get Started</button>
-  </div>
-  `;
+    }, 200);
+    
+    // Check if we need to show analytics based on localStorage flag
+    // This handles navigation from other pages
+    if (localStorage.getItem('showProgressAnalytics') === 'true' && dashboardContent) {
+      console.log('Found flag to show Progress Analytics');
+      localStorage.removeItem('showProgressAnalytics');
+      
+      setTimeout(function() {
+        if (progressAnalyticsItem) {
+          // Simulate click on Progress Analytics
+          progressAnalyticsItem.click();
+        }
+      }, 300); // Allow time for dashboard to initialize
+    }
+});
