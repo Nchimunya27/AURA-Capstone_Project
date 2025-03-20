@@ -110,6 +110,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             console.error('Profile creation error:', profileError);
                             showStatusMessage('Account created but profile setup failed. Please contact support.', true);
                         } else {
+                            // Store username in localStorage for sign-up as well
+                            localStorage.setItem('currentUsername', username);
+                            
                             showStatusMessage('Account created successfully! Please check your email for verification.');
                             
                             // Clear the form
@@ -189,6 +192,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Store user ID for verification
                 localStorage.setItem('user_id', data.user.id);
                 
+                // Store the username in localStorage for dashboard display
+                localStorage.setItem('currentUsername', username);
+                
                 showStatusMessage('Login successful!');
                 
                 // Clear any redirect loop protection
@@ -224,6 +230,8 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('supabase.auth.token');
             localStorage.removeItem('user_id');
             localStorage.removeItem('redirect_loop_protection');
+            // Also clear the username
+            localStorage.removeItem('currentUsername');
             
             showStatusMessage('Logged out successfully!');
             

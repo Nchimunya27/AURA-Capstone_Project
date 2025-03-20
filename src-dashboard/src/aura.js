@@ -16,7 +16,10 @@ class Dashboard {
             tasksList: document.querySelector('.tasks-list'),
             achievementsList: document.querySelector('.achievements-list'),
             statsGrid: document.querySelector('.stats-grid'),
-            recentCoursesGrid: document.querySelector('.courses-grid')
+            recentCoursesGrid: document.querySelector('.courses-grid'),
+            
+            userNameElement: document.querySelector('.user-name'),
+            welcomeTextElement: document.querySelector('.welcome-text')
         };
 
         // Initialize state
@@ -32,7 +35,8 @@ class Dashboard {
                 completedQuizzes: 0,
                 flashcardsMastered: 0,
                 averageScore: 0
-            }
+            },
+            username: localStorage.getItem('currentUsername') || 'User'
         };
 
         // Bind methods
@@ -45,12 +49,57 @@ class Dashboard {
         this.loadAchievements = this.loadAchievements.bind(this);
         this.loadStats = this.loadStats.bind(this);
 
+        this.updateUsernameDisplay = this.updateUsernameDisplay.bind(this);
+
         // Initialize the dashboard
         this.init();
     }
 
+    updateUsernameDisplay() {
+        try {
+            // Get username from state or try to get from localStorage
+            const username = this.state.username || localStorage.getItem('currentUsername') || 'User';
+            
+            // Update username in sidebar if element exists
+            if (this.elements.userNameElement) {
+                this.elements.userNameElement.textContent = username;
+            }
+            
+            // Update welcome message if element exists
+            if (this.elements.welcomeTextElement) {
+                this.elements.welcomeTextElement.textContent = `Welcome back, ${username}!`;
+            }
+    
+            // Store username in state for future reference
+            this.state.username = username;
+        } catch (error) {
+            console.error('Error updating username display:', error);
+        }
+    }
+    
+    // Modify the handleLogout method to also clear the username
+    handleLogout() {
+        try {
+            // Remove current user data
+            localStorage.removeItem('currentUsername');
+            localStorage.removeItem('supabase.auth.token');
+            localStorage.removeItem('user_id');
+            
+            // Redirect to login page
+            window.location.href = '../../aura-login/login.html';
+        } catch (error) {
+            console.error('Error during logout:', error);
+        }
+    }
+    
+
+
+
+
     async init() {
         this.updateDate();
+
+        this.updateUsernameDisplay();
         await Promise.all([
             this.loadRecentCourses(),
             this.loadTasks(),

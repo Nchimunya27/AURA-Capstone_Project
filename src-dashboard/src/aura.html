@@ -91,7 +91,7 @@
                     <header class="dashboard-header">
                       <div class="header-content">
                         <div class="welcome-section">
-                          <div class="welcome-text">Welcome back, Sarah!</div>
+                          <div class="welcome-text">Welcome back!</div>
                           <div class="current-date">Monday, January 15, 2025</div>
                         </div>
                         <div class="streak-container">
@@ -185,6 +185,28 @@
   <script src="aura.js"></script>
   <script src="common.js"></script>
   <script src="profile-picture-manager.js"></script>
+
+
+  // Add this to your aura.js file or to a script tag at the end of aura.html
+<script>document.addEventListener('DOMContentLoaded', function() {
+  // Get username from localStorage
+  const username = localStorage.getItem('currentUsername');
+  
+  if (username) {
+    // Update welcome message
+    const welcomeTextElement = document.querySelector('.welcome-text');
+    if (welcomeTextElement) {
+      welcomeTextElement.textContent = `Welcome back, ${username}!`;
+    }
+    
+    // Also update username in sidebar
+    const userNameElement = document.querySelector('.user-name');
+    if (userNameElement) {
+      userNameElement.textContent = username;
+    }
+  }
+});
+</script>
 
 
 
