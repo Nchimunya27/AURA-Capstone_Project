@@ -126,3 +126,14 @@
 .profile-updated {
   animation: profile-update-pulse 0.8s ease-out;
 }
+
+/* Username styling adjustments */
+.user-name, .welcome-text {
+  transition: opacity 0.3s ease;
+}
+
+/* Class that helps ensure username is visible */
+.username-loaded {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
