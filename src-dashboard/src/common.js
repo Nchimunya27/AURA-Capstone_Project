@@ -64,13 +64,27 @@ document.addEventListener('DOMContentLoaded', function() {
         const logoutButton = document.getElementById('logoutButton');
         if (logoutButton) {
             logoutButton.addEventListener('click', function() {
-                // Clear username
-                localStorage.removeItem('currentUsername');
+                console.log('Logout button clicked, clearing user data');
                 
-                // Clear auth data
-                localStorage.removeItem('supabase.auth.token');
+                // Clear all user-related data
+                localStorage.removeItem('currentUsername');
+                localStorage.removeItem('user_firstName');
+                localStorage.removeItem('user_lastName');
                 localStorage.removeItem('user_id');
+                localStorage.removeItem('supabase.auth.token');
                 localStorage.removeItem('redirect_loop_protection');
+                sessionStorage.removeItem('currentUser');
+                
+                // Try to clear cache
+                try {
+                    caches.open('aura-user-cache').then(cache => {
+                        cache.delete('/currentUser').then(() => {
+                            console.log('User cache cleared');
+                        });
+                    });
+                } catch (error) {
+                    console.log('Failed to clear cache:', error);
+                }
                 
                 // Redirect to login page
                 window.location.href = '../../aura-login/login.html';
