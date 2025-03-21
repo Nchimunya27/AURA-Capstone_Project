@@ -16,28 +16,7 @@
 // Function to check if user is logged in and load user data
 async function checkUserSession() {
   try {
-      // First check if we have a username from login
-      const username = localStorage.getItem('currentUsername');
-      if (username) {
-          console.log('Found username in localStorage:', username);
-          // If we have a username, consider the user logged in
-          const basicUser = {
-              username: username,
-              firstName: localStorage.getItem('user_firstName') || '',
-              lastName: localStorage.getItem('user_lastName') || '',
-              lastLogin: new Date().toISOString()
-          };
-          
-          // Store in session to avoid future checks
-          sessionStorage.setItem('currentUser', JSON.stringify(basicUser));
-          
-          // Clear redirect protection
-          localStorage.removeItem('redirect_loop_protection');
-          
-          return basicUser;
-      }
-      
-      // If no username, check sessionStorage (for current session)
+      // First check sessionStorage (for current session)
       let currentUser = sessionStorage.getItem('currentUser');
       if (currentUser) {
           currentUser = JSON.parse(currentUser);
@@ -65,40 +44,9 @@ async function checkUserSession() {
       
       // If no user found, redirect to login page
       if (!currentUser) {
-          console.log('No user session found, redirecting to login page');
-          
-          // Check if we're already in a redirect
-          const redirecting = localStorage.getItem('redirect_loop_protection');
-          if (redirecting) {
-            console.warn('Detected potential redirect loop. Please clear your browser cache and cookies.');
-            // Display a message to the user instead of redirecting again
-            document.body.innerHTML = `
-              <div style="max-width: 600px; margin: 100px auto; padding: 20px; text-align: center; font-family: sans-serif;">
-                <h1>Login Error</h1>
-                <p>We detected a problem with the login redirect. This might be due to cached data.</p>
-                <p>Please try:</p>
-                <ol style="text-align: left; display: inline-block;">
-                  <li>Clearing your browser cache and cookies</li>
-                  <li>Try opening this link directly: <a href="../../aura-login/login.html">Login Page</a></li>
-                </ol>
-              </div>
-            `;
-            return null;
-          }
-          
-          // Set protection against redirect loops
-          localStorage.setItem('redirect_loop_protection', 'true');
-          
-          // Use a timeout to ensure the loop protection is set before redirecting
-          setTimeout(() => {
-            window.location.href = '../../aura-login/login.html';
-          }, 100);
-          
-          return null;
+          window.location.href = 'login.html';
+          return;
       }
-      
-      // If we got here successfully, clear the redirect protection
-      localStorage.removeItem('redirect_loop_protection');
       
       return currentUser;
   } catch (error) {
@@ -109,22 +57,17 @@ async function checkUserSession() {
 
 // Function to update UI with user information
 function updateUserInterface(user) {
-  if (!user) return;
-  
-  console.log('Updating UI with user:', user);
-  
   // Update welcome message
   const welcomeText = document.querySelector('.welcome-text');
   if (welcomeText) {
       const greeting = user.lastVisit ? 'Welcome back, ' : 'Welcome, ';
-      const name = user.username || user.firstName || 'User';
-      welcomeText.textContent = greeting + name + '!';
+      welcomeText.textContent = greeting + user.username + '!';
   }
   
   // Update user name in sidebar
   const userName = document.querySelector('.user-name');
   if (userName) {
-      userName.textContent = user.username || user.firstName || 'User';
+      userName.textContent = user.username;
   }
   
   // Update profile picture (if exists)
