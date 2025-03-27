@@ -1,150 +1,417 @@
-// Analytics functionality for Progress Analytics page
-// This script handles the analytics visualizations
+// analytics.js
+// Handles updating the UI with analytics data
 
-// Add this to the top of your analytics.js file to set global chart defaults
+document.addEventListener('DOMContentLoaded', initializeAnalytics);
 
-/**
- * Set global Chart.js defaults for better readability
- */
-function setChartGlobalDefaults() {
-  if (typeof Chart !== 'undefined') {
-    // Get theme
-    const isNightMode = document.documentElement.getAttribute('data-theme') === 'night';
+// Global state to track feature flags and user preferences
+const analyticsState = {
+  isInitialized: false,
+  refreshInterval: null,
+  autoRefreshEnabled: false,
+  autoRefreshInterval: 5 * 60 * 1000, // 5 minutes
+  filterPeriod: 'all', // 'week', 'month', 'year', 'all'
+  chartsInitialized: false,
+  darkMode: false,
+  userSettings: {},
+};
+
+// Main initialization function
+async function initializeAnalytics() {
+  try {
+    // Check for theme preference
+    analyticsState.darkMode = document.documentElement.getAttribute('data-theme') === 'night';
     
-    // Set color based on theme
-    const textColor = isNightMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.8)';
-    const gridColor = isNightMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-    const tooltipBgColor = isNightMode ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)';
-    const tooltipTextColor = isNightMode ? 'rgba(255, 255, 255, 0.95)' : 'rgba(0, 0, 0, 0.8)';
+    // Create refresh button if it doesn't exist
+    createRefreshButton();
     
-    // Default font settings
-    Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
-    Chart.defaults.font.size = 14;
-    Chart.defaults.font.weight = '500';
+    // Create time period filters
+    createTimePeriodFilters();
     
-    // Default colors
-    Chart.defaults.color = textColor;
-    Chart.defaults.borderColor = gridColor;
+    // Load motivational quote
+    await loadMotivationalQuote();
     
-    // Improved animation
-    Chart.defaults.animation.duration = 1200;
-    Chart.defaults.animation.easing = 'easeOutQuart';
+    // Show loading state
+    showLoadingState();
     
-    // Enhanced responsiveness
-    Chart.defaults.maintainAspectRatio = false;
-    Chart.defaults.responsive = true;
+    // Load analytics data
+    const data = await window.analyticsData.getAllAnalyticsData();
     
-    // Better tooltips
-    Chart.defaults.plugins.tooltip.backgroundColor = tooltipBgColor;
-    Chart.defaults.plugins.tooltip.titleColor = tooltipTextColor;
-    Chart.defaults.plugins.tooltip.bodyColor = tooltipTextColor;
-    Chart.defaults.plugins.tooltip.padding = 12;
-    Chart.defaults.plugins.tooltip.cornerRadius = 8;
-    Chart.defaults.plugins.tooltip.titleFont = {
-      size: 16,
-      weight: 'bold'
-    };
-    Chart.defaults.plugins.tooltip.bodyFont = {
-      size: 14,
-      weight: 'normal'
-    };
-    Chart.defaults.plugins.tooltip.displayColors = true;
-    Chart.defaults.plugins.tooltip.boxPadding = 6;
-    Chart.defaults.plugins.tooltip.boxWidth = 12;
-    Chart.defaults.plugins.tooltip.boxHeight = 12;
-    Chart.defaults.plugins.tooltip.usePointStyle = true;
+    // Update the UI with the data
+    updateKPICards(data);
+    initializeCharts(data);
+    updateQuizTable(data.quizPerformance);
     
-    // Better legends
-    Chart.defaults.plugins.legend.position = 'bottom';
-    Chart.defaults.plugins.legend.labels.padding = 20;
-    Chart.defaults.plugins.legend.labels.boxWidth = 15;
-    Chart.defaults.plugins.legend.labels.boxHeight = 15;
-    Chart.defaults.plugins.legend.labels.usePointStyle = true;
-    Chart.defaults.plugins.legend.labels.color = textColor;
-    Chart.defaults.plugins.legend.labels.font = {
-      size: 14,
-      weight: '600'
-    };
+    // Hide loading state
+    hideLoadingState();
     
-    // Add shadow for line elements
-    Chart.defaults.elements.line.borderWidth = 3;
-    Chart.defaults.elements.line.tension = 0.4;
+    // Set up event listeners for data updates
+    setupDataUpdateListeners();
     
-    // Improved point styling
-    Chart.defaults.elements.point.radius = 4;
-    Chart.defaults.elements.point.hoverRadius = 6;
+    // Set up theme change detection
+    setupThemeChangeDetection();
     
-    // Better bar styling
-    Chart.defaults.elements.bar.borderRadius = 6;
-    Chart.defaults.elements.bar.borderSkipped = false;
+    // Mark as initialized
+    analyticsState.isInitialized = true;
     
-    console.log('Chart.js global defaults set for better readability');
+  } catch (error) {
+    console.error('Error initializing analytics:', error);
+    hideLoadingState();
+    showErrorMessage('Failed to load analytics data. Please try again later.');
   }
 }
 
-// Enhanced Streak Line Chart
-function createStreakLineChart() {
-  const ctx = document.getElementById('streakLineChart');
-  if (!ctx) return;
+// Create refresh button in the analytics header
+function createRefreshButton() {
+  const header = document.querySelector('.analytics-heading');
   
-  // Sample data - would come from API in real app
-  const streakData = {
-    labels: ['Apr 20', 'Apr 21', 'Apr 22', 'Apr 23', 'Apr 24', 'Apr 25', 'Apr 26', 'Apr 27', 'Apr 28', 'Apr 29', 'Apr 30', 'May 1', 'May 2', 'May 3', 'May 4'],
-    datasets: [{
-      label: 'Daily Streak',
-      data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-      borderColor: 'rgba(89, 151, 172, 1)',
-      backgroundColor: 'rgba(89, 151, 172, 0.15)',
-      fill: true,
-      tension: 0.4,
-      borderWidth: 3,
-      pointBackgroundColor: 'rgba(89, 151, 172, 1)',
-      pointRadius: 4,
-      pointHoverRadius: 6,
-      pointBorderColor: '#fff',
-      pointBorderWidth: 2,
-      pointHoverBorderWidth: 2,
-      pointHoverBackgroundColor: 'rgba(89, 151, 172, 1)',
-      pointHoverBorderColor: '#fff',
-      // Apply shadow to make the line stand out more
-      borderJoinStyle: 'round',
-      borderCapStyle: 'round'
-    }]
-  };
-  
-  // Adjust for night mode
-  if (document.documentElement.getAttribute('data-theme') === 'night') {
-    streakData.datasets[0].borderColor = 'rgba(123, 181, 245, 1)';
-    streakData.datasets[0].backgroundColor = 'rgba(123, 181, 245, 0.2)';
-    streakData.datasets[0].pointBackgroundColor = 'rgba(123, 181, 245, 1)';
-    streakData.datasets[0].pointHoverBackgroundColor = 'rgba(123, 181, 245, 1)';
+  // Check if button already exists
+  if (document.querySelector('.refresh-analytics-btn')) {
+    return;
   }
   
-  new Chart(ctx, {
+  // Create container for controls
+  const controlsContainer = document.createElement('div');
+  controlsContainer.className = 'analytics-controls';
+  
+  // Create refresh button
+  const refreshButton = document.createElement('button');
+  refreshButton.className = 'refresh-analytics-btn';
+  refreshButton.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+    </svg>
+    <span>Refresh</span>
+  `;
+  refreshButton.addEventListener('click', window.refreshAnalytics);
+  
+  // Add auto-refresh toggle
+  const autoRefreshLabel = document.createElement('label');
+  autoRefreshLabel.className = 'auto-refresh-toggle';
+  autoRefreshLabel.innerHTML = `
+    <input type="checkbox" id="auto-refresh-toggle">
+    <span>Auto-refresh</span>
+  `;
+  
+  // Add event listener for auto-refresh toggle
+  const autoRefreshToggle = autoRefreshLabel.querySelector('#auto-refresh-toggle');
+  autoRefreshToggle.addEventListener('change', function() {
+    toggleAutoRefresh(this.checked);
+  });
+  
+  // Add to controls container
+  controlsContainer.appendChild(refreshButton);
+  controlsContainer.appendChild(autoRefreshLabel);
+  
+  // Add controls next to the heading
+  header.parentNode.insertBefore(controlsContainer, header.nextSibling);
+}
+
+// Create time period filter controls
+function createTimePeriodFilters() {
+  const analyticsSection = document.querySelector('.analytics-section');
+  
+  // Check if filters already exist
+  if (document.querySelector('.time-period-filters')) {
+    return;
+  }
+  
+  // Create filter container
+  const filterContainer = document.createElement('div');
+  filterContainer.className = 'time-period-filters';
+  
+  // Create filter label
+  const filterLabel = document.createElement('span');
+  filterLabel.className = 'filter-label';
+  filterLabel.textContent = 'Show data for:';
+  filterContainer.appendChild(filterLabel);
+  
+  // Create filter options
+  const periods = [
+    { id: 'week', label: 'This Week' },
+    { id: 'month', label: 'This Month' },
+    { id: 'year', label: 'This Year' },
+    { id: 'all', label: 'All Time' }
+  ];
+  
+  // Create filter buttons
+  const filterButtons = document.createElement('div');
+  filterButtons.className = 'filter-buttons';
+  
+  periods.forEach(period => {
+    const button = document.createElement('button');
+    button.className = `filter-btn ${period.id === analyticsState.filterPeriod ? 'active' : ''}`;
+    button.dataset.period = period.id;
+    button.textContent = period.label;
+    
+    button.addEventListener('click', function() {
+      // Update active state
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Update filter period and refresh data
+      analyticsState.filterPeriod = this.dataset.period;
+      applyTimePeriodFilter();
+    });
+    
+    filterButtons.appendChild(button);
+  });
+  
+  filterContainer.appendChild(filterButtons);
+  
+  // Insert after analytics heading
+  const targetElement = document.querySelector('.analytics-controls') || document.querySelector('.analytics-heading');
+  targetElement.parentNode.insertBefore(filterContainer, targetElement.nextSibling);
+}
+
+// Apply time period filter to the data
+async function applyTimePeriodFilter() {
+  showLoadingState();
+  
+  try {
+    // Refresh data with filter applied
+    const data = await window.analyticsData.getAllAnalyticsData(true);
+    
+    // Filter the data based on selected time period
+    const filteredData = filterDataByTimePeriod(data, analyticsState.filterPeriod);
+    
+    // Update UI with filtered data
+    updateKPICards(filteredData);
+    // Charts need to be destroyed and recreated to properly update
+    destroyCharts();
+    initializeCharts(filteredData);
+    updateQuizTable(filteredData.quizPerformance);
+    
+    hideLoadingState();
+    
+  } catch (error) {
+    console.error('Error applying time period filter:', error);
+    hideLoadingState();
+    showToast('Failed to update data for selected time period.', 'error');
+  }
+}
+
+// Filter data based on time period
+function filterDataByTimePeriod(data, period) {
+  // Clone the data to avoid modifying the original
+  const filteredData = JSON.parse(JSON.stringify(data));
+  
+  // Get date boundaries for the selected period
+  const now = new Date();
+  let startDate;
+  
+  switch (period) {
+    case 'week':
+      // Start of current week (Sunday)
+      startDate = new Date(now);
+      startDate.setDate(now.getDate() - now.getDay());
+      startDate.setHours(0, 0, 0, 0);
+      break;
+    case 'month':
+      // Start of current month
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      break;
+    case 'year':
+      // Start of current year
+      startDate = new Date(now.getFullYear(), 0, 1);
+      break;
+    case 'all':
+    default:
+      // No filtering needed
+      return filteredData;
+  }
+  
+  // Filter quiz performance data
+  if (filteredData.quizPerformance && filteredData.quizPerformance.recentQuizzes) {
+    filteredData.quizPerformance.recentQuizzes = filteredData.quizPerformance.recentQuizzes.filter(quiz => {
+      if (!quiz.date) return false;
+      const quizDate = new Date(quiz.date);
+      return quizDate >= startDate;
+    });
+    
+    // Update completed/pending counts
+    filteredData.quizPerformance.completed = filteredData.quizPerformance.recentQuizzes.filter(q => q.status === 'completed').length;
+    filteredData.quizPerformance.pending = filteredData.quizPerformance.totalQuizzes - filteredData.quizPerformance.completed;
+  }
+  
+  // Filter study activity data
+  if (filteredData.studyActivity) {
+    // Filter activity heatmap
+    if (filteredData.studyActivity.activityHeatmap) {
+      // This would depend on how your heatmap data is structured
+      // For this example, we'll assume that we don't filter the heatmap
+    }
+    
+    // Weekly hours - no filter needed as it's already weekly
+  }
+  
+  return filteredData;
+}
+
+// Toggle auto-refresh functionality
+function toggleAutoRefresh(enabled) {
+  analyticsState.autoRefreshEnabled = enabled;
+  
+  // Clear existing interval if any
+  if (analyticsState.refreshInterval) {
+    clearInterval(analyticsState.refreshInterval);
+    analyticsState.refreshInterval = null;
+  }
+  
+  // Set up new interval if enabled
+  if (enabled) {
+    analyticsState.refreshInterval = setInterval(async () => {
+      await window.refreshAnalytics();
+    }, analyticsState.autoRefreshInterval);
+    
+    showToast('Auto-refresh enabled. Data will refresh every 5 minutes.', 'info');
+  } else {
+    showToast('Auto-refresh disabled.', 'info');
+  }
+}
+
+// Setup theme change detection
+function setupThemeChangeDetection() {
+  // Create a MutationObserver to watch for theme changes
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'data-theme') {
+        const newTheme = document.documentElement.getAttribute('data-theme');
+        if ((newTheme === 'night') !== analyticsState.darkMode) {
+          analyticsState.darkMode = (newTheme === 'night');
+          
+          // Update charts for the new theme
+          if (analyticsState.chartsInitialized) {
+            // Refresh charts with new theme colors
+            window.refreshAnalytics();
+          }
+        }
+      }
+    });
+  });
+  
+  // Start observing the document element for theme changes
+  observer.observe(document.documentElement, { attributes: true });
+}
+
+// Show loading indicators for all charts
+function showLoadingState() {
+  const chartContainers = document.querySelectorAll('.chart-container');
+  chartContainers.forEach(container => {
+    // Check if loading indicator already exists
+    if (!container.querySelector('.chart-loading')) {
+      const loadingDiv = document.createElement('div');
+      loadingDiv.className = 'chart-loading';
+      loadingDiv.innerHTML = '<div class="spinner"></div><div>Loading data...</div>';
+      container.appendChild(loadingDiv);
+    } else {
+      container.querySelector('.chart-loading').style.display = 'flex';
+    }
+  });
+}
+
+// Hide all loading indicators
+function hideLoadingState() {
+  const loadingIndicators = document.querySelectorAll('.chart-loading');
+  loadingIndicators.forEach(indicator => {
+    indicator.style.display = 'none';
+  });
+}
+
+// Update the KPI cards with the latest data
+function updateKPICards(data) {
+  const { userProfile, courseProgress } = data;
+  
+  // Course Progress KPI
+  document.getElementById('course-progress-percentage').textContent = `${courseProgress.overallPercentage}%`;
+  document.getElementById('course-progress-modules').textContent = 
+    `${courseProgress.modulesCompleted} of ${courseProgress.totalModules} modules completed`;
+  
+  // Current Streak KPI
+  document.getElementById('current-streak-value').textContent = userProfile.currentStreak;
+  
+  // Longest Streak KPI
+  document.getElementById('longest-streak-value').textContent = userProfile.longestStreak;
+  
+  // Study Time KPI
+  document.getElementById('study-time-value').textContent = `${userProfile.totalStudyHours}h`;
+}
+
+// Initialize chart visualizations
+function initializeCharts(data) {
+  const { userProfile, studyActivity, quizPerformance, skillCoverage } = data;
+  
+  // Initialize Streak Line Chart
+  initializeStreakLineChart(userProfile);
+  
+  // Initialize Quiz Status Chart
+  initializeQuizStatusChart(quizPerformance);
+  
+  // Initialize Activity Bar Chart
+  initializeActivityBarChart(studyActivity);
+  
+  // Initialize Skill Coverage Chart
+  initializeSkillCoverageChart(skillCoverage);
+}
+
+// Initialize the streak line chart
+function initializeStreakLineChart(userData) {
+  const ctx = document.getElementById('streakLineChart').getContext('2d');
+  
+  // Generate streak data based on user activity
+  const streakData = generateStreakData(userData);
+  
+  // Get theme colors
+  const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#5997AC';
+  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'night';
+  
+  // Create the chart
+  const chart = new Chart(ctx, {
     type: 'line',
-    data: streakData,
+    data: {
+      labels: streakData.labels,
+      datasets: [{
+        label: 'Daily Streak',
+        data: streakData.values,
+        backgroundColor: `rgba(${hexToRgb(accentColor)}, 0.2)`,
+        borderColor: accentColor,
+        borderWidth: 2,
+        pointRadius: 3,
+        pointBackgroundColor: accentColor,
+        tension: 0.2,
+        fill: true
+      }]
+    },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      layout: {
-        padding: {
-          top: 10,
-          right: 20,
-          bottom: 10,
-          left: 10
-        }
-      },
       plugins: {
         legend: {
-          display: false
+          display: false,
+          labels: {
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.85)'
+          }
         },
         tooltip: {
+          mode: 'index',
+          intersect: false,
+          backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+          titleColor: isDarkMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)',
+          bodyColor: isDarkMode ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)',
+          borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+          borderWidth: 1,
           callbacks: {
-            title: function(context) {
-              return context[0].label;
+            title: function(tooltipItems) {
+              return tooltipItems[0].label;
             },
             label: function(context) {
-              return `Streak: ${context.raw} days`;
+              let label = context.dataset.label || '';
+              if (label) {
+                label += ': ';
+              }
+              if (context.parsed.y !== null) {
+                label += context.parsed.y + ' days';
+              }
+              return label;
             }
           }
         }
@@ -152,40 +419,18 @@ function createStreakLineChart() {
       scales: {
         y: {
           beginAtZero: true,
-          grace: '10%',
           title: {
             display: true,
-            text: 'Streak Days',
-            padding: {
-              bottom: 10,
-              top: 10
-            },
-            font: {
-              size: 14,
-              weight: 'bold'
-            }
-          },
-          grid: {
-            display: true,
-            drawBorder: true,
-            drawOnChartArea: true,
-            drawTicks: true,
-            color: function(context) {
-              if (context.tick.value === 0) {
-                return document.documentElement.getAttribute('data-theme') === 'night' 
-                  ? 'rgba(255, 255, 255, 0.2)' 
-                  : 'rgba(0, 0, 0, 0.2)';
-              }
-              return document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.05)' 
-                : 'rgba(0, 0, 0, 0.05)';
-            }
+            text: 'Streak (days)',
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.85)'
           },
           ticks: {
-            padding: 10,
-            font: {
-              size: 12
-            }
+            stepSize: 1,
+            precision: 0,
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)'
+          },
+          grid: {
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
           }
         },
         x: {
@@ -193,63 +438,122 @@ function createStreakLineChart() {
             display: false
           },
           ticks: {
-            font: {
-              size: 12
-            },
-            padding: 8,
-            maxRotation: 45,
-            minRotation: 45
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)'
           }
         }
       }
     }
   });
+  
+  // Store chart instance reference
+  Chart.streakLineChart = chart;
+  
+  // Mark charts as initialized
+  analyticsState.chartsInitialized = true;
 }
 
-// Enhanced Quiz Status Donut Chart
-function createQuizStatusChart() {
-  const ctx = document.getElementById('quizStatusChart');
-  if (!ctx) return;
+// Generate streak data from user data
+function generateStreakData(userData) {
+  // Generate last 30 days of streak data for the chart
+  const labels = [];
+  const values = [];
   
-  // Sample data
-  const quizData = {
-    labels: ['Completed', 'Pending'],
-    datasets: [{
-      data: [7, 3],
-      backgroundColor: [
-        'rgba(89, 151, 172, 1)',
-        '#e5e7eb'
-      ],
-      borderWidth: 0,
-      hoverOffset: 6
-    }]
-  };
+  // Current date
+  const today = new Date();
   
-  // Adjust colors for night mode
-  if (document.documentElement.getAttribute('data-theme') === 'night') {
-    quizData.datasets[0].backgroundColor[0] = 'rgba(123, 181, 245, 1)';
-    quizData.datasets[0].backgroundColor[1] = '#31456e';
+  // Get actual streak data if available
+  const hasStreakHistory = userData.streakHistory && Array.isArray(userData.streakHistory) && userData.streakHistory.length > 0;
+  
+  // Generate dates for the last 30 days
+  for (let i = 29; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    
+    // Format date as 'MMM DD' (e.g., 'Apr 01')
+    const formatDate = date.toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
+    labels.push(formatDate);
+    
+    if (hasStreakHistory) {
+      // Use real streak history data if available
+      const dateStr = date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+      const streakEntry = userData.streakHistory.find(entry => entry.date === dateStr);
+      values.push(streakEntry ? streakEntry.streakCount : 0);
+    } else {
+      // Generate synthetic streak data if no history available
+      let streakValue = 0;
+      if (i <= 29 - 30 + userData.streakCount) {
+        streakValue = i - (29 - 30 + userData.streakCount) + 1;
+      }
+      values.push(Math.max(0, streakValue));
+    }
   }
   
+  return { labels, values };
+}
+
+// Initialize quiz status doughnut chart
+function initializeQuizStatusChart(quizData) {
+  const ctx = document.getElementById('quizStatusChart').getContext('2d');
+  
+  // Get theme-aware colors
+  const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#5997AC';
+  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'night';
+  const pendingColor = isDarkMode ? '#31456e' : '#e5e7eb';
+  
+  // Ensure we have valid data
+  const completed = typeof quizData.completed === 'number' ? quizData.completed : 0;
+  const pending = typeof quizData.pending === 'number' ? quizData.pending : 0;
+  const total = completed + pending;
+  
+  // Skip chart if no data
+  if (total === 0) {
+    // Display a message instead of an empty chart
+    const container = document.getElementById('quizStatusChart').parentNode;
+    const noDataMsg = document.createElement('div');
+    noDataMsg.className = 'no-data-message';
+    noDataMsg.textContent = 'No quiz data available yet';
+    container.innerHTML = '';
+    container.appendChild(noDataMsg);
+    
+    // Update legend text to show zero values
+    updateQuizLegend(0, 0, 0);
+    return;
+  }
+  
+  // Create the chart
   const chart = new Chart(ctx, {
     type: 'doughnut',
-    data: quizData,
+    data: {
+      labels: ['Completed', 'Pending'],
+      datasets: [{
+        data: [completed, pending],
+        backgroundColor: [accentColor, pendingColor],
+        borderWidth: 0,
+        hoverOffset: 4,
+        borderRadius: 4
+      }]
+    },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: '75%',
+      cutout: '70%',
       plugins: {
         legend: {
-          display: false
+          display: false,
+          labels: {
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.85)'
+          }
         },
         tooltip: {
+          backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+          titleColor: isDarkMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)',
+          bodyColor: isDarkMode ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)',
           callbacks: {
             label: function(context) {
-              const label = context.label;
-              const value = context.raw;
-              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const label = context.label || '';
+              const value = context.raw || 0;
               const percentage = Math.round((value / total) * 100);
-              return `${label}: ${value} out of ${total} (${percentage}%)`;
+              return `${label}: ${value}/${total} (${percentage}%)`;
             }
           }
         }
@@ -261,108 +565,149 @@ function createQuizStatusChart() {
     }
   });
   
-  // Add center text for better visibility
-  const centerText = {
-    id: 'centerText',
-    afterDraw: function(chart) {
-      const width = chart.width;
-      const height = chart.height;
-      const ctx = chart.ctx;
-      
-      ctx.restore();
-      
-      // Calculate percentage
-      const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-      const completed = chart.data.datasets[0].data[0];
-      const percentage = Math.round((completed / total) * 100);
-      
-      // Text style
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      
-      // Percentage
-      ctx.font = '700 28px sans-serif';
-      ctx.fillStyle = document.documentElement.getAttribute('data-theme') === 'night' 
-        ? 'rgba(255, 255, 255, 0.95)' 
-        : 'rgba(0, 0, 0, 0.85)';
-      ctx.fillText(`${percentage}%`, width / 2, height / 2 - 10);
-      
-      // Label
-      ctx.font = '500 14px sans-serif';
-      ctx.fillStyle = document.documentElement.getAttribute('data-theme') === 'night' 
-        ? 'rgba(255, 255, 255, 0.7)' 
-        : 'rgba(0, 0, 0, 0.6)';
-      ctx.fillText('COMPLETE', width / 2, height / 2 + 15);
-      
-      ctx.save();
-    }
-  };
+  // Add a center text plugin if not already present
+  if (!chart.centerTextPlugin) {
+    chart.centerTextPlugin = {
+      id: 'centerText',
+      afterDraw: function(chart) {
+        const width = chart.width;
+        const height = chart.height;
+        const ctx = chart.ctx;
+        
+        ctx.restore();
+        const fontSize = (height / 114).toFixed(2);
+        ctx.font = fontSize + 'em sans-serif';
+        ctx.textBaseline = 'middle';
+        
+        const text = `${Math.round((completed / total) * 100)}%`;
+        const textX = Math.round((width - ctx.measureText(text).width) / 2);
+        const textY = height / 2;
+        
+        ctx.fillStyle = isDarkMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)';
+        ctx.fillText(text, textX, textY);
+        ctx.save();
+      }
+    };
+    
+    // Register the plugin
+    Chart.register(chart.centerTextPlugin);
+  }
   
-  // Add the plugin
-  chart.options.plugins.centerText = true;
-  chart.register(centerText);
-  chart.update();
+  // Update legend text
+  updateQuizLegend(completed, pending, quizData.totalQuizzes);
+  
+  // Store chart instance reference
+  Chart.quizStatusChart = chart;
 }
 
-// Enhanced Activity Bar Chart
-function createActivityBarChart() {
-  const ctx = document.getElementById('activityBarChart');
-  if (!ctx) return;
+// Update the quiz legend text
+function updateQuizLegend(completed, pending, total) {
+  // Use the actual total if provided, otherwise use the sum
+  const actualTotal = total || (completed + pending);
   
-  // Sample data - would come from API in real app
-  const activityData = {
-    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    datasets: [{
-      label: 'Hours Studied',
-      data: [2.5, 3.0, 1.5, 3.5, 2.0, 1.0, 0.5],
-      backgroundColor: function(context) {
-        const value = context.raw;
-        const max = Math.max(...context.dataset.data);
-        const opacity = 0.4 + (value / max) * 0.6;
-        
-        return document.documentElement.getAttribute('data-theme') === 'night'
-          ? `rgba(123, 181, 245, ${opacity})`
-          : `rgba(89, 151, 172, ${opacity})`;
-      },
-      borderRadius: 6,
-      borderWidth: 1,
-      borderColor: document.documentElement.getAttribute('data-theme') === 'night'
-        ? 'rgba(123, 181, 245, 0.8)'
-        : 'rgba(89, 151, 172, 0.8)',
-      hoverBackgroundColor: document.documentElement.getAttribute('data-theme') === 'night'
-        ? 'rgba(123, 181, 245, 0.9)'
-        : 'rgba(89, 151, 172, 0.9)',
-      barPercentage: 0.7,
-      categoryPercentage: 0.7
-    }]
-  };
+  // Safely update the legend texts
+  const completedLegend = document.querySelector('.chart-legend .legend-item:first-child .legend-text');
+  const pendingLegend = document.querySelector('.chart-legend .legend-item:last-child .legend-text');
   
-  new Chart(ctx, {
+  if (completedLegend) {
+    completedLegend.textContent = `Completed (${completed}/${actualTotal})`;
+  }
+  
+  if (pendingLegend) {
+    pendingLegend.textContent = `Pending (${pending}/${actualTotal})`;
+  }
+}
+
+// Initialize activity by day bar chart
+function initializeActivityBarChart(activityData) {
+  const ctx = document.getElementById('activityBarChart').getContext('2d');
+  
+  // Get theme-aware colors
+  const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#5997AC';
+  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'night';
+  
+  // Day labels
+  const dayLabels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  
+  // Process the weekly hours data to handle missing days or null values
+  const weeklyHours = processWeeklyHoursData(activityData.weeklyHours);
+  
+  // Calculate peak day for highlighting
+  const peakDayIndex = findPeakDayIndex(weeklyHours);
+  
+  // Generate colors with peak day highlighted
+  const barColors = weeklyHours.map((_, index) => {
+    if (index === peakDayIndex) {
+      // Highlight peak day
+      return accentColor;
+    } else {
+      // Use a lighter shade for other days
+      const rgb = hexToRgb(accentColor);
+      return `rgba(${rgb}, 0.6)`;
+    }
+  });
+  
+  // Create the chart
+  const chart = new Chart(ctx, {
     type: 'bar',
-    data: activityData,
+    data: {
+      labels: dayLabels,
+      datasets: [{
+        label: 'Hours Studied',
+        data: weeklyHours,
+        backgroundColor: barColors,
+        borderRadius: 4,
+        maxBarThickness: 40,
+        borderWidth: 0
+      }]
+    },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      layout: {
-        padding: {
-          top: 20,
-          right: 20,
-          bottom: 10,
-          left: 10
-        }
-      },
       plugins: {
         legend: {
           display: false
         },
         tooltip: {
+          backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+          titleColor: isDarkMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)',
+          bodyColor: isDarkMode ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)',
           callbacks: {
-            title: function(context) {
-              return `${context[0].label}`;
-            },
             label: function(context) {
-              const value = context.raw;
-              return `${value} hours studied`;
+              const value = context.parsed.y || 0;
+              const formattedValue = value.toFixed(1);
+              return `${formattedValue} hour${formattedValue !== '1.0' ? 's' : ''}`;
+            },
+            afterLabel: function(context) {
+              const value = context.parsed.y || 0;
+              const total = weeklyHours.reduce((acc, curr) => acc + curr, 0);
+              if (total > 0) {
+                const percentage = Math.round((value / total) * 100);
+                return `${percentage}% of weekly total`;
+              }
+              return '';
+            }
+          }
+        },
+        annotation: {
+          annotations: {
+            line1: {
+              type: 'line',
+              yMin: calculateAverageDailyHours(weeklyHours),
+              yMax: calculateAverageDailyHours(weeklyHours),
+              borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
+              borderWidth: 1,
+              borderDash: [5, 5],
+              label: {
+                content: 'Average',
+                enabled: true,
+                position: 'end',
+                backgroundColor: 'transparent',
+                color: isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)',
+                font: {
+                  size: 11
+                }
+              }
             }
           }
         }
@@ -370,36 +715,19 @@ function createActivityBarChart() {
       scales: {
         y: {
           beginAtZero: true,
-          grace: '15%',
           title: {
             display: true,
             text: 'Hours',
-            padding: {
-              bottom: 10,
-              top: 10
-            },
-            font: {
-              size: 14,
-              weight: 'bold'
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.85)'
+          },
+          ticks: {
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)',
+            callback: function(value) {
+              return value.toFixed(1);
             }
           },
           grid: {
-            color: function(context) {
-              if (context.tick.value === 0) {
-                return document.documentElement.getAttribute('data-theme') === 'night' 
-                  ? 'rgba(255, 255, 255, 0.2)' 
-                  : 'rgba(0, 0, 0, 0.2)';
-              }
-              return document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.05)' 
-                : 'rgba(0, 0, 0, 0.05)';
-            }
-          },
-          ticks: {
-            padding: 10,
-            callback: function(value) {
-              return value + 'h';
-            }
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
           }
         },
         x: {
@@ -407,634 +735,867 @@ function createActivityBarChart() {
             display: false
           },
           ticks: {
-            padding: 10,
-            font: {
-              size: 13,
-              weight: '500'
-            }
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)'
           }
         }
       }
     }
   });
-}
-
-// This will prevent initializing analytics multiple times
-let analyticsInitialized = false;
-
-// Main initialization function
-function initializeAnalytics() {
-  // Prevent multiple initializations
-  if (analyticsInitialized) return;
   
-  console.log('Initializing analytics...');
-  
-  // Make sure Chart.js is available
-  if (typeof Chart !== 'undefined') {
-    // Set improved chart defaults
-    if (window.setChartGlobalDefaults) {
-      window.setChartGlobalDefaults();
-    }
-    
-    // Create the charts
-    createStreakLineChart();
-    createQuizStatusChart(); 
-    createActivityBarChart();
-    createSkillRadarChart();
-    createMasteryBubbleChart();
-    createActivityHeatmap();
-
-    // Update analytics cards with data
-    updateAnalyticsCards();
-    
-    // Mark as initialized
-    analyticsInitialized = true;
-  } else {
-    console.warn('Chart.js is not loaded. Advanced charts will not be displayed.');
-    
-    // Try to load Chart.js if it's not available
-    loadChartJS();
-  }
-}
-
-// Function to load Chart.js dynamically if it's not already available
-function loadChartJS() {
-  const script = document.createElement('script');
-  script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
-  script.onload = function() {
-    console.log('Chart.js loaded successfully');
-    initializeAnalytics();
-  };
-  script.onerror = function() {
-    console.error('Failed to load Chart.js');
-  };
-  document.head.appendChild(script);
-}
-
-// Update analytics cards with data from the data adapter
-async function updateAnalyticsCards() {
-  try {
-    // Get data from the adapter
-    const userData = await window.analyticsData.getUserProfile();
-    const progressData = await window.analyticsData.getCourseProgress();
-    const quizData = await window.analyticsData.getQuizPerformance();
-    const activityData = await window.analyticsData.getStudyActivity();
-    
-    // Update course progress card
-    const progressValue = document.querySelector('.analytics-card:nth-child(1) .analytics-value');
-    const progressBar = document.querySelector('.analytics-card:nth-child(1) .progress-fill');
-    const progressDetails = document.querySelector('.analytics-card:nth-child(1) .analytics-details');
-    
-    if (progressValue && progressBar && progressDetails) {
-      progressValue.textContent = progressData.overallPercentage + '%';
-      progressBar.style.width = progressData.overallPercentage + '%';
-      progressDetails.innerHTML = `
-        <p>${progressData.modulesCompleted} of ${progressData.totalModules} modules completed</p>
-        <p>Estimated completion: ${progressData.estimatedCompletionDate}</p>
-      `;
-    }
-    
-    // Update streak stats card
-    updateStreakCard(userData);
-    
-    // Update quiz performance card
-    updateQuizCard(quizData);
-    
-    // Update study time card
-    updateStudyTimeCard(activityData);
-    
-  } catch (error) {
-    console.error('Error updating analytics cards:', error);
-  }
-}
-
-// Helper function to update streak card
-function updateStreakCard(userData) {
-  const currentStreakValue = document.querySelector('.streak-stats .streak-stat:first-child .analytics-value');
-  const longestStreakValue = document.querySelector('.streak-stats .streak-stat:last-child .analytics-value');
-  
-  if (currentStreakValue && longestStreakValue) {
-    currentStreakValue.textContent = userData.currentStreak;
-    longestStreakValue.textContent = userData.longestStreak;
-  }
-}
-
-// Helper function to update quiz card
-function updateQuizCard(quizData) {
-  const completedSegment = document.querySelector('.chart-segment.completed');
-  const pendingSegment = document.querySelector('.chart-segment.pending');
-  const quizLegend = document.querySelector('.chart-legend');
-  
-  if (completedSegment && pendingSegment && quizLegend) {
-    const completedPercentage = (quizData.completed / quizData.totalQuizzes) * 100;
-    completedSegment.style.setProperty('--percentage', completedPercentage);
-    completedSegment.textContent = Math.round(completedPercentage) + '%';
-    
-    const pendingPercentage = (quizData.pending / quizData.totalQuizzes) * 100;
-    pendingSegment.textContent = Math.round(pendingPercentage) + '%';
-    
-    const legendItems = quizLegend.querySelectorAll('.legend-text');
-    if (legendItems.length >= 2) {
-      legendItems[0].textContent = `Completed (${quizData.completed}/${quizData.totalQuizzes})`;
-      legendItems[1].textContent = `Pending (${quizData.pending}/${quizData.totalQuizzes})`;
-    }
-  }
-}
-
-// Helper function to update study time card
-function updateStudyTimeCard(activityData) {
-  const timeValue = document.querySelector('.time-stats .analytics-value');
-  const chartBars = document.querySelectorAll('.weekly-chart .chart-bar');
-  const timeDetails = document.querySelector('.analytics-card:nth-child(4) .analytics-details');
-  
-  if (timeValue) {
-    timeValue.textContent = activityData.totalHours + 'h';
-  }
-  
-  if (chartBars.length === 7 && activityData.weeklyHours.length === 7) {
-    // Find the maximum value for scaling
-    const maxHours = Math.max(...activityData.weeklyHours);
-    
-    // Update each bar
-    chartBars.forEach((bar, index) => {
-      const percentage = (activityData.weeklyHours[index] / maxHours) * 100;
-      bar.style.setProperty('--height', percentage + '%');
-    });
-  }
-  
-  if (timeDetails) {
-    timeDetails.innerHTML = `
-      <p>Peak study day: ${activityData.peakDay} (${activityData.weeklyHours[getDayIndex(activityData.peakDay)]}h)</p>
-      <p>Average daily: ${activityData.averageDailyStudy}h</p>
-    `;
-  }
-}
-
-// Helper function to get day index from name
-function getDayIndex(dayName) {
-  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  return days.indexOf(dayName);
-}
-
-// Create streak line chart
-function createStreakLineChart() {
-  const ctx = document.getElementById('streakLineChart');
-  if (!ctx) return;
-  
-  // Sample data - would come from API in real app
-  const streakData = {
-    labels: ['Apr 20', 'Apr 21', 'Apr 22', 'Apr 23', 'Apr 24', 'Apr 25', 'Apr 26', 'Apr 27', 'Apr 28', 'Apr 29', 'Apr 30', 'May 1', 'May 2', 'May 3', 'May 4'],
-    datasets: [{
-      label: 'Daily Streak',
-      data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-      borderColor: 'rgba(89, 151, 172, 1)',
-      backgroundColor: 'rgba(89, 151, 172, 0.1)',
-      fill: true,
-      tension: 0.3
-    }]
-  };
-  
-  new Chart(ctx, {
-    type: 'line',
-    data: streakData,
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false
-        },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return `Day ${context.raw}`;
-            }
-          }
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: 'Streak Days'
-          }
+  // Add an annotation plugin if it's not registered yet
+  if (!chart.annotationsRegistered) {
+    // Create a simple annotation plugin
+    const annotationPlugin = {
+      id: 'customAnnotations',
+      afterDraw: function(chart) {
+        const ctx = chart.ctx;
+        const yAxis = chart.scales.y;
+        const xAxis = chart.scales.x;
+        const avg = calculateAverageDailyHours(weeklyHours);
+        
+        if (avg > 0) {
+          const y = yAxis.getPixelForValue(avg);
+          
+          // Draw dashed line
+          ctx.save();
+          ctx.beginPath();
+          ctx.setLineDash([5, 5]);
+          ctx.strokeStyle = isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)';
+          ctx.lineWidth = 1;
+          ctx.moveTo(xAxis.left, y);
+          ctx.lineTo(xAxis.right, y);
+          ctx.stroke();
+          
+          // Draw label
+          ctx.fillStyle = isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)';
+          ctx.font = '11px sans-serif';
+          ctx.textAlign = 'right';
+          ctx.fillText(`Average: ${avg.toFixed(1)}h`, xAxis.right - 5, y - 5);
+          ctx.restore();
         }
       }
-    }
-  });
-}
-
-// Create quiz status donut chart
-function createQuizStatusChart() {
-  const ctx = document.getElementById('quizStatusChart');
-  if (!ctx) return;
-  
-  // Sample data
-  const quizData = {
-    labels: ['Completed', 'Pending'],
-    datasets: [{
-      data: [7, 3],
-      backgroundColor: [
-        'rgba(89, 151, 172, 1)',
-        '#e5e7eb'
-      ],
-      borderWidth: 0
-    }]
-  };
-  
-  // Adjust colors for night mode
-  if (document.documentElement.getAttribute('data-theme') === 'night') {
-    quizData.datasets[0].backgroundColor[0] = 'rgba(123, 181, 245, 1)';
-    quizData.datasets[0].backgroundColor[1] = '#31456e';
-  }
-  
-  new Chart(ctx, {
-    type: 'doughnut',
-    data: quizData,
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: '70%',
-      plugins: {
-        legend: {
-          display: false
-        },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              const label = context.label;
-              const value = context.raw;
-              const total = context.dataset.data.reduce((a, b) => a + b, 0);
-              const percentage = Math.round((value / total) * 100);
-              return `${label}: ${value} (${percentage}%)`;
-            }
-          }
-        }
-      }
-    }
-  });
-}
-
-// Create activity bar chart 
-function createActivityBarChart() {
-  const ctx = document.getElementById('activityBarChart');
-  if (!ctx) return;
-  
-  // Sample data - would come from API in real app
-  const activityData = {
-    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    datasets: [{
-      label: 'Hours Studied',
-      data: [2.5, 3.0, 1.5, 3.5, 2.0, 1.0, 0.5],
-      backgroundColor: 'rgba(89, 151, 172, 0.8)',
-      borderRadius: 4
-    }]
-  };
-  
-  // Adjust colors for night mode
-  if (document.documentElement.getAttribute('data-theme') === 'night') {
-    activityData.datasets[0].backgroundColor = 'rgba(123, 181, 245, 0.8)';
-  }
-  
-  new Chart(ctx, {
-    type: 'bar',
-    data: activityData,
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: 'Hours'
-          }
-        }
-      }
-    }
-  });
-}
-
-// Create radar chart for skill coverage
-async function createSkillRadarChart() {
-  const ctx = document.getElementById('skillCoverageChart');
-  if (!ctx) return;
-  
-  try {
-    // Get skill data from the adapter
-    const skillData = await window.analyticsData.getSkillCoverage();
+    };
     
-    // Prepare data for Chart.js
-    const chartData = {
-      labels: skillData.skills.map(skill => skill.name),
+    // Register the plugin
+    Chart.register(annotationPlugin);
+    chart.annotationsRegistered = true;
+  }
+  
+  // Store chart instance reference
+  Chart.activityBarChart = chart;
+  
+  // Add a note about the peak day if we have valid data
+  if (peakDayIndex !== -1) {
+    const chartCard = document.getElementById('activityBarChart').closest('.chart-card');
+    let chartNote = chartCard.querySelector('.chart-note');
+    
+    if (!chartNote) {
+      chartNote = document.createElement('div');
+      chartNote.className = 'chart-note';
+      chartCard.appendChild(chartNote);
+    }
+    
+    chartNote.textContent = `Your most productive day is ${dayLabels[peakDayIndex]} with ${weeklyHours[peakDayIndex].toFixed(1)} hours.`;
+  }
+}
+
+// Process weekly hours data to handle missing or invalid values
+function processWeeklyHoursData(weeklyHours) {
+  // Check if we have valid weekly hours data
+  if (!weeklyHours || !Array.isArray(weeklyHours) || weeklyHours.length === 0) {
+    // Return default array with zeros for 7 days
+    return [0, 0, 0, 0, 0, 0, 0];
+  }
+  
+  // Ensure we have exactly 7 days
+  const processed = Array(7).fill(0);
+  
+  // Copy valid values
+  for (let i = 0; i < Math.min(weeklyHours.length, 7); i++) {
+    processed[i] = typeof weeklyHours[i] === 'number' && !isNaN(weeklyHours[i]) 
+      ? weeklyHours[i] 
+      : 0;
+  }
+  
+  return processed;
+}
+
+// Find the peak day index from weekly hours data
+function findPeakDayIndex(weeklyHours) {
+  if (!weeklyHours || weeklyHours.length === 0) {
+    return -1;
+  }
+  
+  let maxValue = -1;
+  let maxIndex = -1;
+  
+  weeklyHours.forEach((hours, index) => {
+    if (hours > maxValue) {
+      maxValue = hours;
+      maxIndex = index;
+    }
+  });
+  
+  // Only return a peak day if there's actual activity
+  return maxValue > 0 ? maxIndex : -1;
+}
+
+// Calculate average daily hours from weekly data
+function calculateAverageDailyHours(weeklyHours) {
+  if (!weeklyHours || weeklyHours.length === 0) {
+    return 0;
+  }
+  
+  const total = weeklyHours.reduce((acc, curr) => acc + curr, 0);
+  return total / weeklyHours.length;
+}
+
+// Initialize skill coverage radar chart
+function initializeSkillCoverageChart(skillData) {
+  const ctx = document.getElementById('skillCoverageChart').getContext('2d');
+  
+  // Get theme-aware colors
+  const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#5997AC';
+  const accentRgb = hexToRgb(accentColor);
+  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'night';
+  
+  // Process and validate skill data
+  const processedData = processSkillData(skillData);
+  
+  // Check if we have valid data
+  if (processedData.labels.length === 0) {
+    // Display a message instead of an empty chart
+    const container = document.getElementById('skillCoverageChart').parentNode;
+    const noDataMsg = document.createElement('div');
+    noDataMsg.className = 'no-data-message';
+    noDataMsg.textContent = 'No skill data available yet';
+    container.innerHTML = '';
+    container.appendChild(noDataMsg);
+    return;
+  }
+  
+  // Create the chart
+  const chart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: processedData.labels,
       datasets: [
         {
-          label: 'Your Skill Coverage',
-          data: skillData.skills.map(skill => skill.userScore),
-          backgroundColor: 'rgba(89, 151, 172, 0.2)',
-          borderColor: 'rgba(89, 151, 172, 1)',
-          pointBackgroundColor: 'rgba(89, 151, 172, 1)',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: 'rgba(89, 151, 172, 1)',
+          label: 'Your Score',
+          data: processedData.userScores,
+          backgroundColor: `rgba(${accentRgb}, 0.2)`,
+          borderColor: accentColor,
+          borderWidth: 2,
+          pointBackgroundColor: accentColor,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: accentColor
         },
         {
           label: 'Course Average',
-          data: skillData.skills.map(skill => skill.courseAverage),
-          backgroundColor: 'rgba(230, 140, 140, 0.2)',
-          borderColor: 'rgba(230, 140, 140, 1)',
-          pointBackgroundColor: 'rgba(230, 140, 140, 1)',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: 'rgba(230, 140, 140, 1)',
+          data: processedData.courseAverages,
+          backgroundColor: isDarkMode ? 'rgba(200, 200, 200, 0.1)' : 'rgba(120, 120, 120, 0.1)',
+          borderColor: isDarkMode ? 'rgba(200, 200, 200, 0.7)' : 'rgba(120, 120, 120, 0.7)',
+          borderWidth: 1,
+          pointBackgroundColor: isDarkMode ? 'rgba(200, 200, 200, 0.7)' : 'rgba(120, 120, 120, 0.7)',
+          pointRadius: 2,
+          pointHoverRadius: 4
         }
       ]
-    };
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          angleLines: {
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+          },
+          grid: {
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+          },
+          ticks: {
+            backdropColor: 'transparent',
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)'
+          },
+          pointLabels: {
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.85)',
+            font: {
+              size: 11
+            }
+          },
+          suggestedMin: 0,
+          suggestedMax: 100
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.85)',
+            usePointStyle: true,
+            pointStyleWidth: 10
+          }
+        },
+        tooltip: {
+          backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+          titleColor: isDarkMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)',
+          bodyColor: isDarkMode ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)',
+          callbacks: {
+            title: function(tooltipItems) {
+              return tooltipItems[0].label;
+            },
+            label: function(context) {
+              let label = context.dataset.label || '';
+              if (label) {
+                label += ': ';
+              }
+              if (context.parsed.r !== null) {
+                label += context.parsed.r + '%';
+              }
+              return label;
+            },
+            afterBody: function(tooltipItems) {
+              const skillName = tooltipItems[0].label;
+              const userScore = tooltipItems[0].raw;
+              const courseAvg = tooltipItems[1].raw;
+              
+              if (userScore > courseAvg) {
+                const diff = userScore - courseAvg;
+                return `You're ${diff.toFixed(0)}% above average!`;
+              } else if (userScore < courseAvg) {
+                const diff = courseAvg - userScore;
+                return `${diff.toFixed(0)}% below average - keep practicing!`;
+              } else {
+                return 'Doing great! You are right at the course average!';
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+  
+  // Store chart instance reference
+  Chart.skillCoverageChart = chart;
+  
+  // Add a note about strengths and areas for improvement if available
+  const chartCard = document.getElementById('skillCoverageChart').closest('.chart-card');
+  let chartNote = chartCard.querySelector('.chart-note');
+  
+  if (!chartNote) {
+    chartNote = document.createElement('div');
+    chartNote.className = 'chart-note skill-insights';
+    chartCard.appendChild(chartNote);
+  }
+  
+  // Build insights text
+  let insightsHtml = '';
+  
+  if (skillData.strengths && skillData.strengths.length > 0) {
+    insightsHtml += `<span class="insight-label">Strengths:</span> ${skillData.strengths.join(', ')}`;
+  }
+  
+  if (skillData.areasForImprovement && skillData.areasForImprovement.length > 0) {
+    if (insightsHtml) insightsHtml += '<br>';
+    insightsHtml += `<span class="insight-label">Areas to improve:</span> ${skillData.areasForImprovement.join(', ')}`;
+  }
+  
+  if (insightsHtml) {
+    chartNote.innerHTML = insightsHtml;
+  } else {
+    chartNote.innerHTML = '<em>Keep learning to reveal your skill insights!</em>';
+  }
+}
+
+// Process and validate skill data
+function processSkillData(skillData) {
+  const result = {
+    labels: [],
+    userScores: [],
+    courseAverages: []
+  };
+  
+  // Check if we have valid skill data
+  if (!skillData || !skillData.skills || !Array.isArray(skillData.skills) || skillData.skills.length === 0) {
+    return result;
+  }
+  
+  // Process each skill
+  skillData.skills.forEach(skill => {
+    // Validate individual skill data
+    if (skill && skill.name && typeof skill.userScore === 'number' && typeof skill.courseAverage === 'number') {
+      result.labels.push(skill.name);
+      result.userScores.push(skill.userScore);
+      result.courseAverages.push(skill.courseAverage);
+    }
+  });
+  
+  return result;
+}
+
+// Update quiz performance table
+function updateQuizTable(quizData) {
+  const tableContainer = document.querySelector('.analytics-table').parentNode;
+  const table = document.querySelector('.analytics-table');
+  const tableBody = table.querySelector('tbody');
+  
+  // Check if we have quiz data
+  if (!quizData || !quizData.recentQuizzes || !Array.isArray(quizData.recentQuizzes) || quizData.recentQuizzes.length === 0) {
+    // Show a message if no quiz data
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="5" class="empty-state">
+          <div class="empty-state-message">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2Z"/>
+              <line x1="9" y1="9" x2="15" y2="9"/>
+              <line x1="9" y1="13" x2="15" y2="13"/>
+              <line x1="9" y1="17" x2="13" y2="17"/>
+            </svg>
+            <p>No quiz data available yet. Complete quizzes to see your performance here.</p>
+          </div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
+  // Clear existing rows
+  tableBody.innerHTML = '';
+  
+  // Sort quizzes by date (completed first, then most recent first)
+  const sortedQuizzes = [...quizData.recentQuizzes].sort((a, b) => {
+    // Completed quizzes first
+    if (a.status === 'completed' && b.status !== 'completed') return -1;
+    if (a.status !== 'completed' && b.status === 'completed') return 1;
     
-    // Adjust colors for dark mode
-    if (document.documentElement.getAttribute('data-theme') === 'night') {
-      chartData.datasets[0].backgroundColor = 'rgba(123, 181, 245, 0.2)';
-      chartData.datasets[0].borderColor = 'rgba(123, 181, 245, 1)';
-      chartData.datasets[0].pointBackgroundColor = 'rgba(123, 181, 245, 1)';
-      chartData.datasets[0].pointHoverBorderColor = 'rgba(123, 181, 245, 1)';
-      
-      chartData.datasets[1].backgroundColor = 'rgba(245, 158, 158, 0.2)';
-      chartData.datasets[1].borderColor = 'rgba(245, 158, 158, 1)';
-      chartData.datasets[1].pointBackgroundColor = 'rgba(245, 158, 158, 1)';
-      chartData.datasets[1].pointHoverBorderColor = 'rgba(245, 158, 158, 1)';
+    // If both have same status, sort by date
+    if (a.date && b.date) {
+      return new Date(b.date) - new Date(a.date); // Most recent first
     }
     
-    // Create the chart
-    new Chart(ctx, {
-      type: 'radar',
-      data: chartData,
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        elements: {
-          line: {
-            borderWidth: 2
-          }
-        },
-        scales: {
-          r: {
-            angleLines: {
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.1)' 
-                : 'rgba(0, 0, 0, 0.1)'
-            },
-            grid: {
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.1)' 
-                : 'rgba(0, 0, 0, 0.1)'
-            },
-            ticks: {
-              backdropColor: 'transparent',
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.7)' 
-                : 'rgba(0, 0, 0, 0.7)'
-            },
-            pointLabels: {
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.7)' 
-                : 'rgba(0, 0, 0, 0.7)'
-            }
-          }
-        },
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                return context.dataset.label + ': ' + context.raw + '%';
-              }
-            }
-          },
-          legend: {
-            position: 'bottom',
-            labels: {
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.7)' 
-                : 'rgba(0, 0, 0, 0.7)'
-            }
-          }
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Error creating skill radar chart:', error);
-    ctx.parentElement.innerHTML = '<p class="chart-error">Unable to load skill data</p>';
-  }
-}
-
-// Create bubble chart for mastery by topic
-async function createMasteryBubbleChart() {
-  const ctx = document.getElementById('masteryBubbleChart');
-  if (!ctx) return;
+    // If one has date and other doesn't
+    if (a.date && !b.date) return -1;
+    if (!a.date && b.date) return 1;
+    
+    // If neither has date, sort by name
+    return a.name.localeCompare(b.name);
+  });
   
-  try {
-    // Get topic mastery data from the adapter
-    const topicData = await window.analyticsData.getTopicMastery();
+  // Add recent quizzes to the table
+  sortedQuizzes.forEach(quiz => {
+    const row = document.createElement('tr');
+    row.className = quiz.status === 'completed' ? 'completed-quiz' : 'pending-quiz';
     
-    // Prepare data for Chart.js
-    const bubbleData = {
-      datasets: [{
-        label: 'Topic Mastery',
-        data: topicData.topics.map(topic => ({
-          x: topic.position,
-          y: topic.mastery,
-          r: topic.importance
-        })),
-        backgroundColor: function(context) {
-          const value = context.raw.y;
-          const alpha = 0.7;
-          
-          if (value > 80) return `rgba(46, 204, 113, ${alpha})`;
-          if (value > 70) return `rgba(52, 152, 219, ${alpha})`;
-          if (value > 60) return `rgba(155, 89, 182, ${alpha})`;
-          return `rgba(231, 76, 60, ${alpha})`;
-        }
-      }]
-    };
+    // Quiz name
+    const nameCell = document.createElement('td');
+    nameCell.className = 'quiz-name-cell';
+    nameCell.textContent = quiz.name;
+    row.appendChild(nameCell);
     
-    // Create the chart
-    new Chart(ctx, {
-      type: 'bubble',
-      data: bubbleData,
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            min: 0,
-            max: 100,
-            grid: {
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.1)' 
-                : 'rgba(0, 0, 0, 0.1)'
-            },
-            ticks: {
-              display: false
-            },
-            title: {
-              display: true,
-              text: 'Topic Progression',
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.7)' 
-                : 'rgba(0, 0, 0, 0.7)'
-            }
-          },
-          y: {
-            min: 40,
-            max: 100,
-            grid: {
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.1)' 
-                : 'rgba(0, 0, 0, 0.1)'
-            },
-            ticks: {
-              callback: function(value) {
-                return value + '%';
-              },
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.7)' 
-                : 'rgba(0, 0, 0, 0.7)'
-            },
-            title: {
-              display: true,
-              text: 'Mastery Level',
-              color: document.documentElement.getAttribute('data-theme') === 'night' 
-                ? 'rgba(255, 255, 255, 0.7)' 
-                : 'rgba(0, 0, 0, 0.7)'
-            }
-          }
-        },
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                return [
-                  'Topic: ' + getTopicName(context.raw.x, topicData.topics),
-                  'Mastery: ' + context.raw.y + '%',
-                  'Importance: ' + getImportanceLevel(context.raw.r)
-                ];
-              }
-            }
-          },
-          legend: {
-            display: false
-          }
-        }
+    // Date completed
+    const dateCell = document.createElement('td');
+    dateCell.className = 'date-cell';
+    
+    if (quiz.date) {
+      // Format the date if it exists
+      const date = new Date(quiz.date);
+      if (!isNaN(date.getTime())) {
+        dateCell.textContent = date.toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+      } else {
+        dateCell.textContent = quiz.date; // Use as is if it's not a valid date
       }
-    });
-  } catch (error) {
-    console.error('Error creating mastery bubble chart:', error);
-    ctx.parentElement.innerHTML = '<p class="chart-error">Unable to load topic mastery data</p>';
-  }
-}
-
-// Helper function to get topic name from position
-function getTopicName(position, topics) {
-  const topic = topics.find(t => t.position === position);
-  return topic ? topic.name : 'Unknown Topic';
-}
-
-// Helper function to map radius to importance
-function getImportanceLevel(r) {
-  if (r >= 13) return 'Critical';
-  if (r >= 10) return 'High';
-  if (r >= 7) return 'Medium';
-  return 'Low';
-}
-
-// Create a simplified heatmap for activity patterns
-async function createActivityHeatmap() {
-  const container = document.getElementById('activityHeatmap');
-  if (!container) return;
-  
-  try {
-    // Get activity data from the adapter
-    const activityData = await window.analyticsData.getStudyActivity();
+    } else {
+      dateCell.textContent = '-';
+    }
+    row.appendChild(dateCell);
     
-    // Create a simplified visualization
-    container.innerHTML = `
-      <div class="simplified-heatmap">
-        <div class="heatmap-header">
-          <div class="heatmap-title">Weekly Activity Pattern</div>
-        </div>
-        <div class="heatmap-days">
-          <div class="heatmap-day">
-            <div class="day-label">Monday</div>
-            <div class="hour-blocks">
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.2)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.3)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.1)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.7)"></div>
-            </div>
-          </div>
-          <div class="heatmap-day">
-            <div class="day-label">Tuesday</div>
-            <div class="hour-blocks">
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.5)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.6)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.3)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.2)"></div>
-            </div>
-          </div>
-          <div class="heatmap-day">
-            <div class="day-label">Wednesday</div>
-            <div class="hour-blocks">
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.1)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.3)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.2)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.5)"></div>
-            </div>
-          </div>
-          <div class="heatmap-day">
-            <div class="day-label">Thursday</div>
-            <div class="hour-blocks">
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.2)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.8)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.7)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.6)"></div>
-            </div>
-          </div>
-          <div class="heatmap-day">
-            <div class="day-label">Friday</div>
-            <div class="hour-blocks">
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.3)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.2)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.5)"></div>
-              <div class="hour-block" style="background-color: rgba(89, 151, 172, 0.3)"></div>
-            </div>
-          </div>
-        </div>
-        <div class="heatmap-legend">
-          <div class="legend-item"><div class="legend-color" style="background-color: rgba(89, 151, 172, 0.1)"></div><span>Low</span></div>
-          <div class="legend-item"><div class="legend-color" style="background-color: rgba(89, 151, 172, 0.4)"></div><span>Medium</span></div>
-          <div class="legend-item"><div class="legend-color" style="background-color: rgba(89, 151, 172, 0.8)"></div><span>High</span></div>
-        </div>
+    // Score
+    const scoreCell = document.createElement('td');
+    scoreCell.className = 'score-cell';
+    
+    if (quiz.score !== null && quiz.score !== undefined) {
+      scoreCell.textContent = `${quiz.score}%`;
+      
+      // Add a visual indicator of score quality
+      if (quiz.score >= 90) {
+        scoreCell.classList.add('excellent-score');
+      } else if (quiz.score >= 80) {
+        scoreCell.classList.add('good-score');
+      } else if (quiz.score >= 70) {
+        scoreCell.classList.add('average-score');
+      } else if (quiz.score > 0) {
+        scoreCell.classList.add('below-average-score');
+      }
+    } else {
+      scoreCell.textContent = '-';
+    }
+    row.appendChild(scoreCell);
+    
+    // Time spent
+    const timeCell = document.createElement('td');
+    timeCell.className = 'time-cell';
+    
+    if (quiz.timeSpent !== null && quiz.timeSpent !== undefined) {
+      // Format time nicely
+      if (quiz.timeSpent < 60) {
+        timeCell.textContent = `${quiz.timeSpent} min`;
+      } else {
+        const hours = Math.floor(quiz.timeSpent / 60);
+        const minutes = quiz.timeSpent % 60;
+        timeCell.textContent = `${hours}h ${minutes > 0 ? `${minutes}m` : ''}`;
+      }
+    } else {
+      timeCell.textContent = '-';
+    }
+    row.appendChild(timeCell);
+    
+    // Status
+    const statusCell = document.createElement('td');
+    statusCell.className = 'status-cell';
+    const statusBadge = document.createElement('span');
+    statusBadge.className = `status-badge ${quiz.status}`;
+    statusBadge.textContent = quiz.status === 'completed' ? 'Completed' : 'Pending';
+    statusCell.appendChild(statusBadge);
+    row.appendChild(statusCell);
+    
+    // Add interaction for completed quizzes
+    if (quiz.status === 'completed') {
+      row.addEventListener('click', () => {
+        showQuizDetails(quiz);
+      });
+      row.classList.add('clickable-row');
+      
+      // Add indicator for clickable rows
+      const infoIcon = document.createElement('span');
+      infoIcon.className = 'row-action-icon';
+      infoIcon.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="16" x2="12" y2="12"/>
+          <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+      `;
+      nameCell.appendChild(infoIcon);
+    }
+    
+    // Add row to table
+    tableBody.appendChild(row);
+  });
+  
+  // Add a load more button if there are more quizzes available
+  if (quizData.totalQuizzes > sortedQuizzes.length) {
+    const loadMoreRow = document.createElement('tr');
+    loadMoreRow.className = 'load-more-row';
+    
+    const loadMoreCell = document.createElement('td');
+    loadMoreCell.colSpan = 5;
+    loadMoreCell.className = 'load-more-cell';
+    
+    const loadMoreButton = document.createElement('button');
+    loadMoreButton.className = 'load-more-button';
+    loadMoreButton.textContent = 'Load More Quizzes';
+    loadMoreButton.addEventListener('click', () => {
+      loadMoreQuizzes();
+    });
+    
+    loadMoreCell.appendChild(loadMoreButton);
+    loadMoreRow.appendChild(loadMoreCell);
+    tableBody.appendChild(loadMoreRow);
+  }
+  
+  // Add a summary row at the top of the table
+  if (sortedQuizzes.length > 0) {
+    const tableHeader = table.querySelector('thead');
+    
+    // Remove existing summary if present
+    const existingSummary = tableContainer.querySelector('.quiz-summary');
+    if (existingSummary) {
+      existingSummary.remove();
+    }
+    
+    // Create summary container
+    const summaryContainer = document.createElement('div');
+    summaryContainer.className = 'quiz-summary';
+    
+    // Add summary content
+    summaryContainer.innerHTML = `
+      <div class="quiz-stat">
+        <span class="quiz-stat-value">${quizData.completed}/${quizData.totalQuizzes}</span>
+        <span class="quiz-stat-label">Quizzes Completed</span>
+      </div>
+      <div class="quiz-stat">
+        <span class="quiz-stat-value">${quizData.averageScore || 0}%</span>
+        <span class="quiz-stat-label">Average Score</span>
+      </div>
+      <div class="quiz-stat">
+        <span class="quiz-stat-value">${quizData.highestScore || 0}%</span>
+        <span class="quiz-stat-label">Highest Score</span>
       </div>
     `;
     
-    // Update colors for night mode
-    if (document.documentElement.getAttribute('data-theme') === 'night') {
-      const hourBlocks = container.querySelectorAll('.hour-block');
-      hourBlocks.forEach(block => {
-        const style = block.getAttribute('style');
-        if (style) {
-          const newStyle = style.replace('rgba(89, 151, 172,', 'rgba(123, 181, 245,');
-          block.setAttribute('style', newStyle);
-        }
-      });
+    // Insert summary before the table
+    tableContainer.insertBefore(summaryContainer, table);
+  }
+}
+
+// Function to load more quizzes
+async function loadMoreQuizzes() {
+  try {
+    // Show loading state for the load more button
+    const loadMoreButton = document.querySelector('.load-more-button');
+    if (loadMoreButton) {
+      loadMoreButton.textContent = 'Loading...';
+      loadMoreButton.disabled = true;
+    }
+    
+    // Fetch additional quiz data
+    // You'd implement this endpoint in your backend
+    const additionalQuizzes = await window.analyticsData.getAdditionalQuizzes();
+    
+    // Refresh the quiz data with the newly loaded quizzes
+    const quizData = await window.analyticsData.getQuizPerformance(true);
+    
+    // Update the UI
+    updateQuizTable(quizData);
+    
+  } catch (error) {
+    console.error('Error loading more quizzes:', error);
+    showToast('Failed to load additional quizzes', 'error');
+    
+    // Reset the button
+    const loadMoreButton = document.querySelector('.load-more-button');
+    if (loadMoreButton) {
+      loadMoreButton.textContent = 'Load More Quizzes';
+      loadMoreButton.disabled = false;
+    }
+  }
+}
+
+// Show detailed quiz information in a modal/popup
+function showQuizDetails(quiz) {
+  // Create a modal element if it doesn't exist
+  let modal = document.getElementById('quiz-details-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'quiz-details-modal';
+    modal.className = 'modal';
+    document.body.appendChild(modal);
+    
+    // Add click event to close when clicking outside
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeQuizModal();
+      }
+    });
+  }
+  
+  // Prepare quiz details content
+  modal.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>${quiz.name}</h3>
+        <button class="modal-close-button" onclick="closeQuizModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="quiz-detail-grid">
+          <div class="quiz-detail">
+            <span class="detail-label">Date Completed</span>
+            <span class="detail-value">${quiz.date || 'N/A'}</span>
+          </div>
+          <div class="quiz-detail">
+            <span class="detail-label">Score</span>
+            <span class="detail-value ${getScoreClass(quiz.score)}">${quiz.score ? `${quiz.score}%` : 'N/A'}</span>
+          </div>
+          <div class="quiz-detail">
+            <span class="detail-label">Time Spent</span>
+            <span class="detail-value">${quiz.timeSpent ? `${quiz.timeSpent} min` : 'N/A'}</span>
+          </div>
+          <div class="quiz-detail">
+            <span class="detail-label">Status</span>
+            <span class="detail-value">
+              <span class="status-badge ${quiz.status}">${quiz.status === 'completed' ? 'Completed' : 'Pending'}</span>
+            </span>
+          </div>
+        </div>
+        
+        ${quiz.topics ? `
+          <div class="quiz-topics">
+            <h4>Topics Covered</h4>
+            <ul class="topic-list">
+              ${quiz.topics.map(topic => `<li>${topic}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+        
+        ${quiz.feedback ? `
+          <div class="quiz-feedback">
+            <h4>Instructor Feedback</h4>
+            <p>${quiz.feedback}</p>
+          </div>
+        ` : ''}
+      </div>
+      <div class="modal-footer">
+        ${quiz.retakable ? '<button class="retake-quiz-button">Retake Quiz</button>' : ''}
+        <button class="close-modal-button" onclick="closeQuizModal()">Close</button>
+      </div>
+    </div>
+  `;
+  
+  // Register retake quiz button event if present
+  const retakeButton = modal.querySelector('.retake-quiz-button');
+  if (retakeButton) {
+    retakeButton.addEventListener('click', () => {
+      retakeQuiz(quiz.id || quiz.name);
+    });
+  }
+  
+  // Add the close quiz modal function to window
+  window.closeQuizModal = function() {
+    const modal = document.getElementById('quiz-details-modal');
+    if (modal) {
+      modal.classList.add('closing');
+      setTimeout(() => {
+        modal.classList.remove('closing');
+        modal.style.display = 'none';
+      }, 300);
+    }
+  };
+  
+  // Display the modal
+  modal.style.display = 'flex';
+  setTimeout(() => {
+    modal.classList.add('open');
+  }, 10);
+}
+
+// Function to determine score CSS class
+function getScoreClass(score) {
+  if (!score && score !== 0) return '';
+  if (score >= 90) return 'excellent-score';
+  if (score >= 80) return 'good-score';
+  if (score >= 70) return 'average-score';
+  return 'below-average-score';
+}
+
+// Function to handle quiz retake
+function retakeQuiz(quizId) {
+  // Close the modal
+  window.closeQuizModal();
+  
+  // Show toast notification
+  showToast('Preparing quiz for retake...', 'info');
+  
+  // Redirect to the quiz page
+  // This would be implemented based on your app's routing
+  setTimeout(() => {
+    window.location.href = `/course/quiz/${quizId}?retake=true`;
+  }, 1000);
+}
+
+// Set up event listeners for data updates
+function setupDataUpdateListeners() {
+  // Listen for data update events
+  window.analyticsData.addEventListener('data-updated', async (data) => {
+    // Update the UI with the new data
+    updateKPICards(data);
+    // Charts need to be destroyed and recreated to properly update
+    destroyCharts();
+    initializeCharts(data);
+    updateQuizTable(data.quizPerformance);
+  });
+  
+  // Listen for quiz completion events
+  window.analyticsData.addEventListener('quiz-completed', async () => {
+    // Refresh quiz performance data
+    const quizData = await window.analyticsData.getQuizPerformance(true);
+    // Update just the quiz-related elements
+    updateQuizTable(quizData);
+    // Need to destroy the chart first
+    destroyChart('quizStatusChart');
+    initializeQuizStatusChart(quizData);
+  });
+  
+  // Listen for course progress update events
+  window.analyticsData.addEventListener('course-progress-updated', async () => {
+    // Refresh course progress data
+    const courseData = await window.analyticsData.getCourseProgress(true);
+    // Update the course progress KPI
+    document.getElementById('course-progress-percentage').textContent = `${courseData.overallPercentage}%`;
+    document.getElementById('course-progress-modules').textContent = 
+      `${courseData.modulesCompleted} of ${courseData.totalModules} modules completed`;
+  });
+}
+
+// Helper function to destroy all charts for redrawing
+function destroyCharts() {
+  const chartIds = ['streakLineChart', 'quizStatusChart', 'activityBarChart', 'skillCoverageChart'];
+  chartIds.forEach(destroyChart);
+}
+
+// Helper function to destroy a specific chart
+function destroyChart(chartId) {
+  const chartInstance = Chart.getChart(chartId);
+  if (chartInstance) {
+    chartInstance.destroy();
+  }
+}
+
+// Function to display error messages
+function showErrorMessage(message) {
+  const analyticsSection = document.querySelector('.analytics-section');
+  
+  // Create error message element
+  const errorDiv = document.createElement('div');
+  errorDiv.className = 'analytics-error-message';
+  errorDiv.textContent = message;
+  
+  // Add a retry button
+  const retryButton = document.createElement('button');
+  retryButton.className = 'retry-button';
+  retryButton.textContent = 'Retry';
+  retryButton.addEventListener('click', () => {
+    errorDiv.remove();
+    initializeAnalytics();
+  });
+  
+  errorDiv.appendChild(retryButton);
+  
+  // Add to DOM
+  analyticsSection.prepend(errorDiv);
+}
+
+// Load and display a motivational quote
+async function loadMotivationalQuote() {
+  try {
+    const quoteContainer = document.querySelector('.motivational-quote-container');
+    
+    // Check if quotes are available in the global scope (from motivational-quotes.js)
+    if (typeof window.motivationalQuotes !== 'undefined' && Array.isArray(window.motivationalQuotes) && window.motivationalQuotes.length > 0) {
+      const randomIndex = Math.floor(Math.random() * window.motivationalQuotes.length);
+      const quote = window.motivationalQuotes[randomIndex];
+      
+      // Create quote HTML
+      quoteContainer.innerHTML = `
+        <div class="quote-content quote-fade-in">
+          <div class="quote-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9.17 6L4 11.17V16H8.83L14 10.83V6H9.17ZM10.83 10.17L8.83 12.17H6V9.17L8 7.17H10.83V10.17Z" fill="currentColor"/>
+              <path d="M20 6L14.83 11.17V16H19.66L24.83 10.83V6H20ZM21.66 10.17L19.66 12.17H16.83V9.17L18.83 7.17H21.66V10.17Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="quote-text">${quote.text}</div>
+          <div class="quote-author">- ${quote.author}</div>
+        </div>
+      `;
+    } else {
+      // If quotes aren't available, fetch from an API
+      const response = await fetch('https://api.quotable.io/random?tags=education,learning,success');
+      const data = await response.json();
+      
+      quoteContainer.innerHTML = `
+        <div class="quote-content quote-fade-in">
+          <div class="quote-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9.17 6L4 11.17V16H8.83L14 10.83V6H9.17ZM10.83 10.17L8.83 12.17H6V9.17L8 7.17H10.83V10.17Z" fill="currentColor"/>
+              <path d="M20 6L14.83 11.17V16H19.66L24.83 10.83V6H20ZM21.66 10.17L19.66 12.17H16.83V9.17L18.83 7.17H21.66V10.17Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="quote-text">${data.content}</div>
+          <div class="quote-author">- ${data.author}</div>
+        </div>
+      `;
     }
   } catch (error) {
-    console.error('Error creating activity heatmap:', error);
-    container.innerHTML = '<p class="chart-error">Unable to load activity data</p>';
+    console.error('Error loading motivational quote:', error);
+    // Don't show error for quotes - just fail silently as it's non-critical
   }
+}
+
+// Convert hex color to RGB
+function hexToRgb(hex) {
+  // Remove # if present
+  hex = hex.replace('#', '');
+  
+  // Handle shorthand hex (#fff)
+  if (hex.length === 3) {
+    hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+  }
+  
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  
+  return `${r}, ${g}, ${b}`;
+}
+
+// Function to manually refresh analytics data
+window.refreshAnalytics = async function() {
+  try {
+    showLoadingState();
+    
+    // Refresh all data
+    const data = await window.analyticsData.refreshAllData();
+    
+    // Apply any active filters
+    const filteredData = analyticsState.filterPeriod !== 'all'
+      ? filterDataByTimePeriod(data, analyticsState.filterPeriod)
+      : data;
+    
+    // Update UI with the new data
+    updateKPICards(filteredData);
+    destroyCharts();
+    initializeCharts(filteredData);
+    updateQuizTable(filteredData.quizPerformance);
+    
+    hideLoadingState();
+    
+    // Show success message
+    showToast('Analytics data refreshed successfully!', 'success');
+  } catch (error) {
+    console.error('Error refreshing analytics:', error);
+    hideLoadingState();
+    showToast('Failed to refresh analytics data.', 'error');
+  }
+};
+
+// Toast notification function
+function showToast(message, type = 'info') {
+  // Create toast container if it doesn't exist
+  let toastContainer = document.querySelector('.toast-container');
+  if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.className = 'toast-container';
+    document.body.appendChild(toastContainer);
+  }
+  
+  // Create toast element
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.textContent = message;
+  
+  // Add close button
+  const closeButton = document.createElement('button');
+  closeButton.className = 'toast-close';
+  closeButton.innerHTML = '&times;';
+  closeButton.addEventListener('click', () => {
+    toast.remove();
+  });
+  toast.appendChild(closeButton);
+  
+  // Add to container
+  toastContainer.appendChild(toast);
+  
+  // Auto remove after 5 seconds
+  setTimeout(() => {
+    toast.classList.add('toast-hide');
+    setTimeout(() => {
+      toast.remove();
+    }, 300);
+  }, 5000);
 }

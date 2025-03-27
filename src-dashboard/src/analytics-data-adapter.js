@@ -1,24 +1,138 @@
 // analytics-data-adapter.js
 // This file serves as a centralized data source for the analytics features
-// When real data becomes available, you only need to modify this file
 
 // Flag to control whether to use real data or placeholder data
-const USE_REAL_DATA = false; // Set to true when real data API is ready
+const USE_REAL_DATA = true; // Now set to true to use real API data
+
+// Define API endpoints - adjust these based on your backend structure
+const API_ENDPOINTS = {
+  USER_PROFILE: '/api/user/profile',
+  COURSE_PROGRESS: '/api/user/courses/progress',
+  QUIZ_PERFORMANCE: '/api/user/quizzes/performance',
+  STUDY_ACTIVITY: '/api/user/activity',
+  SKILL_COVERAGE: '/api/user/skills',
+  TOPIC_MASTERY: '/api/user/topics/mastery',
+  UPDATE_QUIZ: '/api/user/quizzes/update',
+  UPDATE_COURSE_PROGRESS: '/api/user/courses/update-progress',
+  RECORD_STUDY_SESSION: '/api/user/activity/record'
+};
 
 // Student data interface
 class AnalyticsDataService {
   constructor() {
     // Cache for data to avoid unnecessary API calls
     this.cache = {};
+    this.cacheExpiration = {};
+    this.DEFAULT_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+    
+    // Event system for data updates
+    this.eventListeners = {
+      'data-updated': [],
+      'quiz-completed': [],
+      'course-progress-updated': [],
+      'course-completed': [],
+      'error': []
+    };
+    
+    // Initialize data refresh on page load
+    this.refreshAllData();
+    
+    // Set up periodic refresh
+    setInterval(() => this.refreshAllData(), 5 * 60 * 1000); // Refresh every 5 minutes
   }
-
+  
+  // Event handling methods
+  addEventListener(event, callback) {
+    if (this.eventListeners[event]) {
+      this.eventListeners[event].push(callback);
+    }
+  }
+  
+  removeEventListener(event, callback) {
+    if (this.eventListeners[event]) {
+      this.eventListeners[event] = this.eventListeners[event].filter(cb => cb !== callback);
+    }
+  }
+  
+  triggerEvent(event, data) {
+    if (this.eventListeners[event]) {
+      this.eventListeners[event].forEach(callback => callback(data));
+    }
+  }
+  
+  // Utility method for API calls
+  async fetchAPI(endpoint, options = {}) {
+    try {
+      const response = await fetch(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+          // Add any authentication headers needed
+          // 'Authorization': `Bearer ${getAuthToken()}`
+        },
+        ...options
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error(`Error fetching from ${endpoint}:`, error);
+      this.triggerEvent('error', { endpoint, error });
+      throw error;
+    }
+  }
+  
+  // Cache management
+  setCache(key, data, duration = this.DEFAULT_CACHE_DURATION) {
+    this.cache[key] = data;
+    this.cacheExpiration[key] = Date.now() + duration;
+  }
+  
+  getCache(key) {
+    if (this.cache[key] && this.cacheExpiration[key] > Date.now()) {
+      return this.cache[key];
+    }
+    return null;
+  }
+  
+  clearCache(key) {
+    if (key) {
+      delete this.cache[key];
+      delete this.cacheExpiration[key];
+    } else {
+      this.cache = {};
+      this.cacheExpiration = {};
+    }
+  }
+  
+  // Refresh all data from API
+  async refreshAllData() {
+    try {
+      const data = await this.getAllAnalyticsData(true); // Force refresh
+      this.triggerEvent('data-updated', data);
+      return data;
+    } catch (error) {
+      console.error('Failed to refresh analytics data:', error);
+      return null;
+    }
+  }
+  
   // Get user profile data
-  async getUserProfile() {
+  async getUserProfile(forceRefresh = false) {
+    const cacheKey = 'userProfile';
+    
+    if (!forceRefresh) {
+      const cachedData = this.getCache(cacheKey);
+      if (cachedData) return cachedData;
+    }
+    
     if (USE_REAL_DATA) {
-      // Replace with your actual API call
       try {
-        const response = await fetch('/api/user/profile');
-        return await response.json();
+        const data = await this.fetchAPI(API_ENDPOINTS.USER_PROFILE);
+        this.setCache(cacheKey, data);
+        return data;
       } catch (error) {
         console.error('Error fetching user profile:', error);
         return this.getPlaceholderUserProfile(); // Fallback to placeholder
@@ -29,12 +143,19 @@ class AnalyticsDataService {
   }
 
   // Get course progress data
-  async getCourseProgress() {
+  async getCourseProgress(forceRefresh = false) {
+    const cacheKey = 'courseProgress';
+    
+    if (!forceRefresh) {
+      const cachedData = this.getCache(cacheKey);
+      if (cachedData) return cachedData;
+    }
+    
     if (USE_REAL_DATA) {
-      // Replace with your actual API call
       try {
-        const response = await fetch('/api/user/courses/progress');
-        return await response.json();
+        const data = await this.fetchAPI(API_ENDPOINTS.COURSE_PROGRESS);
+        this.setCache(cacheKey, data);
+        return data;
       } catch (error) {
         console.error('Error fetching course progress:', error);
         return this.getPlaceholderCourseProgress(); // Fallback to placeholder
@@ -45,12 +166,19 @@ class AnalyticsDataService {
   }
 
   // Get quiz performance data
-  async getQuizPerformance() {
+  async getQuizPerformance(forceRefresh = false) {
+    const cacheKey = 'quizPerformance';
+    
+    if (!forceRefresh) {
+      const cachedData = this.getCache(cacheKey);
+      if (cachedData) return cachedData;
+    }
+    
     if (USE_REAL_DATA) {
-      // Replace with your actual API call
       try {
-        const response = await fetch('/api/user/quizzes/performance');
-        return await response.json();
+        const data = await this.fetchAPI(API_ENDPOINTS.QUIZ_PERFORMANCE);
+        this.setCache(cacheKey, data);
+        return data;
       } catch (error) {
         console.error('Error fetching quiz performance:', error);
         return this.getPlaceholderQuizPerformance(); // Fallback to placeholder
@@ -61,12 +189,19 @@ class AnalyticsDataService {
   }
 
   // Get study activity data
-  async getStudyActivity() {
+  async getStudyActivity(forceRefresh = false) {
+    const cacheKey = 'studyActivity';
+    
+    if (!forceRefresh) {
+      const cachedData = this.getCache(cacheKey);
+      if (cachedData) return cachedData;
+    }
+    
     if (USE_REAL_DATA) {
-      // Replace with your actual API call
       try {
-        const response = await fetch('/api/user/activity');
-        return await response.json();
+        const data = await this.fetchAPI(API_ENDPOINTS.STUDY_ACTIVITY);
+        this.setCache(cacheKey, data);
+        return data;
       } catch (error) {
         console.error('Error fetching study activity:', error);
         return this.getPlaceholderStudyActivity(); // Fallback to placeholder
@@ -77,12 +212,19 @@ class AnalyticsDataService {
   }
 
   // Get skill coverage data
-  async getSkillCoverage() {
+  async getSkillCoverage(forceRefresh = false) {
+    const cacheKey = 'skillCoverage';
+    
+    if (!forceRefresh) {
+      const cachedData = this.getCache(cacheKey);
+      if (cachedData) return cachedData;
+    }
+    
     if (USE_REAL_DATA) {
-      // Replace with your actual API call
       try {
-        const response = await fetch('/api/user/skills');
-        return await response.json();
+        const data = await this.fetchAPI(API_ENDPOINTS.SKILL_COVERAGE);
+        this.setCache(cacheKey, data);
+        return data;
       } catch (error) {
         console.error('Error fetching skill coverage:', error);
         return this.getPlaceholderSkillCoverage(); // Fallback to placeholder
@@ -93,12 +235,19 @@ class AnalyticsDataService {
   }
 
   // Get topic mastery data
-  async getTopicMastery() {
+  async getTopicMastery(forceRefresh = false) {
+    const cacheKey = 'topicMastery';
+    
+    if (!forceRefresh) {
+      const cachedData = this.getCache(cacheKey);
+      if (cachedData) return cachedData;
+    }
+    
     if (USE_REAL_DATA) {
-      // Replace with your actual API call
       try {
-        const response = await fetch('/api/user/topics/mastery');
-        return await response.json();
+        const data = await this.fetchAPI(API_ENDPOINTS.TOPIC_MASTERY);
+        this.setCache(cacheKey, data);
+        return data;
       } catch (error) {
         console.error('Error fetching topic mastery:', error);
         return this.getPlaceholderTopicMastery(); // Fallback to placeholder
@@ -109,164 +258,187 @@ class AnalyticsDataService {
   }
 
   // Get all analytics data at once
-  async getAllAnalyticsData() {
+  async getAllAnalyticsData(forceRefresh = false) {
     return {
-      userProfile: await this.getUserProfile(),
-      courseProgress: await this.getCourseProgress(),
-      quizPerformance: await this.getQuizPerformance(),
-      studyActivity: await this.getStudyActivity(),
-      skillCoverage: await this.getSkillCoverage(),
-      topicMastery: await this.getTopicMastery()
+      userProfile: await this.getUserProfile(forceRefresh),
+      courseProgress: await this.getCourseProgress(forceRefresh),
+      quizPerformance: await this.getQuizPerformance(forceRefresh),
+      studyActivity: await this.getStudyActivity(forceRefresh),
+      skillCoverage: await this.getSkillCoverage(forceRefresh),
+      topicMastery: await this.getTopicMastery(forceRefresh)
     };
+  }
+  
+  // Update methods for user actions
+  
+  // Record a completed quiz
+  async recordQuizCompletion(quizData) {
+    if (USE_REAL_DATA) {
+      try {
+        const result = await this.fetchAPI(API_ENDPOINTS.UPDATE_QUIZ, {
+          method: 'POST',
+          body: JSON.stringify(quizData)
+        });
+        
+        // Clear relevant caches
+        this.clearCache('quizPerformance');
+        this.clearCache('skillCoverage');
+        
+        // Trigger event
+        this.triggerEvent('quiz-completed', result);
+        
+        // Refresh affected data
+        await this.getQuizPerformance(true);
+        await this.getSkillCoverage(true);
+        
+        return result;
+      } catch (error) {
+        console.error('Error recording quiz completion:', error);
+        return null;
+      }
+    } else {
+      // Simulate a successful update in placeholder mode
+      console.log('Quiz completion recorded (placeholder):', quizData);
+      return { success: true, message: 'Quiz recorded (placeholder)' };
+    }
+  }
+  
+  // Update course progress
+  async updateCourseProgress(progressData) {
+    if (USE_REAL_DATA) {
+      try {
+        const result = await this.fetchAPI(API_ENDPOINTS.UPDATE_COURSE_PROGRESS, {
+          method: 'POST',
+          body: JSON.stringify(progressData)
+        });
+        
+        // Clear relevant caches
+        this.clearCache('courseProgress');
+        
+        // Trigger event
+        this.triggerEvent('course-progress-updated', result);
+        
+        // Check if course is completed
+        if (progressData.completed) {
+          this.triggerEvent('course-completed', progressData.courseId);
+        }
+        
+        // Refresh affected data
+        await this.getCourseProgress(true);
+        
+        return result;
+      } catch (error) {
+        console.error('Error updating course progress:', error);
+        return null;
+      }
+    } else {
+      // Simulate a successful update in placeholder mode
+      console.log('Course progress updated (placeholder):', progressData);
+      return { success: true, message: 'Progress updated (placeholder)' };
+    }
+  }
+  
+  // Record study session
+  async recordStudySession(sessionData) {
+    if (USE_REAL_DATA) {
+      try {
+        const result = await this.fetchAPI(API_ENDPOINTS.RECORD_STUDY_SESSION, {
+          method: 'POST',
+          body: JSON.stringify(sessionData)
+        });
+        
+        // Clear relevant caches
+        this.clearCache('studyActivity');
+        this.clearCache('userProfile'); // May affect streaks
+        
+        // Refresh affected data
+        await this.getStudyActivity(true);
+        await this.getUserProfile(true);
+        
+        return result;
+      } catch (error) {
+        console.error('Error recording study session:', error);
+        return null;
+      }
+    } else {
+      // Simulate a successful update in placeholder mode
+      console.log('Study session recorded (placeholder):', sessionData);
+      return { success: true, message: 'Session recorded (placeholder)' };
+    }
   }
 
   // ===== PLACEHOLDER DATA =====
+  // Modified to show empty/zero data initially
 
   getPlaceholderUserProfile() {
     return {
       name: "Sarah Johnson",
-      currentStreak: 15,
-      longestStreak: 32,
-      totalStudyHours: 24,
-      averageScore: 85,
-      scoreImprovement: 7,
-      productiveDay: 'Thursday',
-      productiveDayPercent: 30,
-      hasProductivityData: true,
-      hasPeakStudyTime: true,
-      peakStudyTime: 'evenings (7-9pm)',
-      targetStreak: 40,
-      streakPercentage: 37.5,
-      currentCourse: 'web-development',
-      streakCount: 15,
-      daysToRecord: 17
+      currentStreak: 0,            // Changed from 15 to 0
+      longestStreak: 0,            // Changed from 32 to 0
+      totalStudyHours: 0,          // Changed from 24 to 0
+      averageScore: 0,             // Changed from 85 to 0
+      scoreImprovement: 0,         // Changed from 7 to 0
+      productiveDay: null,         // Changed from 'Thursday' to null
+      productiveDayPercent: 0,     // Changed from 30 to 0
+      hasProductivityData: false,  // Changed from true to false
+      hasPeakStudyTime: false,     // Changed from true to false
+      peakStudyTime: null,         // Changed from 'evenings (7-9pm)' to null
+      targetStreak: 10,            // Kept as a goal
+      streakPercentage: 0,         // Changed from 37.5 to 0
+      currentCourse: null,         // Changed from 'web-development' to null
+      streakCount: 0,              // Changed from 15 to 0
+      daysToRecord: 0              // Changed from 17 to 0
     };
   }
 
   getPlaceholderCourseProgress() {
     return {
-      overallPercentage: 75,
-      modulesCompleted: 6,
-      totalModules: 8,
-      estimatedCompletionDate: 'May 15, 2025',
-      timeSpentTotal: 24, // hours
-      lastActivity: '2025-02-27T15:30:00Z',
-      courses: [
-        {
-          id: 1,
-          name: 'Web Development',
-          progress: 75,
-          modules: [{completed: true}, {completed: true}, {completed: true}, 
-                   {completed: true}, {completed: true}, {completed: true}, 
-                   {completed: false}, {completed: false}]
-        }
-      ]
+      overallPercentage: 0,        // Changed from 75 to 0
+      modulesCompleted: 0,         // Changed from 6 to 0
+      totalModules: 0,             // Changed from 8 to 0
+      estimatedCompletionDate: null, // Changed from date to null
+      timeSpentTotal: 0,           // Changed from 24 to 0
+      lastActivity: null,          // Changed from date to null
+      courses: []                  // Changed from array with course to empty array
     };
   }
 
   getPlaceholderQuizPerformance() {
     return {
-      completed: 7,
-      pending: 3,
-      totalQuizzes: 10,
-      averageScore: 85,
-      highestScore: 95,
-      lowestScore: 70,
-      nextQuiz: {
-        name: 'Arrays and Loops',
-        date: 'Tomorrow',
-        estimatedDifficulty: 'Medium'
-      },
-      recentQuizzes: [
-        {
-          name: 'Variables Quiz',
-          date: 'May 1, 2025',
-          score: 90,
-          timeSpent: 15, // minutes
-          status: 'completed'
-        },
-        {
-          name: 'Functions Quiz',
-          date: 'May 3, 2025',
-          score: 85,
-          timeSpent: 20, // minutes
-          status: 'completed'
-        },
-        {
-          name: 'Loops Quiz',
-          date: 'May 6, 2025',
-          score: 75,
-          timeSpent: 25, // minutes
-          status: 'completed'
-        },
-        {
-          name: 'Arrays Quiz',
-          date: null,
-          score: null,
-          timeSpent: null,
-          status: 'pending'
-        },
-        {
-          name: 'Objects Quiz',
-          date: null,
-          score: null,
-          timeSpent: null,
-          status: 'pending'
-        }
-      ]
+      completed: 0,                // Changed from 7 to 0
+      pending: 0,                  // Changed from 3 to 0
+      totalQuizzes: 0,             // Changed from 10 to 0
+      averageScore: 0,             // Changed from 85 to 0
+      highestScore: 0,             // Changed from 95 to 0
+      lowestScore: 0,              // Changed from 70 to 0
+      nextQuiz: null,              // Changed from object to null
+      recentQuizzes: []            // Changed from array with quizzes to empty array
     };
   }
 
   getPlaceholderStudyActivity() {
     return {
-      weeklyHours: [2.5, 3.0, 1.5, 3.5, 2.0, 1.0, 0.5], // [Mon, Tue, Wed, Thu, Fri, Sat, Sun]
-      totalHours: 24,
-      peakDay: 'Thursday',
-      peakHours: '18:00-20:00', // 6PM-8PM
-      averageSessionLength: 45, // minutes
-      averageDailyStudy: 1.7, // hours
-      activityHeatmap: [
-        // Format: [day, hour, intensity (0-3)]
-        [0, 9, 0], [0, 10, 1], [0, 11, 0], [0, 12, 0], [0, 13, 0], [0, 14, 0], 
-        [0, 15, 2], [0, 16, 3], [0, 17, 1], [0, 18, 0], [0, 19, 1], [0, 20, 0],
-        [1, 9, 0], [1, 10, 0], [1, 11, 2], [1, 12, 1], [1, 13, 0], [1, 14, 0], 
-        [1, 15, 0], [1, 16, 0], [1, 17, 0], [1, 18, 2], [1, 19, 3], [1, 20, 1],
-        [2, 9, 0], [2, 10, 0], [2, 11, 0], [2, 12, 0], [2, 13, 1], [2, 14, 1], 
-        [2, 15, 0], [2, 16, 0], [2, 17, 0], [2, 18, 0], [2, 19, 1], [2, 20, 2],
-        [3, 9, 0], [3, 10, 2], [3, 11, 1], [3, 12, 0], [3, 13, 0], [3, 14, 0], 
-        [3, 15, 0], [3, 16, 1], [3, 17, 2], [3, 18, 3], [3, 19, 2], [3, 20, 1],
-        [4, 9, 1], [4, 10, 0], [4, 11, 0], [4, 12, 0], [4, 13, 1], [4, 14, 0], 
-        [4, 15, 0], [4, 16, 0], [4, 17, 1], [4, 18, 2], [4, 19, 1], [4, 20, 0]
-      ]
+      weeklyHours: [0, 0, 0, 0, 0, 0, 0], // Changed all values to 0
+      totalHours: 0,                      // Changed from 24 to 0
+      peakDay: null,                      // Changed from 'Thursday' to null
+      peakHours: null,                    // Changed from '18:00-20:00' to null
+      averageSessionLength: 0,            // Changed from 45 to 0
+      averageDailyStudy: 0,               // Changed from 1.7 to 0
+      activityHeatmap: []                 // Changed to empty array
     };
   }
 
   getPlaceholderSkillCoverage() {
     return {
-      skills: [
-        { name: 'HTML', userScore: 85, courseAverage: 65 },
-        { name: 'CSS', userScore: 75, courseAverage: 70 },
-        { name: 'JavaScript', userScore: 60, courseAverage: 50 },
-        { name: 'Responsive Design', userScore: 80, courseAverage: 75 },
-        { name: 'APIs', userScore: 55, courseAverage: 60 },
-        { name: 'Version Control', userScore: 70, courseAverage: 55 }
-      ],
-      strengths: ['HTML', 'Responsive Design'],
-      areasForImprovement: ['JavaScript', 'APIs']
+      skills: [],                  // Changed from array of skills to empty array
+      strengths: [],               // Changed from array with strengths to empty array
+      areasForImprovement: []      // Changed from array with areas to empty array
     };
   }
 
   getPlaceholderTopicMastery() {
     return {
-      topics: [
-        { name: 'HTML Basics', mastery: 85, importance: 15, position: 20 },
-        { name: 'CSS Fundamentals', mastery: 82, importance: 12, position: 30 },
-        { name: 'JavaScript Variables', mastery: 70, importance: 8, position: 40 },
-        { name: 'Functions', mastery: 65, importance: 5, position: 50 },
-        { name: 'DOM Manipulation', mastery: 60, importance: 7, position: 60 },
-        { name: 'Responsive Design', mastery: 75, importance: 10, position: 70 },
-        { name: 'APIs', mastery: 55, importance: 6, position: 80 }
-      ]
+      topics: []                   // Changed from array with topics to empty array
     };
   }
 }
@@ -275,5 +447,4 @@ class AnalyticsDataService {
 const analyticsData = new AnalyticsDataService();
 
 // Export the instance for use in other files
-// Since we're not using ES modules, we'll make it available globally
 window.analyticsData = analyticsData;
