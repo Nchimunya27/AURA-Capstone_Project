@@ -14,6 +14,17 @@
     <link rel="stylesheet" href="upload.css">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+      .user-name, .welcome-text {
+        opacity: 0.1;
+        transition: opacity 0.3s ease;
+      }
+      .username-loaded {
+        opacity: 1;
+      }
+    </style>
+
     <script src="notestab-fix.js"></script>
     <script src="mycoursestocoursepage.js"></script>
     <script src="documentholder.js"></script>
@@ -30,9 +41,9 @@
           </div>
           <div class="user-profile">
             <div class="user-info">
-              <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/9dbfea57b8a729137111c79719a1c4f8e5573959547359abb4b9cbb79dbfb1bf?apiKey=5b35dfe34207418398a5304200905620&" class="user-avatar" alt="User avatar" />
+              <img loading="lazy" src="default_avatar.svg" class="user-avatar" alt="User avatar" />
               <div class="user-details">
-                <div class="user-name">Sarah Johnson</div>
+                <div class="user-name">User</div>
               </div>
             </div>
           </div>
@@ -138,5 +149,33 @@
 
     <script src="upload.js"></script>
     <script src="aura.js"></script>
+    <script src="profile-picture-manager.js"></script>
+    <script src="common.js"></script>
+
+    <script>
+      // Username update script
+      (function() {
+        function updateUsername() {
+          const username = localStorage.getItem('currentUsername');
+          const userNameElement = document.querySelector('.user-name');
+          
+          if (userNameElement && username) {
+            userNameElement.textContent = username;
+            userNameElement.classList.add('username-loaded');
+          }
+          
+          setTimeout(function() {
+            if (userNameElement) {
+              userNameElement.style.opacity = "1";
+              userNameElement.style.visibility = "visible";
+            }
+          }, 500);
+        }
+        
+        updateUsername();
+        setTimeout(updateUsername, 100);
+        window.addEventListener('load', updateUsername);
+      })();
+    </script>
   </body>
 </html>
