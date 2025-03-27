@@ -109,25 +109,25 @@
                   <div class="analytics-kpi-row">
                     <div class="kpi-card">
                       <div class="kpi-title">Course Progress</div>
-                      <div class="kpi-value">75%</div>
-                      <div class="kpi-subtext">6 of 8 modules completed</div>
+                      <div class="kpi-value" id="course-progress-percentage">0%</div>
+                      <div class="kpi-subtext" id="course-progress-modules">0 of 0 modules completed</div>
                     </div>
                     
                     <div class="kpi-card">
                       <div class="kpi-title">Current Streak</div>
-                      <div class="kpi-value">15</div>
+                      <div class="kpi-value" id="current-streak-value">0</div>
                       <div class="kpi-subtext">days in a row</div>
                     </div>
                     
                     <div class="kpi-card">
                       <div class="kpi-title">Longest Streak</div>
-                      <div class="kpi-value">32</div>
+                      <div class="kpi-value" id="longest-streak-value">0</div>
                       <div class="kpi-subtext">days</div>
                     </div>
                     
                     <div class="kpi-card">
                       <div class="kpi-title">Study Time</div>
-                      <div class="kpi-value">24h</div>
+                      <div class="kpi-value" id="study-time-value">0h</div>
                       <div class="kpi-subtext">total hours</div>
                     </div>
                   </div>
@@ -155,11 +155,11 @@
                       <div class="chart-legend" style="margin-top: 10px; text-align: center;">
                         <div class="legend-item">
                           <span class="legend-color" style="background-color: var(--accent-color);"></span>
-                          <span class="legend-text">Completed (7/10)</span>
+                          <span class="legend-text">Completed (0/0)</span>
                         </div>
                         <div class="legend-item">
                           <span class="legend-color" style="background-color: #e5e7eb;"></span>
-                          <span class="legend-text">Pending (3/10)</span>
+                          <span class="legend-text">Pending (0/0)</span>
                         </div>
                       </div>
                     </div>
@@ -205,32 +205,17 @@
                       </thead>
                       <tbody>
                         <tr>
-                          <td>Variables Quiz</td>
-                          <td>April 1, 2025</td>
-                          <td>90%</td>
-                          <td>15 min</td>
-                          <td><span class="status-badge completed">Completed</span></td>
-                        </tr>
-                        <tr>
-                          <td>Functions Quiz</td>
-                          <td>April 3, 2025</td>
-                          <td>85%</td>
-                          <td>20 min</td>
-                          <td><span class="status-badge completed">Completed</span></td>
-                        </tr>
-                        <tr>
-                          <td>Loops Quiz</td>
-                          <td>April 6, 2025</td>
-                          <td>75%</td>
-                          <td>25 min</td>
-                          <td><span class="status-badge completed">Completed</span></td>
-                        </tr>
-                        <tr>
-                          <td>Arrays Quiz</td>
-                          <td>-</td>
-                          <td>-</td>
-                          <td>-</td>
-                          <td><span class="status-badge pending">Pending</span></td>
+                          <td colspan="5" class="empty-state">
+                            <div class="empty-state-message">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2Z"/>
+                                <line x1="9" y1="9" x2="15" y2="9"/>
+                                <line x1="9" y1="13" x2="15" y2="13"/>
+                                <line x1="9" y1="17" x2="13" y2="17"/>
+                              </svg>
+                              <p>No quiz data available yet. Complete quizzes to see your performance here.</p>
+                            </div>
+                          </td>
                         </tr>
                       </tbody>
                     </table>
