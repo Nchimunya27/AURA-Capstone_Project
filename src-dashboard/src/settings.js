@@ -77,26 +77,44 @@ document.addEventListener('DOMContentLoaded', function() {
             const firstName = document.getElementById('firstName').value;
             const lastName = document.getElementById('lastName').value;
             const email = document.getElementById('email').value;
+            const username = document.getElementById('username').value; // Added username field
             
             // Save user data
             localStorage.setItem('user_firstName', firstName);
             localStorage.setItem('user_lastName', lastName);
             localStorage.setItem('user_email', email);
+            localStorage.setItem('user_username', username); // Added username storage
             
-            console.log('Saving user data:', { firstName, lastName, email });
+            console.log('Saving user data:', { firstName, lastName, email, username });
             alert('Changes saved successfully!');
+            
+            // Update the display name in the sidebar
+            updateSidebarUsername(username);
         });
     }
+    
+    // Function to update sidebar username display
+    const updateSidebarUsername = (username) => {
+        const userNameDisplay = document.querySelector('.user-name');
+        if (userNameDisplay && username) {
+            userNameDisplay.textContent = username;
+        }
+    };
     
     // Load saved user data if available
     const loadSavedUserData = () => {
         const firstName = localStorage.getItem('user_firstName');
         const lastName = localStorage.getItem('user_lastName');
         const email = localStorage.getItem('user_email');
+        const username = localStorage.getItem('user_username'); // Added username retrieval
         
         if (firstName) document.getElementById('firstName').value = firstName;
         if (lastName) document.getElementById('lastName').value = lastName;
         if (email) document.getElementById('email').value = email;
+        if (username) document.getElementById('username').value = username; // Added username field update
+        
+        // Update sidebar with saved username
+        updateSidebarUsername(username);
     };
     
     // Call function to load user data
