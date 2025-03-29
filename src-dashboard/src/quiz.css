@@ -23,6 +23,10 @@
   --success-color: #12b76a;
   --warning-color: #f79009;
   --error-color: #f04438;
+  
+  /* Added new variables for enhanced components */
+  --success-bg: rgba(18, 183, 106, 0.15);
+  --error-bg: rgba(240, 68, 56, 0.15);
 }
 
 /* Night Mode - Updated with the right color palette */
@@ -47,9 +51,13 @@
   --primary-color: #7bb5f5;
   --secondary-color: #9ccaff;
   --hover-color: #a8d5ff;
-  --success-color: #4ade80;
+  --success-color: #00ffaa; /* Brighter, more vibrant teal */
   --warning-color: #fbbf24;
-  --error-color: #f87171;
+  --error-color: #ff6e6e;   /* Softer but clearer red */
+  
+  /* Added new variables for enhanced components */
+  --success-bg: rgba(0, 255, 170, 0.15); /* Background for success messages */
+  --error-bg: rgba(255, 110, 110, 0.15); /* Background for error messages */
 }
 
 * {
@@ -403,6 +411,8 @@ body {
 
 .question-container {
   margin-bottom: 40px;
+  animation: fadeIn 0.5s ease;
+  position: relative;
 }
 
 .question-text {
@@ -430,11 +440,21 @@ body {
   cursor: pointer;
   transition: all 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
   background-color: var(--background-secondary);
+  position: relative;
+  overflow: hidden;
 }
 
 .option-item:hover {
   border-color: var(--accent-color);
   background-color: rgba(89, 151, 172, 0.05);
+  transform: translateY(-2px);
+}
+
+.option-item.active-selection {
+  border-color: var(--accent-color);
+  background-color: rgba(89, 151, 172, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 [data-theme="night"] .option-item:hover {
@@ -503,6 +523,8 @@ body {
   cursor: pointer;
   transition: all 0.3s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   font-size: 14px;
+  position: relative;
+  overflow: hidden;
 }
 
 .nav-button {
@@ -534,6 +556,7 @@ body {
 .flag-button.flagged {
   color: var(--warning-color);
   border-color: var(--warning-color);
+  background-color: rgba(251, 191, 36, 0.1);
 }
 
 .submit-button {
@@ -546,6 +569,47 @@ body {
   background-color: var(--accent-hover);
 }
 
+/* Button ripple effect */
+.nav-button::after, .flag-button::after, .submit-button::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+@keyframes ripple-effect {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(25, 25);
+    opacity: 0;
+  }
+}
+
+.nav-button:active::after, .flag-button:active::after, .submit-button:active::after {
+  animation: ripple-effect 0.4s ease-out;
+}
+
+/* Enhanced feedback for flagged questions */
+[data-theme="night"] .flag-button.flagged {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(251, 191, 36, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); }
+}
+
 /* Results Styles */
 .results-card {
   padding: 30px;
@@ -556,24 +620,168 @@ body {
   margin-bottom: 30px;
 }
 
+/* ===== Interactive Score Display ===== */
+/* Base styling for the interactive score circle */
 .score-circle {
-  width: 150px;
-  height: 150px;
+  position: relative;
+  width: 180px;
+  height: 180px;
   border-radius: 50%;
-  background: var(--accent-color);
+  background: #f3f4f6;
+  margin: 30px auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 24px auto;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  transition: all 0.5s ease;
+}
+
+[data-theme="night"] .score-circle {
+  background: #1f2b4d;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Score circle inner content */
+.score-circle-inner {
   position: relative;
-  transition: background-color 0.3s ease;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: var(--background-secondary);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="night"] .score-circle-inner {
+  background: #2a3356;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Score fill animation */
+.score-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, var(--primary-color), rgba(89, 151, 172, 0.7));
+  border-radius: 0;
+  transition: height 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  height: 0%;
+}
+
+[data-theme="night"] .score-fill {
+  background: linear-gradient(to top, var(--primary-color), rgba(123, 181, 245, 0.7));
+  box-shadow: 0 0 20px rgba(123, 181, 245, 0.4);
+}
+
+/* Animation for the score percentage text */
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .score-percentage {
-  color: white;
-  font-size: 36px;
+  font-size: 48px;
   font-weight: 700;
+  color: var(--text-primary);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: countUp 0.8s forwards;
+  animation-delay: 0.5s;
+}
+
+/* Score rating text with subtle animation */
+.score-rating {
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 6px;
+  color: var(--accent-color);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: countUp 0.8s forwards;
+  animation-delay: 0.7s;
+}
+
+/* Celebration confetti for high scores */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: #f00;
+  opacity: 0.8;
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  from {
+    transform: translateY(-100px) rotate(0deg);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateY(calc(100vh + 100px)) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Emoji reactions for different score ranges */
+.emoji-reaction {
+  font-size: 32px;
+  margin-bottom: 10px;
+  animation: bounce 0.6s ease infinite alternate;
+  opacity: 0;
+  animation-delay: 1s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-8px); }
+}
+
+/* Level indicator */
+.level-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: slideUp 0.8s forwards;
+  animation-delay: 1.2s;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.level-star {
+  color: #FFD700;
+  font-size: 24px;
+  margin: 0 2px;
+  transform: scale(0);
+  animation: popIn 0.4s forwards;
+}
+
+@keyframes popIn {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
 }
 
 .score-details {
@@ -602,13 +810,41 @@ body {
   gap: 16px;
 }
 
+/* Enhanced Question Items in Results with Better Contrast */
 .question-item {
   display: flex;
   padding: 16px;
   border-radius: 8px;
   background-color: var(--background-tertiary);
   gap: 16px;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.question-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="night"] .question-item {
+  background: linear-gradient(to right, #1f2b4d, #2a3356);
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+  border: 1px solid #5470a9;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="night"] .question-item.correct {
+  border-left: 4px solid var(--success-color);
+}
+
+[data-theme="night"] .question-item.incorrect {
+  border-left: 4px solid var(--error-color);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .question-status {
@@ -640,6 +876,7 @@ body {
   transition: color 0.3s ease;
 }
 
+/* Enhanced Color Accessibility for Correct/Incorrect Indicators */
 .answer-info .correct {
   color: var(--success-color);
 }
@@ -648,11 +885,58 @@ body {
   color: var(--error-color);
 }
 
+[data-theme="night"] .answer-info .correct {
+  color: var(--success-color);
+  background: var(--success-bg);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  display: inline-block;
+  position: relative;
+  text-shadow: none;
+}
+
+[data-theme="night"] .answer-info .incorrect {
+  color: var(--error-color);
+  background: var(--error-bg);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  display: inline-block;
+  position: relative;
+  text-shadow: none;
+}
+
+/* Add icons to make the correct/incorrect status more obvious beyond just color */
+[data-theme="night"] .answer-info .correct::before {
+  content: "✓ ";
+  font-weight: bold;
+}
+
+[data-theme="night"] .answer-info .incorrect::before {
+  content: "✗ ";
+  font-weight: bold;
+}
+
 .correct-answer {
   display: block;
   margin-top: 4px;
   font-weight: 500;
   color: var(--success-color);
+}
+
+[data-theme="night"] .correct-answer {
+  color: var(--success-color);
+  background: var(--success-bg);
+  border-left: 3px solid var(--success-color);
+  box-shadow: 0 0 8px rgba(0, 255, 170, 0.2);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 12px;
+  position: relative;
+  transition: all 0.3s ease;
 }
 
 .results-actions {
@@ -690,22 +974,69 @@ body {
   background-color: var(--accent-hover);
 }
 
-/* NIGHT MODE SPECIFIC STYLES */
-[data-theme="night"] .quiz-card {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+/* Question number pill */
+.question-number {
+  display: inline-block;
+  background-color: var(--accent-color);
+  color: white;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-right: 10px;
 }
 
-[data-theme="night"] .option-item {
-  background-color: #31456e;
+[data-theme="night"] .question-number {
+  background-color: #7bb5f5;
+  box-shadow: 0 0 10px rgba(123, 181, 245, 0.3);
 }
 
-[data-theme="night"] .option-item input[type="radio"]:checked + .option-text {
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+/* Review specific styles */
+.review-list {
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 10px;
 }
 
-[data-theme="night"] .question-text,
-[data-theme="night"] .results-breakdown h3 {
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+.review-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.review-option {
+  padding: 10px 14px;
+  border-radius: 6px;
+  background-color: var(--background-tertiary);
+  transition: all 0.3s ease;
+}
+
+.review-option.correct-selected {
+  background-color: var(--success-bg);
+  border-left: 3px solid var(--success-color);
+  color: var(--success-color);
+  font-weight: 500;
+}
+
+.review-option.incorrect-selected {
+  background-color: var(--error-bg);
+  border-left: 3px solid var(--error-color);
+  color: var(--error-color);
+  font-weight: 500;
+}
+
+.review-option.correct-answer {
+  background-color: var(--success-bg);
+  border-left: 3px solid var(--success-color);
+  color: var(--success-color);
+  font-weight: 500;
+}
+
+/* Added accessibility-friendly focus indicators */
+button:focus, input:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
 }
 
 /* Responsive styles */

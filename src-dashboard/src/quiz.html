@@ -20,6 +20,390 @@
       .username-loaded {
         opacity: 1;
       }
+
+      /* === ENHANCED STYLES FOR QUIZ === */
+      /* Enhanced Night Mode Colors for Better Readability */
+      [data-theme="night"] {
+        /* Improved contrast colors for success/error states */
+        --success-color: #00ffaa; /* Brighter, more vibrant teal */
+        --error-color: #ff6e6e;   /* Softer but clearer red */
+        
+        /* Add these new variables */
+        --success-bg: rgba(0, 255, 170, 0.15); /* Background for success messages */
+        --error-bg: rgba(255, 110, 110, 0.15); /* Background for error messages */
+      }
+
+      /* Enhanced Color Accessibility for Correct/Incorrect Indicators */
+      [data-theme="night"] .correct-answer {
+        color: var(--success-color);
+        background: var(--success-bg);
+        border-left: 3px solid var(--success-color);
+        box-shadow: 0 0 8px rgba(0, 255, 170, 0.2);
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        display: inline-block;
+        margin-top: 12px;
+        position: relative;
+        transition: all 0.3s ease;
+      }
+
+      [data-theme="night"] .answer-info .correct {
+        color: var(--success-color);
+        background: var(--success-bg);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+        display: inline-block;
+        position: relative;
+        text-shadow: none;
+      }
+
+      [data-theme="night"] .answer-info .incorrect {
+        color: var(--error-color);
+        background: var(--error-bg);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+        display: inline-block;
+        position: relative;
+        text-shadow: none;
+      }
+
+      /* Add icons to make the correct/incorrect status more obvious beyond just color */
+      [data-theme="night"] .answer-info .correct::before {
+        content: "✓ ";
+        font-weight: bold;
+      }
+
+      [data-theme="night"] .answer-info .incorrect::before {
+        content: "✗ ";
+        font-weight: bold;
+      }
+
+      /* Enhanced Question Items in Results with Better Contrast */
+      [data-theme="night"] .question-item {
+        background: linear-gradient(to right, #1f2b4d, #2a3356);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 18px;
+        border: 1px solid #5470a9;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      [data-theme="night"] .question-item.correct {
+        border-left: 4px solid var(--success-color);
+      }
+
+      [data-theme="night"] .question-item.incorrect {
+        border-left: 4px solid var(--error-color);
+      }
+
+      [data-theme="night"] .question-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Option Item Enhancements */
+      [data-theme="night"] .option-item {
+        background: linear-gradient(to right, #2a3356, #31456e);
+        border-color: #5470a9;
+        padding: 18px;
+        transition: all 0.3s ease, transform 0.2s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      [data-theme="night"] .option-item:hover {
+        background: linear-gradient(to right, #31456e, #3d4c7a);
+        transform: translateY(-2px);
+        border-color: #8ac5ff;
+      }
+
+      /* Add subtle animation to checked options */
+      [data-theme="night"] .option-item:has(input[type="radio"]:checked) {
+        background: linear-gradient(to right, #31456e, #3d4c7a);
+        border-color: #8ac5ff;
+        box-shadow: 0 0 15px rgba(138, 197, 255, 0.3);
+        transform: translateY(-2px);
+      }
+
+      /* Add ripple effect when selecting an option */
+      @keyframes ripple {
+        0% {
+          transform: scale(0);
+          opacity: 0.8;
+        }
+        100% {
+          transform: scale(2.5);
+          opacity: 0;
+        }
+      }
+
+      [data-theme="night"] .option-item input[type="radio"]:checked::before {
+        content: "";
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: rgba(138, 197, 255, 0.5);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        animation: ripple 0.6s ease-out;
+      }
+
+      /* ===== Interactive Score Display ===== */
+      /* Base styling for the interactive score circle */
+      .score-circle {
+        position: relative;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: #f3f4f6;
+        margin: 30px auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        transition: all 0.5s ease;
+      }
+
+      [data-theme="night"] .score-circle {
+        background: #1f2b4d;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Score circle inner content */
+      .score-circle-inner {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: var(--background-secondary);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      [data-theme="night"] .score-circle-inner {
+        background: #2a3356;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Score fill animation */
+      .score-fill {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, var(--primary-color), rgba(89, 151, 172, 0.7));
+        border-radius: 0;
+        transition: height 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+        height: 0%;
+      }
+
+      [data-theme="night"] .score-fill {
+        background: linear-gradient(to top, var(--primary-color), rgba(123, 181, 245, 0.7));
+        box-shadow: 0 0 20px rgba(123, 181, 245, 0.4);
+      }
+
+      /* Animation for the score percentage text */
+      @keyframes countUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .score-percentage {
+        font-size: 48px;
+        font-weight: 700;
+        color: var(--text-primary);
+        opacity: 0;
+        transform: translateY(10px);
+        animation: countUp 0.8s forwards;
+        animation-delay: 0.5s;
+      }
+
+      /* Score rating text with subtle animation */
+      .score-rating {
+        font-size: 18px;
+        font-weight: 600;
+        margin-top: 6px;
+        color: var(--accent-color);
+        opacity: 0;
+        transform: translateY(10px);
+        animation: countUp 0.8s forwards;
+        animation-delay: 0.7s;
+      }
+
+      /* Celebration confetti for high scores */
+      .confetti-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+        overflow: hidden;
+      }
+
+      .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: #f00;
+        opacity: 0.8;
+        animation: fall linear forwards;
+      }
+
+      @keyframes fall {
+        from {
+          transform: translateY(-100px) rotate(0deg);
+          opacity: 0.8;
+        }
+        to {
+          transform: translateY(calc(100vh + 100px)) rotate(360deg);
+          opacity: 0;
+        }
+      }
+
+      /* Emoji reactions for different score ranges */
+      .emoji-reaction {
+        font-size: 32px;
+        margin-bottom: 10px;
+        animation: bounce 0.6s ease infinite alternate;
+        opacity: 0;
+        animation-delay: 1s;
+        animation-fill-mode: forwards;
+      }
+
+      @keyframes bounce {
+        from { transform: translateY(0); }
+        to { transform: translateY(-8px); }
+      }
+
+      /* Level indicator */
+      .level-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 20px;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: slideUp 0.8s forwards;
+        animation-delay: 1.2s;
+      }
+
+      @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .level-star {
+        color: #FFD700;
+        font-size: 24px;
+        margin: 0 2px;
+        transform: scale(0);
+        animation: popIn 0.4s forwards;
+      }
+
+      @keyframes popIn {
+        from { transform: scale(0); }
+        to { transform: scale(1); }
+      }
+
+      /* Enhanced view transitions for question navigation */
+      .question-container {
+        animation: fadeIn 0.5s ease;
+        position: relative;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* Improve button feedback */
+      .nav-button, .flag-button, .submit-button {
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Button ripple effect */
+      .nav-button::after, .flag-button::after, .submit-button::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 5px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.5);
+        opacity: 0;
+        border-radius: 100%;
+        transform: scale(1, 1) translate(-50%, -50%);
+        transform-origin: 50% 50%;
+      }
+
+      @keyframes ripple-effect {
+        0% {
+          transform: scale(0, 0);
+          opacity: 0.5;
+        }
+        100% {
+          transform: scale(25, 25);
+          opacity: 0;
+        }
+      }
+
+      .nav-button:active::after, .flag-button:active::after, .submit-button:active::after {
+        animation: ripple-effect 0.4s ease-out;
+      }
+
+      /* Enhanced feedback for flagged questions */
+      .flag-button.flagged {
+        color: var(--warning-color);
+        border-color: var(--warning-color);
+        background-color: rgba(251, 191, 36, 0.1);
+      }
+
+      [data-theme="night"] .flag-button.flagged {
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); }
+        70% { box-shadow: 0 0 0 8px rgba(251, 191, 36, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); }
+      }
+
+      /* Added accessibility-friendly focus indicators */
+      button:focus, input:focus {
+        outline: 2px solid var(--accent-color);
+        outline-offset: 2px;
+      }
+
+      /* Question number pill */
+      .question-number {
+        display: inline-block;
+        background-color: var(--accent-color);
+        color: white;
+        border-radius: 20px;
+        padding: 4px 12px;
+        font-size: 14px;
+        font-weight: 600;
+        margin-right: 10px;
+      }
+
+      [data-theme="night"] .question-number {
+        background-color: #7bb5f5;
+        box-shadow: 0 0 10px rgba(123, 181, 245, 0.3);
+      }
     </style>
   </head>
   <body>
@@ -117,7 +501,7 @@
 
           <div class="question-container">
             <h2 class="question-text">
-              Which of the following is NOT a type of database index?
+              <span class="question-number">12</span> Which of the following is NOT a type of database index?
             </h2>
 
             <div class="options-container">
@@ -172,8 +556,8 @@
     <script src="theme-init.js"></script>
     <script src="common.js"></script>
     <script src="profile-picture-manager.js"></script>
-    <script src="quiz.js"></script>
-
+    
+    <!-- Enhanced Quiz JavaScript -->
     <script>
       // Username update script
       (function() {
@@ -198,6 +582,460 @@
         setTimeout(updateUsername, 100);
         window.addEventListener('load', updateUsername);
       })();
+
+      // Enhanced Quiz Interactivity
+      document.addEventListener("DOMContentLoaded", function () {
+        // Original quiz code initializations
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+          item.addEventListener('click', function() {
+            navItems.forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+          });
+        });
+
+        // Logout functionality
+        const logoutButton = document.getElementById('logoutButton');
+        if (logoutButton) {
+          logoutButton.addEventListener('click', function() {
+            localStorage.removeItem('currentUsername');
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'login.html';
+          });
+        }
+
+        // Load quiz data from localStorage
+        let quizData = [];
+        try {
+          quizData = JSON.parse(localStorage.getItem('quizData')) || [];
+        } catch (e) {
+          console.error('Error loading quiz data:', e);
+          
+          // Sample data for demonstration if no data is found
+          quizData = [
+            {
+              question: "Which of the following is NOT a type of database index?",
+              options: ["B-tree Index", "Hash Index", "Circle Index", "Bitmap Index"],
+              correctAnswer: "Circle Index"
+            },
+            {
+              question: "What is the primary purpose of normalization in database design?",
+              options: ["To eliminate redundancy", "To improve performance", "To simplify queries", "To encrypt data"],
+              correctAnswer: "To eliminate redundancy"
+            }
+          ];
+        }
+
+        // If no quiz data, show message or redirect
+        if (!quizData.length) {
+          alert('No quiz data found. Please generate a quiz first.');
+          // Uncomment to redirect back to upload page
+          // window.location.href = 'upload.html';
+          return;
+        }
+
+        // Quiz state variables
+        let currentQuestionIndex = 0;
+        const userAnswers = new Array(quizData.length).fill(null);
+        const flaggedQuestions = new Set();
+
+        // Get DOM elements
+        const questionText = document.querySelector('.question-text');
+        const optionsContainer = document.querySelector('.options-container');
+        const progressText = document.querySelector('.progress-text');
+        const progressFill = document.querySelector('.progress-fill');
+        const prevButton = document.querySelector('.prev-button');
+        const nextButton = document.querySelector('.next-button');
+        const flagButton = document.querySelector('.flag-button');
+        const submitButton = document.querySelector('.submit-button');
+
+        // Enhanced: Add question number to question text
+        function loadQuestion() {
+          const question = quizData[currentQuestionIndex];
+          
+          // Update question text with question number indicator
+          questionText.innerHTML = `<span class="question-number">${currentQuestionIndex + 1}</span> ${question.question}`;
+          
+          // Update options with enhanced selection feedback
+          optionsContainer.innerHTML = '';
+          question.options.forEach((option, index) => {
+            const isChecked = userAnswers[currentQuestionIndex] === option ? 'checked' : '';
+            optionsContainer.innerHTML += `
+              <label class="option-item">
+                <input type="radio" name="answer" value="${index}" ${isChecked} />
+                <span class="option-text">${option}</span>
+              </label>
+            `;
+          });
+          
+          // Update progress
+          progressText.textContent = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+          progressFill.style.width = `${((currentQuestionIndex + 1) / quizData.length) * 100}%`;
+          
+          // Update flag button state
+          flagButton.classList.toggle('flagged', flaggedQuestions.has(currentQuestionIndex));
+          flagButton.innerHTML = flaggedQuestions.has(currentQuestionIndex) 
+            ? '<i class="fas fa-flag"></i> Flagged'
+            : '<i class="fas fa-flag"></i> Flag Question';
+          
+          // Add click event to each option with enhanced feedback
+          document.querySelectorAll(".option-item").forEach((item, optionIndex) => {
+            item.addEventListener("click", function () {
+              const radio = this.querySelector('input[type="radio"]');
+              radio.checked = true;
+              
+              // Add selection animation
+              addSelectionEffect(this);
+              
+              // Save the answer
+              userAnswers[currentQuestionIndex] = quizData[currentQuestionIndex].options[radio.value];
+            });
+          });
+        }
+
+        // Add visual feedback when selecting an option
+        function addSelectionEffect(element) {
+          // Remove any existing active classes
+          document.querySelectorAll('.option-item').forEach(item => {
+            item.classList.remove('active-selection');
+          });
+          
+          // Add active class
+          element.classList.add('active-selection');
+          
+          // Add ripple effect
+          const ripple = document.createElement('span');
+          ripple.classList.add('ripple-effect');
+          element.appendChild(ripple);
+          
+          // Remove ripple after animation completes
+          setTimeout(() => {
+            ripple.remove();
+          }, 500);
+        }
+
+        // Enhanced navigation with animation
+        prevButton.addEventListener("click", function () {
+          if (currentQuestionIndex > 0) {
+            animateQuestionTransition('right');
+            currentQuestionIndex--;
+            loadQuestion();
+          }
+        });
+
+        nextButton.addEventListener("click", function () {
+          if (currentQuestionIndex < quizData.length - 1) {
+            animateQuestionTransition('left');
+            currentQuestionIndex++;
+            loadQuestion();
+          }
+        });
+
+        // Question transition animation
+        function animateQuestionTransition(direction) {
+          const questionContainer = document.querySelector('.question-container');
+          
+          // Add exit animation class
+          questionContainer.style.opacity = '0';
+          questionContainer.style.transform = `translateX(${direction === 'left' ? '-10px' : '10px'})`;
+          
+          // After a short delay, reset for entrance animation
+          setTimeout(() => {
+            questionContainer.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            questionContainer.style.opacity = '1';
+            questionContainer.style.transform = 'translateX(0)';
+          }, 300);
+        }
+
+        // Flag question for review with enhanced feedback
+        flagButton.addEventListener("click", function () {
+          this.classList.toggle("flagged");
+          if (this.classList.contains('flagged')) {
+            flaggedQuestions.add(currentQuestionIndex);
+            this.innerHTML = '<i class="fas fa-flag"></i> Flagged';
+            
+            // Add quick pulse animation
+            this.animate([
+              { transform: 'scale(1)' },
+              { transform: 'scale(1.1)' },
+              { transform: 'scale(1)' }
+            ], {
+              duration: 300,
+              easing: 'ease-in-out'
+            });
+          } else {
+            flaggedQuestions.delete(currentQuestionIndex);
+            this.innerHTML = '<i class="fas fa-flag"></i> Flag Question';
+          }
+        });
+
+        // Submit quiz
+        submitButton.addEventListener("click", function () {
+          // Check if all questions are answered
+          const unansweredCount = userAnswers.filter(answer => answer === null).length;
+          
+          if (unansweredCount > 0) {
+            if (!confirm(`You have ${unansweredCount} unanswered questions. Do you want to submit anyway?`)) {
+              return;
+            }
+          }
+          
+          // Calculate score
+          let correctAnswers = 0;
+          userAnswers.forEach((answer, index) => {
+            if (answer === quizData[index].correctAnswer) {
+              correctAnswers++;
+            }
+          });
+          
+          const score = Math.round((correctAnswers / quizData.length) * 100);
+          
+          // Display enhanced interactive results
+          displayEnhancedResults(correctAnswers, quizData.length, score);
+        });
+
+        // Enhanced interactive results display
+        function displayEnhancedResults(correct, total, percentage) {
+          // Replace quiz content with results
+          const mainContent = document.querySelector('.main-content');
+          
+          // Create emoji and message based on score
+          const { emoji, message, stars } = getScoreMessage(percentage);
+          
+          mainContent.innerHTML = `
+            <h1 class="page-title">Quiz Results</h1>
+            
+            <div class="quiz-card results-card">
+              <div class="results-header">
+                <h2>Your Score</h2>
+                
+                <div class="emoji-reaction">${emoji}</div>
+                
+                <div class="score-circle">
+                  <div class="score-fill"></div>
+                  <div class="score-circle-inner">
+                    <span class="score-percentage">0%</span>
+                    <span class="score-rating">${message}</span>
+                  </div>
+                </div>
+                
+                <div class="level-indicator">
+                  ${generateStars(stars)}
+                </div>
+                
+                <p class="score-details">You got ${correct} out of ${total} questions correct</p>
+              </div>
+              
+              <div class="results-breakdown">
+                <h3>Question Breakdown</h3>
+                <div class="questions-list">
+                  ${generateQuestionBreakdown()}
+                </div>
+              </div>
+              
+              <div class="action-buttons results-actions">
+                <button class="review-button">Review Answers</button>
+                <button class="new-quiz-button" onclick="window.location.href='upload.html'">Create New Quiz</button>
+              </div>
+            </div>
+          `;
+          
+          // Animate the score fill
+          setTimeout(() => {
+            const scoreFill = document.querySelector('.score-fill');
+            const scorePercentage = document.querySelector('.score-percentage');
+            
+            if (scoreFill && scorePercentage) {
+              // Animate the fill height
+              scoreFill.style.height = `${percentage}%`;
+              
+              // Animate the percentage counter
+              animateCounter(0, percentage, 1500, value => {
+                scorePercentage.textContent = `${Math.round(value)}%`;
+              });
+            }
+            
+            // Trigger confetti for high scores
+            if (percentage >= 80) {
+              createConfetti();
+            }
+            
+            // Add stars animation
+            const stars = document.querySelectorAll('.level-star');
+            stars.forEach((star, index) => {
+              setTimeout(() => {
+                star.style.animation = 'popIn 0.4s forwards';
+              }, 1200 + (index * 200));
+            });
+            
+            // Make emoji visible
+            document.querySelector('.emoji-reaction').style.opacity = '1';
+          }, 500);
+          
+          // Add event listener for review button
+          setTimeout(() => {
+            document.querySelector('.review-button').addEventListener('click', function() {
+              displayQuestionReview();
+            });
+          }, 100);
+        }
+
+        // Create celebration confetti
+        function createConfetti() {
+          // Create confetti container if it doesn't exist
+          let confettiContainer = document.querySelector('.confetti-container');
+          if (!confettiContainer) {
+            confettiContainer = document.createElement('div');
+            confettiContainer.className = 'confetti-container';
+            document.body.appendChild(confettiContainer);
+          }
+          
+          // Colors for confetti
+          const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+          
+          // Create 100 confetti pieces
+          for (let i = 0; i < 100; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            
+            // Random properties
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const left = Math.random() * 100; // Random horizontal position
+            const width = Math.random() * 10 + 5; // Random width
+            const height = Math.random() * 10 + 5; // Random height
+            const duration = Math.random() * 3 + 2; // Random animation duration
+            const delay = Math.random() * 1.5; // Random delay
+            
+            // Apply random styles
+            confetti.style.backgroundColor = color;
+            confetti.style.left = `${left}%`;
+            confetti.style.width = `${width}px`;
+            confetti.style.height = `${height}px`;
+            confetti.style.animationDuration = `${duration}s`;
+            confetti.style.animationDelay = `${delay}s`;
+            
+            // Add to container
+            confettiContainer.appendChild(confetti);
+          }
+          
+          // Remove confetti after 5 seconds
+          setTimeout(() => {
+            confettiContainer.remove();
+          }, 5000);
+        }
+
+        // Get score message and emoji based on percentage
+        function getScoreMessage(percentage) {
+          if (percentage >= 90) {
+            return { 
+              emoji: '🏆', 
+              message: 'Outstanding!',
+              stars: 5
+            };
+          } else if (percentage >= 80) {
+            return { 
+              emoji: '🎉', 
+              message: 'Excellent!',
+              stars: 4
+            };
+          } else if (percentage >= 70) {
+            return { 
+              emoji: '😊', 
+              message: 'Good Job!',
+              stars: 3
+            };
+          } else if (percentage >= 60) {
+            return { 
+              emoji: '🙂', 
+              message: 'Not Bad',
+              stars: 2
+            };
+          } else {
+            return { 
+              emoji: '📚', 
+              message: 'Keep Learning',
+              stars: 1
+            };
+          }
+        }
+
+        // Generate star rating based on score
+        function generateStars(count) {
+          let starsHTML = '';
+          for (let i = 0; i < 5; i++) {
+            // Filled star or empty star based on count
+            const starType = i < count ? 'fas fa-star' : 'far fa-star';
+            const delay = i * 0.1;
+            starsHTML += `<i class="level-star ${starType}" style="animation-delay: ${delay}s"></i>`;
+          }
+          return starsHTML;
+        }
+
+        // Counter animation helper
+        function animateCounter(start, end, duration, callback) {
+          const startTime = performance.now();
+          
+          function updateCounter(currentTime) {
+            const elapsedTime = currentTime - startTime;
+            const progress = Math.min(elapsedTime / duration, 1);
+            
+            // Easing function for smoother animation
+            const easedProgress = easeOutQuad(progress);
+            const currentValue = start + (end - start) * easedProgress;
+            
+            callback(currentValue);
+            
+            if (progress < 1) {
+              requestAnimationFrame(updateCounter);
+            }
+          }
+          
+          requestAnimationFrame(updateCounter);
+        }
+
+        // Easing function for smoother animations
+        function easeOutQuad(t) {
+          return t * (2 - t);
+        }
+
+        // Enhanced question breakdown with animations
+        function generateQuestionBreakdown() {
+          let html = '';
+          
+          userAnswers.forEach((answer, index) => {
+            const question = quizData[index];
+            const isCorrect = answer === question.correctAnswer;
+            const status = isCorrect ? 'correct' : 'incorrect';
+            const icon = isCorrect ? 'check-circle' : 'times-circle';
+            
+            html += `
+              <div class="question-item ${status}" style="animation: fadeIn 0.5s ease forwards; animation-delay: ${index * 0.1}s; opacity: 0;">
+                <div class="question-status">
+                  <i class="fas fa-${icon}"></i>
+                </div>
+                <div class="question-info">
+                  <p class="question-text"><span class="question-number">${index + 1}</span> ${question.question}</p>
+                  <p class="answer-info">
+                    Your answer: <span class="${status}">${answer || 'Not answered'}</span>
+                    ${!isCorrect ? `<span class="correct-answer">Correct answer: ${question.correctAnswer}</span>` : ''}
+                  </p>
+                </div>
+              </div>
+            `;
+          });
+          
+          return html;
+        }
+
+        // Display detailed question review
+        function displayQuestionReview() {
+          // Implement if needed - shows each question with user's answer and correct answer
+          console.log("Display question review");
+        }
+
+        // Initialize the quiz
+        loadQuestion();
+      });
     </script>
   </body>
 </html>
