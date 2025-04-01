@@ -18,6 +18,12 @@
   <script src="documentholder.js"></script>
   <script src="theme-init.js"></script>
   <script src="coursetitle-fix.js"></script>
+  <script>
+    // Set up PDF.js worker
+    window.pdfjsLib = window.pdfjsLib || {};
+    window.pdfjsLib.GlobalWorkerOptions = window.pdfjsLib.GlobalWorkerOptions || {};
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  </script>
   <title>AURA Learning Platform</title>
 </head>
 <body>
@@ -174,6 +180,10 @@
                 <!-- Flashcards Tab Content -->
         <div class="tab-content" id="flashcards-tab" style="display: none;">
           <div class="flashcard-actions">
+            <button class="action-btn upload-for-flashcards-btn">
+              <i class="fas fa-upload"></i>
+              Upload Document
+            </button>
             <button class="action-btn timer-btn">
               <i class="fas fa-stopwatch"></i>
               Time Set
@@ -183,6 +193,9 @@
               Filter
             </button>
           </div>
+          
+          <!-- Hidden file input for document upload -->
+          <input type="file" id="flashcard-document-input" style="display: none;" accept=".txt,.doc,.docx,.pdf">
           
           <div class="flashcard-container">
             <div class="flashcard-item">
@@ -516,6 +529,7 @@
     </main>
   </div>
 <script src="coursepage.js"></script>
+<script src="flashcard-generator.js"></script>
 <script src= "aura.js" ></script>
 <script src="tab-system-fix.js"></script>
 <script src="task-bar.js"></script>

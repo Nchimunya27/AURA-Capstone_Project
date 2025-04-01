@@ -1883,71 +1883,189 @@ function cacheDocument(file) {
     }
   }
 
-  // First, let's create the flashcard dictionary
-  const webDevFlashcards = [
-    {
-      question: "HTML",
-      answer: "HyperText Markup Language - The standard markup language used to create and structure content on the web"
-    },
-    {
-      question: "CSS",
-      answer: "Cascading Style Sheets - A style sheet language used for describing the presentation of a document written in HTML"
-    },
-    {
-      question: "JavaScript",
-      answer: "A programming language that enables interactive web pages and is an essential part of web applications"
-    },
-    {
-      question: "DOM",
-      answer: "Document Object Model - A programming interface for HTML documents that represents the page as a tree-like hierarchy of objects"
-    },
-    {
-      question: "API",
-      answer: "Application Programming Interface - A set of rules and protocols for building and interacting with software applications"
-    },
-    {
-      question: "Responsive Design",
-      answer: "An approach to web design that makes web pages render well on a variety of devices and window or screen sizes"
-    },
-    {
-      question: "HTTP",
-      answer: "HyperText Transfer Protocol - The foundation of data communication for the World Wide Web"
-    },
-    {
-      question: "HTTPS",
-      answer: "HTTP Secure - An extension of HTTP used for secure communication over a computer network, encrypted using TLS or SSL"
-    },
-    {
-      question: "Frontend",
-      answer: "The client-side and user interface of a website that users interact with directly in their web browser"
-    },
-    {
-      question: "Backend",
-      answer: "The server-side of a website that processes requests, interacts with databases, and sends responses to the frontend"
-    },
-    {
-      question: "Database",
-      answer: "An organized collection of structured information or data typically stored electronically in a computer system"
-    },
-    {
-      question: "Framework",
-      answer: "A pre-built structure of code that provides a foundation for developing software applications"
-    },
-    {
-      question: "Git",
-      answer: "A distributed version control system for tracking changes in source code during software development"
-    },
-    {
-      question: "SEO",
-      answer: "Search Engine Optimization - The process of improving a website to increase its visibility in search engines"
-    },
-    {
-      question: "Cache",
-      answer: "A hardware or software component that stores data so future requests for that data can be served faster"
-    }
-  ];
+  // Remove the hardcoded webDevFlashcards array and replace with empty array
+  let webDevFlashcards = [];
 
-  // Modify the generateFlashcards function to use this dictionary instead of AI
+  // Update the initializeFlashcardTab function
+  function initializeFlashcardTab() {
+    const flashcardItem = document.querySelector(".flashcard-item");
+    const prevBtn = document.querySelector("#flashcards-tab .nav-arrow:first-child");
+    const nextBtn = document.querySelector("#flashcards-tab .nav-controls .nav-arrow");
+    const cardCount = document.querySelector("#flashcards-tab .card-count");
+    const shuffleBtn = document.querySelector("#flashcards-tab .fa-random")?.parentElement;
+    
+    let currentCard = 0;
+    let totalCards = 0;
+
+    // Show initial "no flashcards" state
+    function showNoFlashcardsState() {
+      if (flashcardItem) {
+        const frontContent = flashcardItem.querySelector('.flashcard-front');
+        const backContent = flashcardItem.querySelector('.flashcard-back');
+        
+        if (frontContent && backContent) {
+          frontContent.innerHTML = `
+            <div class="flashcard-category">No Flashcards Available</div>
+            <div class="flashcard-question">Upload a document to generate flashcards</div>
+            <div class="flashcard-controls">
+              <button class="show-answer-btn" disabled>Show Answer</button>
+            </div>
+          `;
+          backContent.innerHTML = `
+            <div class="flashcard-category">No Content</div>
+            <div class="flashcard-answer">Generate flashcards to start studying</div>
+          `;
+        }
+        
+        // Update card count
+        if (cardCount) {
+          cardCount.textContent = "0 / 0";
+        }
+        
+        // Disable navigation buttons
+        if (prevBtn) prevBtn.style.opacity = "0.5";
+        if (nextBtn) nextBtn.style.opacity = "0.5";
+        if (shuffleBtn) shuffleBtn.style.opacity = "0.5";
+      }
+    }
+
+    // Function to update flashcard content
+    function updateFlashcardContent() {
+      if (!flashcardItem || webDevFlashcards.length === 0) {
+        showNoFlashcardsState();
+        return;
+      }
+
+      const currentFlashcard = webDevFlashcards[currentCard];
+      const frontContent = flashcardItem.querySelector('.flashcard-front');
+      const backContent = flashcardItem.querySelector('.flashcard-back');
+
+      if (frontContent && backContent && currentFlashcard) {
+        // Update front of card
+        frontContent.innerHTML = `
+          <div class="flashcard-category">Card ${currentCard + 1} of ${totalCards}</div>
+          <div class="flashcard-question">${currentFlashcard.front}</div>
+          <div class="flashcard-controls">
+            <button class="show-answer-btn">Show Answer</button>
+            <button class="rotate-btn">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+        `;
+
+        // Update back of card
+        backContent.innerHTML = `
+          <div class="flashcard-category">Answer</div>
+          <div class="flashcard-answer">${currentFlashcard.back}</div>
+          <div class="flashcard-controls">
+            <button class="show-answer-btn">Show Question</button>
+            <button class="rotate-btn">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+        `;
+
+        // Update card count
+        if (cardCount) {
+          cardCount.textContent = `${currentCard + 1} / ${totalCards}`;
+        }
+
+        // Enable/disable navigation buttons based on position
+        if (prevBtn) prevBtn.style.opacity = currentCard === 0 ? "0.5" : "1";
+        if (nextBtn) nextBtn.style.opacity = currentCard === totalCards - 1 ? "0.5" : "1";
+        if (shuffleBtn) shuffleBtn.style.opacity = "1";
+
+        // Add event listeners for flipping
+        const showAnswerBtns = flashcardItem.querySelectorAll('.show-answer-btn');
+        const rotateBtns = flashcardItem.querySelectorAll('.rotate-btn');
+
+        [...showAnswerBtns, ...rotateBtns].forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            flashcardItem.classList.toggle('flipped');
+          });
+        });
+      }
+    }
+
+    // Navigation functions
+    function nextCard() {
+      if (currentCard < totalCards - 1) {
+        currentCard++;
+        updateFlashcardContent();
+      }
+    }
+
+    function prevCard() {
+      if (currentCard > 0) {
+        currentCard--;
+        updateFlashcardContent();
+      }
+    }
+
+    // Shuffle function
+    function shuffleCards() {
+      for (let i = webDevFlashcards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [webDevFlashcards[i], webDevFlashcards[j]] = [webDevFlashcards[j], webDevFlashcards[i]];
+      }
+      currentCard = 0;
+      updateFlashcardContent();
+    }
+
+    // Set up navigation event listeners
+    if (nextBtn) nextBtn.addEventListener('click', nextCard);
+    if (prevBtn) prevBtn.addEventListener('click', prevCard);
+    if (shuffleBtn) shuffleBtn.addEventListener('click', shuffleCards);
+
+    // Event listener for flashcard generation
+    document.addEventListener('flashcardsGenerated', function(e) {
+      webDevFlashcards = e.detail;
+      currentCard = 0;
+      totalCards = webDevFlashcards.length;
+      updateFlashcardContent();
+    });
+
+    // Load any existing flashcards from IndexedDB
+    loadFlashcardsFromIndexedDB().then(flashcards => {
+      if (flashcards && flashcards.length > 0) {
+        webDevFlashcards = flashcards;
+        currentCard = 0;
+        totalCards = flashcards.length;
+        updateFlashcardContent();
+      } else {
+        showNoFlashcardsState();
+      }
+    });
+  }
+
+  // Function to load flashcards from IndexedDB
+  async function loadFlashcardsFromIndexedDB() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open("auraLearningDB", 1);
+      
+      request.onerror = () => reject(request.error);
+      
+      request.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(["flashcards"], "readonly");
+        const store = transaction.objectStore("flashcards");
+        const request = store.getAll();
+        
+        request.onsuccess = () => {
+          const flashcards = request.result.map(card => ({
+            front: card.front,
+            back: card.back
+          }));
+          resolve(flashcards);
+        };
+        
+        request.onerror = () => reject(request.error);
+      };
+    });
+  }
+
+  // Update the generateFlashcards function to use IndexedDB
   async function generateFlashcards(docData) {
     try {
       // Save flashcards to IndexedDB
@@ -1959,54 +2077,10 @@ function cacheDocument(file) {
         const frontContent = flashcardItem.querySelector('.flashcard-front');
         const backContent = flashcardItem.querySelector('.flashcard-back');
         
-        if (frontContent && backContent) {
-          frontContent.innerHTML = `
-            <h3 class="flashcard-question">${webDevFlashcards[0].question}</h3>
-            <div class="flashcard-controls">
-              <button class="show-answer-btn">Show Answer</button>
-              <button class="rotate-btn">
-                <i class="fas fa-sync-alt"></i>
-              </button>
-            </div>
-          `;
-          
-          backContent.innerHTML = `
-            <h3 class="flashcard-answer">${webDevFlashcards[0].answer}</h3>
-            <div class="flashcard-controls">
-              <button class="show-answer-btn">Show Question</button>
-              <button class="rotate-btn">
-                <i class="fas fa-sync-alt"></i>
-              </button>
-            </div>
-          `;
-          
-          // Re-attach event listeners to new buttons
-          const newShowAnswerBtns = flashcardItem.querySelectorAll('.show-answer-btn');
-          const newRotateBtns = flashcardItem.querySelectorAll('.rotate-btn');
-          
-          function toggleFlashcard() {
-            flashcardItem.classList.toggle("flipped");
-          }
-          
-          newShowAnswerBtns.forEach(btn => {
-            btn.addEventListener("click", function(e) {
-              e.stopPropagation();
-              toggleFlashcard();
-            });
-          });
-          
-          newRotateBtns.forEach(btn => {
-            btn.addEventListener("click", function(e) {
-              e.stopPropagation();
-              toggleFlashcard();
-            });
-          });
-          
-          // Update card count
-          const cardCount = document.querySelector("#flashcards-tab .card-count");
-          if (cardCount) {
-            cardCount.textContent = `1 / ${webDevFlashcards.length}`;
-          }
+        if (frontContent && backContent && webDevFlashcards.length > 0) {
+          updateFlashcardContent();
+        } else {
+          showNoFlashcardsState();
         }
       }
       
@@ -2188,178 +2262,6 @@ function cacheDocument(file) {
       this.classList.toggle("flipped");
     });
   });
-
-  // Flashcard tab functionality
-  function initializeFlashcardTab() {
-    const flashcardItem = document.querySelector(".flashcard-item");
-    const prevBtn = document.querySelector("#flashcards-tab .nav-arrow:first-child");
-    const nextBtn = document.querySelector("#flashcards-tab .nav-controls .nav-arrow");
-    const cardCount = document.querySelector("#flashcards-tab .card-count");
-    const shuffleBtn = document.querySelector("#flashcards-tab .fa-random")?.parentElement;
-    
-    // Current card tracking
-    let currentCard = 1;
-    const totalCards = webDevFlashcards.length;
-
-    // Initialize the first flashcard
-    updateFlashcardContent();
-
-    // Flip flashcard function
-    function toggleFlashcard() {
-      if (flashcardItem) {
-        flashcardItem.classList.toggle("flipped");
-      }
-    }
-
-    // Make the entire flashcard clickable
-    if (flashcardItem) {
-      flashcardItem.addEventListener("click", function(e) {
-        // Only toggle if the click is directly on the flashcard (not on a button)
-        if (e.target === flashcardItem || 
-            e.target === flashcardItem.querySelector('.flashcard-front') || 
-            e.target === flashcardItem.querySelector('.flashcard-back') ||
-            e.target === flashcardItem.querySelector('.flashcard-question') || 
-            e.target === flashcardItem.querySelector('.flashcard-answer')) {
-          toggleFlashcard();
-        }
-      });
-    }
-
-    // Update flashcard content
-    function updateFlashcardContent() {
-      if (!flashcardItem || !webDevFlashcards.length) return;
-      
-      const currentFlashcard = webDevFlashcards[currentCard - 1];
-      const frontContent = flashcardItem.querySelector('.flashcard-front');
-      const backContent = flashcardItem.querySelector('.flashcard-back');
-      
-      if (frontContent && backContent) {
-        frontContent.innerHTML = `
-          <h3 class="flashcard-question">${currentFlashcard.question}</h3>
-          <div class="flashcard-controls">
-            <button class="show-answer-btn">Show Answer</button>
-            <button class="rotate-btn">
-              <i class="fas fa-sync-alt"></i>
-            </button>
-          </div>
-        `;
-        
-        backContent.innerHTML = `
-          <h3 class="flashcard-answer">${currentFlashcard.answer}</h3>
-          <div class="flashcard-controls">
-            <button class="show-answer-btn">Show Question</button>
-            <button class="rotate-btn">
-              <i class="fas fa-sync-alt"></i>
-            </button>
-          </div>
-        `;
-        
-        // Re-attach event listeners to new buttons
-        const newShowAnswerBtns = flashcardItem.querySelectorAll('.show-answer-btn');
-        const newRotateBtns = flashcardItem.querySelectorAll('.rotate-btn');
-        
-        newShowAnswerBtns.forEach(btn => {
-          btn.addEventListener("click", function(e) {
-            e.stopPropagation();
-            toggleFlashcard();
-          });
-        });
-        
-        newRotateBtns.forEach(btn => {
-          btn.addEventListener("click", function(e) {
-            e.stopPropagation();
-            toggleFlashcard();
-          });
-        });
-      }
-    }
-
-    // Navigation functionality
-    if (prevBtn) {
-      prevBtn.addEventListener("click", function() {
-        if (currentCard > 1) {
-          currentCard--;
-          updateCardCount();
-          resetCard();
-          updateFlashcardContent();
-        }
-      });
-    }
-    
-    if (nextBtn) {
-      nextBtn.addEventListener("click", function() {
-        if (currentCard < totalCards) {
-          currentCard++;
-          updateCardCount();
-          resetCard();
-          updateFlashcardContent();
-        }
-      });
-    }
-    
-    function updateCardCount() {
-      if (cardCount) {
-        cardCount.textContent = `${currentCard} / ${totalCards}`;
-      }
-    }
-    
-    function resetCard() {
-      if (flashcardItem && flashcardItem.classList.contains("flipped")) {
-        flashcardItem.classList.remove("flipped");
-      }
-    }
-
-    // Shuffle functionality
-    if (shuffleBtn) {
-      shuffleBtn.addEventListener("click", function() {
-        if (flashcardItem && webDevFlashcards.length) {
-          flashcardItem.style.transition = "transform 0.4s";
-          flashcardItem.style.transform = "translateX(10px) rotate(5deg)";
-          
-          setTimeout(() => {
-            flashcardItem.style.transform = "translateX(-10px) rotate(-5deg)";
-            
-            setTimeout(() => {
-              flashcardItem.style.transform = "";
-              flashcardItem.style.transition = "transform 0.8s";
-              
-              // Reset to the front and update count
-              resetCard();
-              currentCard = Math.floor(Math.random() * totalCards) + 1;
-              updateCardCount();
-              updateFlashcardContent();
-            }, 200);
-          }, 200);
-        }
-      });
-    }
-
-    // Set initial card count
-    updateCardCount();
-  }
-
-  // Function to load flashcards from IndexedDB
-  function loadFlashcards() {
-    return new Promise((resolve, reject) => {
-      if (!db) {
-        return reject("Database not initialized");
-      }
-      
-      const transaction = db.transaction(["flashcards"], "readonly");
-      const store = transaction.objectStore("flashcards");
-      const request = store.getAll();
-      
-      request.onsuccess = () => {
-        const flashcards = request.result || [];
-        resolve(flashcards);
-      };
-      
-      request.onerror = (event) => {
-        console.error("Error loading flashcards:", event.target.error);
-        reject("Error loading flashcards");
-      };
-    });
-  }
 
   // Function to save flashcards to IndexedDB
   function saveFlashcards(flashcards) {
@@ -2788,4 +2690,55 @@ element.innerHTML = `
     // After successfully deleting the document
     loadCachedDocuments(); // Reload all documents to update the display
   }
+
+  // Add this near the top of the file, where other event listeners are set up
+  document.addEventListener('flashcardsGenerated', function(e) {
+    const flashcards = e.detail;
+    currentFlashcardIndex = 0;
+    webDevFlashcards.length = 0; // Clear existing flashcards
+    webDevFlashcards.push(...flashcards); // Add new flashcards
+    
+    // Update the display
+    if (currentFlashcard) {
+      updateFlashcardDisplay();
+      updateProgress();
+    }
+  });
+
+  // Update the updateFlashcardDisplay function to handle the new format
+  function updateFlashcardDisplay() {
+    const flashcard = webDevFlashcards[currentFlashcardIndex];
+    const frontContent = document.querySelector('.flashcard-front');
+    const backContent = document.querySelector('.flashcard-back');
+    
+    if (frontContent && backContent) {
+      // Update front of card
+      frontContent.innerHTML = `
+        <div class="flashcard-category">Card ${currentFlashcardIndex + 1} of ${webDevFlashcards.length}</div>
+        <div class="flashcard-question">${flashcard.question}</div>
+        <div class="flashcard-controls">
+          <button class="show-answer-btn">Show Answer</button>
+        </div>
+      `;
+
+      // Update back of card
+      backContent.innerHTML = `
+        <div class="flashcard-category">Answer</div>
+        <div class="flashcard-answer">${flashcard.answer}</div>
+      `;
+    }
+  }
+
+  // Add this to the initialization code
+  document.addEventListener('DOMContentLoaded', function() {
+    // Check for previously generated flashcards
+    const savedFlashcards = localStorage.getItem('generatedFlashcards');
+    if (savedFlashcards) {
+      const flashcards = JSON.parse(savedFlashcards);
+      webDevFlashcards.length = 0;
+      webDevFlashcards.push(...flashcards);
+    }
+    
+    // Rest of your initialization code...
+  });
 })();
