@@ -233,7 +233,7 @@ body {
 .logo-container {
     display: flex;
     align-items: center;
-    width: 241.5px;
+    width: 118%;
     gap: 5px;
     padding: 15px;
     border-bottom: 1px solid var(--border-color);
