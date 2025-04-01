@@ -233,6 +233,7 @@ body {
 .logo-container {
     display: flex;
     align-items: center;
+    width: 241.5px;
     gap: 5px;
     padding: 15px;
     border-bottom: 1px solid var(--border-color);
@@ -251,6 +252,40 @@ body {
     color: var(--text-primary);
     transition: color 0.3s ease;
 }
+
+/* DAY MODE - White/Light Theme */
+:root:not([data-theme="night"]) .logo-container {
+    /* Light gradient for day mode */
+    background: linear-gradient(to right, #eeede7, #ffffff) !important;
+    
+    /* Text color for day mode */
+    color: #2d3748 !important; /* Dark text for contrast */
+    
+    /* Border for day mode */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* Day mode text color */
+  :root:not([data-theme="night"]) .logo-text {
+    color: #2d3748 !important; /* Dark text */
+  }
+  
+  /* NIGHT MODE - Blue Gradient (as in screenshot) */
+  [data-theme="night"] .logo-container {
+    /* Exact gradient match from screenshot */
+    background: linear-gradient(to right, #3b7abd, #1e2c54) !important;
+    
+    /* Text color for night mode */
+    color: white !important;
+    
+    /* Border for night mode */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+  }
+  
+  /* Night mode text color */
+  [data-theme="night"] .logo-text {
+    color: white !important;
+  }
 
 /* User Profile */
 .user-profile {
