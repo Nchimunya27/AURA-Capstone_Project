@@ -154,26 +154,35 @@
         animation: ripple 0.6s ease-out;
       }
 
-      /* ===== Interactive Score Display ===== */
-      /* Base styling for the interactive score circle */
+      /* Custom logo reactions instead of emojis */
+      .logo-reaction {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 15px;
+        animation: bounce 0.6s ease infinite alternate;
+        opacity: 0;
+        animation-delay: 1s;
+        animation-fill-mode: forwards;
+      }
+
+      .logo-reaction img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      /* Donut-style score circle */
       .score-circle {
         position: relative;
         width: 180px;
         height: 180px;
         border-radius: 50%;
-        background: #f3f4f6;
+        background: transparent;
         margin: 30px auto;
         display: flex;
         align-items: center;
         justify-content: center;
-        overflow: hidden;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        transition: all 0.5s ease;
-      }
-
-      [data-theme="night"] .score-circle {
-        background: #1f2b4d;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        overflow: visible; /* Changed from hidden to show the whole circle */
       }
 
       /* Score circle inner content */
@@ -196,29 +205,49 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
       }
 
-      /* Score fill animation */
-      .score-fill {
+      /* Donut fill animation using SVG */
+      .circle-progress {
         position: absolute;
-        bottom: 0;
+        top: 0;
         left: 0;
-        right: 0;
-        background: linear-gradient(to top, var(--primary-color), rgba(89, 151, 172, 0.7));
-        border-radius: 0;
-        transition: height 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95);
-        height: 0%;
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg); /* Start from top */
       }
 
-      [data-theme="night"] .score-fill {
-        background: linear-gradient(to top, var(--primary-color), rgba(123, 181, 245, 0.7));
-        box-shadow: 0 0 20px rgba(123, 181, 245, 0.4);
+      .circle-bg {
+        fill: none;
+        stroke: var(--background-tertiary);
+        stroke-width: 15;
       }
 
-      /* Animation for the score percentage text */
-      @keyframes countUp {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+      .circle-fill {
+        fill: none;
+        stroke: var(--primary-color);
+        stroke-width: 15;
+        stroke-linecap: round;
+        stroke-dasharray: 565.48; /* Circumference of a circle with r=90 (2*PI*r) */
+        stroke-dashoffset: 565.48; /* Start with empty circle */
+        transition: stroke-dashoffset 2s cubic-bezier(0.45, 0.05, 0.55, 0.95);
       }
 
+      [data-theme="night"] .circle-fill {
+        stroke: var(--primary-color);
+        filter: drop-shadow(0 0 5px rgba(123, 181, 245, 0.5));
+      }
+
+      /* Shining effect for donut fill */
+      @keyframes glowPulse {
+        0% { filter: drop-shadow(0 0 2px rgba(123, 181, 245, 0.3)); }
+        50% { filter: drop-shadow(0 0 5px rgba(123, 181, 245, 0.5)); }
+        100% { filter: drop-shadow(0 0 2px rgba(123, 181, 245, 0.3)); }
+      }
+
+      [data-theme="night"] .circle-fill {
+        animation: glowPulse 2s infinite;
+      }
+
+      /* Score text styles */
       .score-percentage {
         font-size: 48px;
         font-weight: 700;
@@ -229,7 +258,6 @@
         animation-delay: 0.5s;
       }
 
-      /* Score rating text with subtle animation */
       .score-rating {
         font-size: 18px;
         font-weight: 600;
@@ -239,6 +267,32 @@
         transform: translateY(10px);
         animation: countUp 0.8s forwards;
         animation-delay: 0.7s;
+      }
+
+      /* Enhanced level stars with custom styling */
+      .level-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 25px;
+      }
+
+      .level-star {
+        color: var(--accent-color);
+        font-size: 24px;
+        margin: 0 3px;
+        opacity: 0.3;
+        transition: all 0.4s ease;
+      }
+
+      .level-star.active {
+        color: #FFD700;
+        opacity: 1;
+        filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.5));
+      }
+
+      [data-theme="night"] .level-star.active {
+        filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.7));
       }
 
       /* Celebration confetti for high scores */
@@ -273,49 +327,14 @@
         }
       }
 
-      /* Emoji reactions for different score ranges */
-      .emoji-reaction {
-        font-size: 32px;
-        margin-bottom: 10px;
-        animation: bounce 0.6s ease infinite alternate;
-        opacity: 0;
-        animation-delay: 1s;
-        animation-fill-mode: forwards;
-      }
-
       @keyframes bounce {
         from { transform: translateY(0); }
         to { transform: translateY(-8px); }
       }
 
-      /* Level indicator */
-      .level-indicator {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: 20px;
-        opacity: 0;
-        transform: translateY(20px);
-        animation: slideUp 0.8s forwards;
-        animation-delay: 1.2s;
-      }
-
-      @keyframes slideUp {
-        from { opacity: 0; transform: translateY(20px); }
+      @keyframes countUp {
+        from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
-      }
-
-      .level-star {
-        color: #FFD700;
-        font-size: 24px;
-        margin: 0 2px;
-        transform: scale(0);
-        animation: popIn 0.4s forwards;
-      }
-
-      @keyframes popIn {
-        from { transform: scale(0); }
-        to { transform: scale(1); }
       }
 
       /* Enhanced view transitions for question navigation */
@@ -794,13 +813,21 @@
           displayEnhancedResults(correctAnswers, quizData.length, score);
         });
 
-        // Enhanced interactive results display
+        // Enhanced interactive results display with bear logo and donut animation
         function displayEnhancedResults(correct, total, percentage) {
           // Replace quiz content with results
           const mainContent = document.querySelector('.main-content');
           
-          // Create emoji and message based on score
-          const { emoji, message, stars } = getScoreMessage(percentage);
+          // Create score message based on percentage
+          const { message, stars } = getScoreMessage(percentage);
+          
+          // Create SVG for donut animation
+          const circleSvg = `
+            <svg class="circle-progress" viewBox="0 0 200 200">
+              <circle class="circle-bg" cx="100" cy="100" r="90" />
+              <circle class="circle-fill" cx="100" cy="100" r="90" />
+            </svg>
+          `;
           
           mainContent.innerHTML = `
             <h1 class="page-title">Quiz Results</h1>
@@ -809,16 +836,21 @@
               <div class="results-header">
                 <h2>Your Score</h2>
                 
-                <div class="emoji-reaction">${emoji}</div>
+                <!-- Bear logo reaction instead of emoji -->
+                <div class="logo-reaction">
+                  <img src="quiz-logo.png" alt="Bear mascot" />
+                </div>
                 
+                <!-- Updated score circle with donut animation -->
                 <div class="score-circle">
-                  <div class="score-fill"></div>
+                  ${circleSvg}
                   <div class="score-circle-inner">
                     <span class="score-percentage">0%</span>
                     <span class="score-rating">${message}</span>
                   </div>
                 </div>
                 
+                <!-- Star rating display -->
                 <div class="level-indicator">
                   ${generateStars(stars)}
                 </div>
@@ -840,36 +872,34 @@
             </div>
           `;
           
-          // Animate the score fill
+          // Animate the donut fill and counter
           setTimeout(() => {
-            const scoreFill = document.querySelector('.score-fill');
-            const scorePercentage = document.querySelector('.score-percentage');
+            // Calculate dashoffset for the circle fill (565.48 is the circumference of our circle)
+            const circleFill = document.querySelector('.circle-fill');
+            const dashoffset = 565.48 * (1 - (percentage / 100));
             
-            if (scoreFill && scorePercentage) {
-              // Animate the fill height
-              scoreFill.style.height = `${percentage}%`;
-              
-              // Animate the percentage counter
+            if (circleFill) {
+              circleFill.style.strokeDashoffset = dashoffset;
+            }
+            
+            // Animate the percentage counter
+            const scorePercentage = document.querySelector('.score-percentage');
+            if (scorePercentage) {
               animateCounter(0, percentage, 1500, value => {
                 scorePercentage.textContent = `${Math.round(value)}%`;
               });
             }
             
+            // Activate stars animation
+            activateStars(stars);
+            
+            // Make bear logo visible
+            document.querySelector('.logo-reaction').style.opacity = '1';
+            
             // Trigger confetti for high scores
             if (percentage >= 80) {
               createConfetti();
             }
-            
-            // Add stars animation
-            const stars = document.querySelectorAll('.level-star');
-            stars.forEach((star, index) => {
-              setTimeout(() => {
-                star.style.animation = 'popIn 0.4s forwards';
-              }, 1200 + (index * 200));
-            });
-            
-            // Make emoji visible
-            document.querySelector('.emoji-reaction').style.opacity = '1';
           }, 500);
           
           // Add event listener for review button
@@ -878,6 +908,58 @@
               displayQuestionReview();
             });
           }, 100);
+        }
+
+        // Generate star rating with improved styling
+        function generateStars(count) {
+          let starsHTML = '';
+          for (let i = 0; i < 5; i++) {
+            starsHTML += `<i class="level-star fas fa-star" data-index="${i}"></i>`;
+          }
+          return starsHTML;
+        }
+
+        // Activate stars sequentially
+        function activateStars(count) {
+          const stars = document.querySelectorAll('.level-star');
+          
+          stars.forEach((star, index) => {
+            setTimeout(() => {
+              if (index < count) {
+                star.classList.add('active');
+              }
+            }, 300 + (index * 200));
+          });
+        }
+
+        // Get score message and star count based on percentage (removed emoji)
+        function getScoreMessage(percentage) {
+          if (percentage >= 90) {
+            return { 
+              message: 'Outstanding!',
+              stars: 5
+            };
+          } else if (percentage >= 80) {
+            return { 
+              message: 'Excellent!',
+              stars: 4
+            };
+          } else if (percentage >= 70) {
+            return { 
+              message: 'Good Job!',
+              stars: 3
+            };
+          } else if (percentage >= 60) {
+            return { 
+              message: 'Not Bad',
+              stars: 2
+            };
+          } else {
+            return { 
+              message: 'Keep Learning',
+              stars: 1
+            };
+          }
         }
 
         // Create celebration confetti
@@ -922,53 +1004,6 @@
           setTimeout(() => {
             confettiContainer.remove();
           }, 5000);
-        }
-
-        // Get score message and emoji based on percentage
-        function getScoreMessage(percentage) {
-          if (percentage >= 90) {
-            return { 
-              emoji: '🏆', 
-              message: 'Outstanding!',
-              stars: 5
-            };
-          } else if (percentage >= 80) {
-            return { 
-              emoji: '🎉', 
-              message: 'Excellent!',
-              stars: 4
-            };
-          } else if (percentage >= 70) {
-            return { 
-              emoji: '😊', 
-              message: 'Good Job!',
-              stars: 3
-            };
-          } else if (percentage >= 60) {
-            return { 
-              emoji: '🙂', 
-              message: 'Not Bad',
-              stars: 2
-            };
-          } else {
-            return { 
-              emoji: '📚', 
-              message: 'Keep Learning',
-              stars: 1
-            };
-          }
-        }
-
-        // Generate star rating based on score
-        function generateStars(count) {
-          let starsHTML = '';
-          for (let i = 0; i < 5; i++) {
-            // Filled star or empty star based on count
-            const starType = i < count ? 'fas fa-star' : 'far fa-star';
-            const delay = i * 0.1;
-            starsHTML += `<i class="level-star ${starType}" style="animation-delay: ${delay}s"></i>`;
-          }
-          return starsHTML;
         }
 
         // Counter animation helper

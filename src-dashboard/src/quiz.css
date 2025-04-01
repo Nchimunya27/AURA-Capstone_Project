@@ -1,3 +1,15 @@
+/**
+ * Enhanced Quiz Application with Bear Logo and Donut Chart
+ * 
+ * This file contains all the CSS styling for:
+ * - Quiz layout and responsiveness
+ * - Question and answer option styling
+ * - Enhanced night mode with better readability
+ * - Interactive donut chart animation
+ * - Static bear logo with streamer effects
+ * - Star ratings and animations
+ */
+
 /* === THEME VARIABLES === */
 /* Day Mode (default) */
 :root {
@@ -24,12 +36,12 @@
   --warning-color: #f79009;
   --error-color: #f04438;
   
-  /* Added new variables for enhanced components */
+  /* New variables for enhanced components */
   --success-bg: rgba(18, 183, 106, 0.15);
   --error-bg: rgba(240, 68, 56, 0.15);
 }
 
-/* Night Mode - Updated with the right color palette */
+/* Night Mode */
 [data-theme="night"] {
   /* Night theme colors */
   --background-primary: #121b3e;
@@ -55,16 +67,17 @@
   --warning-color: #fbbf24;
   --error-color: #ff6e6e;   /* Softer but clearer red */
   
-  /* Added new variables for enhanced components */
+  /* New variables for enhanced components */
   --success-bg: rgba(0, 255, 170, 0.15); /* Background for success messages */
   --error-bg: rgba(255, 110, 110, 0.15); /* Background for error messages */
 }
 
+/* === BASE STYLES === */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Inter", sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 body {
@@ -80,7 +93,68 @@ body {
   width: 100%;
 }
 
-/* Sidebar Styles */
+/* === ANIMATIONS === */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ripple {
+  0% { transform: scale(0); opacity: 0.8; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+@keyframes ripple-effect {
+  0% { transform: scale(0, 0); opacity: 0.5; }
+  100% { transform: scale(25, 25); opacity: 0; }
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(251, 191, 36, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); }
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.2; }
+  50% { opacity: 0.7; }
+  100% { opacity: 0.2; }
+}
+
+@keyframes fall {
+  from { transform: translateY(-100px) rotate(0deg); opacity: 0.8; }
+  to { transform: translateY(calc(100vh + 100px)) rotate(360deg); opacity: 0; }
+}
+
+@keyframes glowPulse {
+  0% { filter: drop-shadow(0 0 3px rgba(123, 181, 245, 0.5)); }
+  50% { filter: drop-shadow(0 0 8px rgba(123, 181, 245, 0.8)); }
+  100% { filter: drop-shadow(0 0 3px rgba(123, 181, 245, 0.5)); }
+}
+
+@keyframes popIn {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+
+@keyframes streamerAppear {
+  0% { height: 0; opacity: 0; }
+  20% { opacity: 1; }
+  100% { height: 80px; opacity: 0; }
+}
+
+@keyframes bearGlow {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { opacity: 0.8; }
+  100% { transform: scale(1.2); opacity: 0; }
+}
+
+/* === SIDEBAR STYLES === */
 .sidebar-column {
   width: 16%;
   background-image: var(--sidebar-gradient);
@@ -93,6 +167,16 @@ body {
   overflow: hidden;
 }
 
+/* User name transition */
+.user-name, .welcome-text {
+  opacity: 0.1;
+  transition: opacity 0.3s ease;
+}
+
+.username-loaded {
+  opacity: 1;
+}
+
 /* Stars - Base styles */
 .star {
   position: absolute;
@@ -100,9 +184,7 @@ body {
   background-color: white;
   z-index: 1;
   pointer-events: none;
-  /* Default: invisible in day mode */
-  opacity: 0;
-  /* Transition for mode changes */
+  opacity: 0; /* Default: invisible in day mode */
   transition: opacity 0.5s ease;
 }
 
@@ -161,35 +243,12 @@ body {
 }
 
 /* Twinkling animation */
-@keyframes twinkle {
-  0% { opacity: 0.2; }
-  50% { opacity: 0.7; }
-  100% { opacity: 0.2; }
-}
-
-[data-theme="night"] .star-1 {
-  animation: twinkle 4s infinite ease-in-out;
-}
-
-[data-theme="night"] .star-2 {
-  animation: twinkle 5s infinite ease-in-out 0.5s;
-}
-
-[data-theme="night"] .star-3 {
-  animation: twinkle 3.5s infinite ease-in-out 1s;
-}
-
-[data-theme="night"] .star-4 {
-  animation: twinkle 4.5s infinite ease-in-out 1.5s;
-}
-
-[data-theme="night"] .star-5 {
-  animation: twinkle 4s infinite ease-in-out 2s;
-}
-
-[data-theme="night"] .star-6 {
-  animation: twinkle 3s infinite ease-in-out 2.5s;
-}
+[data-theme="night"] .star-1 { animation: twinkle 4s infinite ease-in-out; }
+[data-theme="night"] .star-2 { animation: twinkle 5s infinite ease-in-out 0.5s; }
+[data-theme="night"] .star-3 { animation: twinkle 3.5s infinite ease-in-out 1s; }
+[data-theme="night"] .star-4 { animation: twinkle 4.5s infinite ease-in-out 1.5s; }
+[data-theme="night"] .star-5 { animation: twinkle 4s infinite ease-in-out 2s; }
+[data-theme="night"] .star-6 { animation: twinkle 3s infinite ease-in-out 2.5s; }
 
 /* Night Mode - Crescent Moon */
 [data-theme="night"] .sidebar-column::after {
@@ -327,7 +386,7 @@ body {
   font-size: 15px;
 }
 
-/* Main Content Styles */
+/* === MAIN CONTENT STYLES === */
 .main-content {
   flex: 1;
   padding: 20px;
@@ -356,6 +415,7 @@ body {
   border: 1px solid var(--border-color);
 }
 
+/* === QUIZ HEADER STYLES === */
 .quiz-header {
   display: flex;
   justify-content: space-between;
@@ -409,6 +469,7 @@ body {
   transition: width 0.3s ease, background-color 0.3s ease;
 }
 
+/* === QUESTION CONTAINER STYLES === */
 .question-container {
   margin-bottom: 40px;
   animation: fadeIn 0.5s ease;
@@ -430,6 +491,24 @@ body {
   gap: 16px;
 }
 
+/* Question number pill */
+.question-number {
+  display: inline-block;
+  background-color: var(--accent-color);
+  color: white;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-right: 10px;
+}
+
+[data-theme="night"] .question-number {
+  background-color: #7bb5f5;
+  box-shadow: 0 0 10px rgba(123, 181, 245, 0.3);
+}
+
+/* === OPTION ITEM STYLES === */
 .option-item {
   display: flex;
   align-items: center;
@@ -455,10 +534,6 @@ body {
   background-color: rgba(89, 151, 172, 0.1);
   transform: translateY(-2px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-[data-theme="night"] .option-item:hover {
-  background-color: rgba(123, 181, 245, 0.1);
 }
 
 .option-item input[type="radio"] {
@@ -498,6 +573,7 @@ body {
   transition: color 0.3s ease;
 }
 
+/* === QUIZ FOOTER STYLES === */
 .quiz-footer {
   display: flex;
   justify-content: space-between;
@@ -584,33 +660,11 @@ body {
   transform-origin: 50% 50%;
 }
 
-@keyframes ripple-effect {
-  0% {
-    transform: scale(0, 0);
-    opacity: 0.5;
-  }
-  100% {
-    transform: scale(25, 25);
-    opacity: 0;
-  }
-}
-
 .nav-button:active::after, .flag-button:active::after, .submit-button:active::after {
   animation: ripple-effect 0.4s ease-out;
 }
 
-/* Enhanced feedback for flagged questions */
-[data-theme="night"] .flag-button.flagged {
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); }
-  70% { box-shadow: 0 0 0 8px rgba(251, 191, 36, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); }
-}
-
-/* Results Styles */
+/* === RESULTS STYLES === */
 .results-card {
   padding: 30px;
 }
@@ -620,26 +674,76 @@ body {
   margin-bottom: 30px;
 }
 
-/* ===== Interactive Score Display ===== */
-/* Base styling for the interactive score circle */
+.score-details {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-top: 16px;
+  transition: color 0.3s ease;
+}
+
+/* === BEAR LOGO AND STREAMERS === */
+/* Custom logo reaction - STATIC (no bounce) */
+.logo-reaction {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 15px;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+  position: relative;
+}
+
+.logo-reaction img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Bear appearance streamers animation */
+.streamer-container {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 160px;
+  height: 160px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.streamer {
+  position: absolute;
+  width: 4px;
+  height: 80px;
+  background: linear-gradient(to bottom, var(--primary-color), transparent);
+  opacity: 0;
+  animation: streamerAppear 1.5s ease-out forwards;
+}
+
+/* Bear highlight glow */
+.bear-glow {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(123, 181, 245, 0.3) 0%, rgba(123, 181, 245, 0) 70%);
+  opacity: 0;
+  z-index: 1;
+  animation: bearGlow 1.5s ease-out forwards;
+}
+
+/* === DONUT CHART STYLES === */
+/* Enhanced donut-style score circle with better visibility */
 .score-circle {
   position: relative;
   width: 180px;
   height: 180px;
   border-radius: 50%;
-  background: #f3f4f6;
+  background: transparent;
   margin: 30px auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  transition: all 0.5s ease;
-}
-
-[data-theme="night"] .score-circle {
-  background: #1f2b4d;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  overflow: visible;
 }
 
 /* Score circle inner content */
@@ -650,8 +754,8 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 150px;
-  height: 150px;
+  width: 140px; /* Slightly smaller to give more room for the donut */
+  height: 140px;
   border-radius: 50%;
   background: var(--background-secondary);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -662,51 +766,93 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Score fill animation */
-.score-fill {
+/* Donut fill animation - IMPROVED VISIBILITY */
+.circle-progress {
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
-  right: 0;
-  background: linear-gradient(to top, var(--primary-color), rgba(89, 151, 172, 0.7));
-  border-radius: 0;
-  transition: height 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95);
-  height: 0%;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg); /* Start from top */
 }
 
-[data-theme="night"] .score-fill {
-  background: linear-gradient(to top, var(--primary-color), rgba(123, 181, 245, 0.7));
-  box-shadow: 0 0 20px rgba(123, 181, 245, 0.4);
+.circle-bg {
+  fill: none;
+  stroke: var(--background-tertiary);
+  stroke-width: 18; /* Thicker stroke for better visibility */
 }
 
-/* Animation for the score percentage text */
-@keyframes countUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+.circle-fill {
+  fill: none;
+  stroke: var(--primary-color);
+  stroke-width: 18; /* Thicker stroke for better visibility */
+  stroke-linecap: round;
+  stroke-dasharray: 565.48;
+  stroke-dashoffset: 565.48;
+  transition: stroke-dashoffset 2s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  stroke-opacity: 0.9; /* More opaque */
 }
 
+[data-theme="night"] .circle-fill {
+  stroke: var(--primary-color);
+  filter: drop-shadow(0 0 8px rgba(123, 181, 245, 0.7)); /* Enhanced glow */
+  animation: glowPulse 2s infinite;
+}
+
+/* Score text styles */
 .score-percentage {
-  font-size: 48px;
+  font-size: 44px; /* Slightly smaller */
   font-weight: 700;
   color: var(--text-primary);
   opacity: 0;
   transform: translateY(10px);
   animation: countUp 0.8s forwards;
   animation-delay: 0.5s;
+  line-height: 1.1;
 }
 
-/* Score rating text with subtle animation */
 .score-rating {
-  font-size: 18px;
+  font-size: 16px; /* Smaller to fit inside circle */
   font-weight: 600;
-  margin-top: 6px;
+  margin-top: 4px; /* Less margin */
   color: var(--accent-color);
   opacity: 0;
   transform: translateY(10px);
   animation: countUp 0.8s forwards;
   animation-delay: 0.7s;
+  max-width: 90%; /* Constrain width */
+  text-align: center;
+  white-space: nowrap; /* Prevent wrapping */
 }
 
+/* === STAR RATING STYLES === */
+/* Enhanced level stars with custom styling */
+.level-indicator {
+  margin-top: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.level-star {
+  color: var(--accent-color);
+  font-size: 24px;
+  margin: 0 3px;
+  opacity: 0.3;
+  transition: all 0.4s ease;
+}
+
+.level-star.active {
+  color: #FFD700;
+  opacity: 1;
+  filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.5));
+}
+
+[data-theme="night"] .level-star.active {
+  filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.7));
+}
+
+/* === CONFETTI STYLES === */
 /* Celebration confetti for high scores */
 .confetti-container {
   position: fixed;
@@ -728,69 +874,7 @@ body {
   animation: fall linear forwards;
 }
 
-@keyframes fall {
-  from {
-    transform: translateY(-100px) rotate(0deg);
-    opacity: 0.8;
-  }
-  to {
-    transform: translateY(calc(100vh + 100px)) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-/* Emoji reactions for different score ranges */
-.emoji-reaction {
-  font-size: 32px;
-  margin-bottom: 10px;
-  animation: bounce 0.6s ease infinite alternate;
-  opacity: 0;
-  animation-delay: 1s;
-  animation-fill-mode: forwards;
-}
-
-@keyframes bounce {
-  from { transform: translateY(0); }
-  to { transform: translateY(-8px); }
-}
-
-/* Level indicator */
-.level-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 20px;
-  opacity: 0;
-  transform: translateY(20px);
-  animation: slideUp 0.8s forwards;
-  animation-delay: 1.2s;
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.level-star {
-  color: #FFD700;
-  font-size: 24px;
-  margin: 0 2px;
-  transform: scale(0);
-  animation: popIn 0.4s forwards;
-}
-
-@keyframes popIn {
-  from { transform: scale(0); }
-  to { transform: scale(1); }
-}
-
-.score-details {
-  font-size: 16px;
-  color: var(--text-secondary);
-  margin-top: 16px;
-  transition: color 0.3s ease;
-}
-
+/* === QUESTION BREAKDOWN STYLES === */
 .results-breakdown {
   margin-top: 40px;
 }
@@ -810,7 +894,6 @@ body {
   gap: 16px;
 }
 
-/* Enhanced Question Items in Results with Better Contrast */
 .question-item {
   display: flex;
   padding: 16px;
@@ -823,28 +906,6 @@ body {
 .question-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-[data-theme="night"] .question-item {
-  background: linear-gradient(to right, #1f2b4d, #2a3356);
-  padding: 20px;
-  border-radius: 10px;
-  margin-bottom: 18px;
-  border: 1px solid #5470a9;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-}
-
-[data-theme="night"] .question-item.correct {
-  border-left: 4px solid var(--success-color);
-}
-
-[data-theme="night"] .question-item.incorrect {
-  border-left: 4px solid var(--error-color);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 .question-status {
@@ -876,7 +937,6 @@ body {
   transition: color 0.3s ease;
 }
 
-/* Enhanced Color Accessibility for Correct/Incorrect Indicators */
 .answer-info .correct {
   color: var(--success-color);
 }
@@ -885,39 +945,7 @@ body {
   color: var(--error-color);
 }
 
-[data-theme="night"] .answer-info .correct {
-  color: var(--success-color);
-  background: var(--success-bg);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-weight: 600;
-  display: inline-block;
-  position: relative;
-  text-shadow: none;
-}
-
-[data-theme="night"] .answer-info .incorrect {
-  color: var(--error-color);
-  background: var(--error-bg);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-weight: 600;
-  display: inline-block;
-  position: relative;
-  text-shadow: none;
-}
-
-/* Add icons to make the correct/incorrect status more obvious beyond just color */
-[data-theme="night"] .answer-info .correct::before {
-  content: "✓ ";
-  font-weight: bold;
-}
-
-[data-theme="night"] .answer-info .incorrect::before {
-  content: "✗ ";
-  font-weight: bold;
-}
-
+/* Correct answer display */
 .correct-answer {
   display: block;
   margin-top: 4px;
@@ -925,20 +953,7 @@ body {
   color: var(--success-color);
 }
 
-[data-theme="night"] .correct-answer {
-  color: var(--success-color);
-  background: var(--success-bg);
-  border-left: 3px solid var(--success-color);
-  box-shadow: 0 0 8px rgba(0, 255, 170, 0.2);
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-weight: 600;
-  display: inline-block;
-  margin-top: 12px;
-  position: relative;
-  transition: all 0.3s ease;
-}
-
+/* === ACTION BUTTONS === */
 .results-actions {
   margin-top: 40px;
   display: flex;
@@ -974,24 +989,7 @@ body {
   background-color: var(--accent-hover);
 }
 
-/* Question number pill */
-.question-number {
-  display: inline-block;
-  background-color: var(--accent-color);
-  color: white;
-  border-radius: 20px;
-  padding: 4px 12px;
-  font-size: 14px;
-  font-weight: 600;
-  margin-right: 10px;
-}
-
-[data-theme="night"] .question-number {
-  background-color: #7bb5f5;
-  box-shadow: 0 0 10px rgba(123, 181, 245, 0.3);
-}
-
-/* Review specific styles */
+/* === REVIEW SPECIFIC STYLES === */
 .review-list {
   max-height: 600px;
   overflow-y: auto;
@@ -1033,13 +1031,106 @@ body {
   font-weight: 500;
 }
 
+/* === ENHANCED NIGHT MODE STYLES === */
+/* Enhanced Color Accessibility for Correct/Incorrect Indicators */
+[data-theme="night"] .correct-answer {
+  color: var(--success-color);
+  background: var(--success-bg);
+  border-left: 3px solid var(--success-color);
+  box-shadow: 0 0 8px rgba(0, 255, 170, 0.2);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 12px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+[data-theme="night"] .answer-info .correct {
+  color: var(--success-color);
+  background: var(--success-bg);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  display: inline-block;
+  position: relative;
+  text-shadow: none;
+}
+
+[data-theme="night"] .answer-info .incorrect {
+  color: var(--error-color);
+  background: var(--error-bg);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  display: inline-block;
+  position: relative;
+  text-shadow: none;
+}
+
+/* Add icons to make the correct/incorrect status more obvious beyond just color */
+[data-theme="night"] .answer-info .correct::before {
+  content: "✓ ";
+  font-weight: bold;
+}
+
+[data-theme="night"] .answer-info .incorrect::before {
+  content: "✗ ";
+  font-weight: bold;
+}
+
+/* Enhanced Question Items in Results with Better Contrast */
+[data-theme="night"] .question-item {
+  background: linear-gradient(to right, #1f2b4d, #2a3356);
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+  border: 1px solid #5470a9;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="night"] .question-item.correct {
+  border-left: 4px solid var(--success-color);
+}
+
+[data-theme="night"] .question-item.incorrect {
+  border-left: 4px solid var(--error-color);
+}
+
+/* Enhanced Option Item Styles */
+[data-theme="night"] .option-item {
+  background: linear-gradient(to right, #2a3356, #31456e);
+  border-color: #5470a9;
+  padding: 18px;
+}
+
+[data-theme="night"] .option-item:hover {
+  background: linear-gradient(to right, #31456e, #3d4c7a);
+  transform: translateY(-2px);
+  border-color: #8ac5ff;
+}
+
+/* Add subtle animation to checked options */
+[data-theme="night"] .option-item:has(input[type="radio"]:checked) {
+  background: linear-gradient(to right, #31456e, #3d4c7a);
+  border-color: #8ac5ff;
+  box-shadow: 0 0 15px rgba(138, 197, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Enhanced feedback for flagged questions */
+[data-theme="night"] .flag-button.flagged {
+  animation: pulse 2s infinite;
+}
+
 /* Added accessibility-friendly focus indicators */
 button:focus, input:focus {
   outline: 2px solid var(--accent-color);
   outline-offset: 2px;
 }
 
-/* Responsive styles */
+/* === RESPONSIVE STYLES === */
 @media (max-width: 991px) {
   .sidebar-column {
     position: relative;
