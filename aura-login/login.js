@@ -1,280 +1,281 @@
-// login.js - Complete file
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Initializing username-based login page');
+    
     // Initialize Supabase client 
     const supabaseClient = supabase.createClient(
-    'https://uumdfsnboqkounadxijq.supabase.co', //URL
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1bWRmc25ib3Frb3VuYWR4aWpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIzNDc5NzMsImV4cCI6MjA1NzkyMzk3M30.s3IDgE3c4kpaiRhCpaKATKdaZzdlTb91heIhrwDZrU0' //anon key
+        'https://uumdfsnboqkounadxijq.supabase.co', //URL
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1bWRmc25ib3Frb3VuYWR4aWpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIzNDc5NzMsImV4cCI6MjA1NzkyMzk3M30.s3IDgE3c4kpaiRhCpaKATKdaZzdlTb91heIhrwDZrU0' //anon key
     );
     
-    console.log('Supabase initialized successfully');
-    
-    // Toggle between login and create account forms
-    window.toggleView = function(view) {
-    const createForm = document.getElementById('createAccountForm');
-    const loginForm = document.getElementById('loginForm');
-    
-    if (view === 'create') {
-    createForm.classList.add('active');
-    loginForm.classList.remove('active');
-    } else {
-    loginForm.classList.add('active');
-    createForm.classList.remove('active');
-    }
-    };
+    //console.log('Supabase client initialized');
     
     // Show the status message function 
     function showStatusMessage(message, isError = false) {
-    let statusElement = document.getElementById('statusMessage');
-    
-    if (!statusElement) {
-    statusElement = document.createElement('div');
-    statusElement.id = 'statusMessage';
-    document.body.appendChild(statusElement);
+        let statusElement = document.getElementById('statusMessage');
+        
+        if (!statusElement) {
+            statusElement = document.createElement('div');
+            statusElement.id = 'statusMessage';
+            document.body.appendChild(statusElement);
+        }
+        
+        statusElement.textContent = message;
+        statusElement.className = 'status-message ' + (isError ? 'error' : 'success');
+        statusElement.style.display = 'block';
+        
+        setTimeout(() => {
+            statusElement.className = 'status-message';
+            statusElement.style.display = 'none';
+        }, 3000);
     }
     
-    statusElement.textContent = message;
-    statusElement.className = 'status-message ' + (isError ? 'error' : 'success');
-    statusElement.style.display = 'block';
+    // Toggle between login and create account forms
+    window.toggleView = function(view) {
+        const createForm = document.getElementById('createAccountForm');
+        const loginForm = document.getElementById('loginForm');
+        
+        if (view === 'create') {
+            createForm.classList.add('active');
+            loginForm.classList.remove('active');
+        } else {
+            loginForm.classList.add('active');
+            createForm.classList.remove('active');
+        }
+    };
     
-    setTimeout(() => {
-    statusElement.className = 'status-message';
-    statusElement.style.display = 'none';
-    }, 3000);
+    // Go through all profiles for debugging purposes
+    async function showAllProfiles() {
+        try {
+            console.log('Fetching all profiles...');
+            const { data, error } = await supabaseClient
+                .from('profiles')
+                .select('*');
+                
+            if (error) {
+                console.error('Error fetching profiles:', error);
+                return;
+            }
+            
+            console.log(`Found ${data.length} profiles:`);
+            console.table(data);
+        } catch (err) {
+            console.error('Error showing profiles:', err);
+        }
     }
     
-    // Clear any redirect loop protection
-    localStorage.removeItem('redirect_loop_protection');
+    // Run on page load
+    showAllProfiles();
+    
+    // Login Form Submission - username lookup first
+    const loginForm = document.getElementById('loginInputForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showStatusMessage('Please enter both username and password', true);
+                return;
+            }
+            
+            showStatusMessage('Logging in...');
+            
+            try {
+                // STEP 1: Look up email by username
+                console.log('Looking up email for username:', username);
+                
+                const { data: profileData, error: profileError } = await supabaseClient
+                    .from('profiles')
+                    .select('email')
+                    .eq('username', username)
+                    .single();
+                
+                if (profileError || !profileData || !profileData.email) {
+                    console.error('Username lookup error:', profileError);
+                    
+                    // For debugging, show all usernames
+                    const { data: allProfiles } = await supabaseClient
+                        .from('profiles')
+                        .select('username, email');
+                    
+                    console.log('Available profiles:', allProfiles);
+                    
+                    showStatusMessage('Username not found', true);
+                    return;
+                }
+                
+                const userEmail = profileData.email;
+                console.log('Found email for username:', userEmail);
+                
+                // STEP 2: Sign in with email/password
+                const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+                    email: userEmail,
+                    password: password
+                });
+                
+                if (authError) {
+                    console.error('Authentication error:', authError);
+                    showStatusMessage('Invalid password', true);
+                    return;
+                }
+                
+                if (!authData || !authData.user) {
+                    showStatusMessage('Login failed: No user data returned', true);
+                    return;
+                }
+                
+                console.log('Login successful!');
+                showStatusMessage('Login successful!');
+                
+                // Store user data
+                localStorage.setItem('user_id', authData.user.id);
+                localStorage.setItem('currentUsername', username);
+                
+                // Redirect to dashboard
+                setTimeout(() => {
+                    window.location.href = '../src-dashboard/src/aura.html';
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Login process error:', error);
+                showStatusMessage(`Login error: ${error.message}`, true);
+            }
+        });
+    } else {
+        console.error('Login form not found. Check your HTML IDs.');
+    }
     
     // Create Account Form Submission
     const createAccountForm = document.getElementById('signupForm');
     if (createAccountForm) {
-    createAccountForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    console.log('Sign up form submitted');
-    
-    const email = document.getElementById('newEmail').value;
-    const username = document.getElementById('newUsername').value;
-    const password = document.getElementById('newPassword').value;
-    
-    // Validation for input
-    if (!email || !username || !password) {
-    showStatusMessage('Please fill out all fields', true);
-    return;
-    }
-    
-    if (password.length < 8) {
-    showStatusMessage('Password must be at least 8 characters long', true);
-    return;
-    }
-    
-    try {
-    // Check if username already exists
-    const { data: existingUsers, error: userCheckError } = await supabaseClient
-    .from('profiles')
-    .select('username')
-    .eq('username', username)
-    .maybeSingle();
-    
-    if (existingUsers) {
-    showStatusMessage('Username already taken. Please choose another.', true);
-    return;
-    }
-    
-    // Sign up with Supabase Auth
-    const { data, error } = await supabaseClient.auth.signUp({
-    email: email,
-    password: password,
-    options: {
-    data: {
-    username: username,
-    full_name: username
-    }
-    }
-    });
-    
-    if (error) throw error;
-    
-    if (data.user) {
-    // Add user profile to our profiles table
-    try {
-    const { error: profileError } = await supabaseClient
-    .from('profiles')
-    .insert({
-    id: data.user.id,
-    username: username,
-    full_name: username,
-    email: email // Store email for easier login
-    });
-    
-    if (profileError) {
-    console.error('Profile creation error:', profileError);
-    showStatusMessage('Account created but profile setup failed. Please contact support.', true);
+        createAccountForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('newEmail').value;
+            const username = document.getElementById('newUsername').value;
+            const password = document.getElementById('newPassword').value;
+            
+            if (!email || !username || !password) {
+                showStatusMessage('Please fill out all fields', true);
+                return;
+            }
+            
+            if (password.length < 8) {
+                showStatusMessage('Password must be at least 8 characters long', true);
+                return;
+            }
+            
+            showStatusMessage('Creating account...');
+            
+            try {
+                // STEP 1: Check if username already exists
+                const { data: existingUser, error: checkError } = await supabaseClient
+                    .from('profiles')
+                    .select('username')
+                    .eq('username', username)
+                    .maybeSingle();
+                
+                if (existingUser) {
+                    showStatusMessage('Username already taken. Please choose another.', true);
+                    return;
+                }
+                
+                // STEP 2: Create the auth user
+                console.log('Creating auth user with email:', email);
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) {
+                    console.error('Signup error:', error);
+                    showStatusMessage(`Error: ${error.message}`, true);
+                    return;
+                }
+                
+                if (!data || !data.user) {
+                    showStatusMessage('Error: No user data returned', true);
+                    return;
+                }
+                
+                const userId = data.user.id;
+                console.log('Auth user created with ID:', userId);
+                
+                // STEP 3: Create profile record
+                console.log('Creating profile for user:', username);
+                const { error: profileError } = await supabaseClient
+                    .from('profiles')
+                    .insert({
+                        id: userId,
+                        username: username,
+                        email: email,
+                        full_name: username,
+                        created_at: new Date().toISOString()
+                    });
+                
+                if (profileError) {
+                    console.error('Profile creation error:', profileError);
+                    showStatusMessage('Account created but profile setup failed. Please contact support.', true);
+                } else {
+                    // STEP 4: Verify the profile was created
+                    const { data: verifyProfile, error: verifyError } = await supabaseClient
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', userId)
+                        .single();
+                        
+                    if (verifyError || !verifyProfile) {
+                        console.error('Profile verification failed:', verifyError);
+                        showStatusMessage('Account created but profile verification failed.', true);
+                    } else {
+                        console.log('Profile created and verified:', verifyProfile);
+                        showStatusMessage('Account created successfully!');
+                        
+                        // STEP 5: Show all profiles for debugging
+                        await showAllProfiles();
+                        
+                        // Clear the form
+                        createAccountForm.reset();
+                        
+                        // Switch to login view
+                        toggleView('login');
+                    }
+                }
+            } catch (error) {
+                console.error('Signup process error:', error);
+                showStatusMessage(`Error: ${error.message}`, true);
+            }
+        });
     } else {
-    // Store username in localStorage for sign-up as well
-    localStorage.setItem('currentUsername', username);
-    
-    showStatusMessage('Account created successfully! Please check your email for verification.');
-    
-    // Clear the form
-    createAccountForm.reset();
-    
-    // Switch to login view
-    toggleView('login');
-    }
-    } catch (profileError) {
-    console.error('Profile creation exception:', profileError);
-    showStatusMessage('Account created but profile setup failed. Please contact support.', true);
-    }
-    }
-    } catch (error) {
-    console.error('Signup error:', error);
-    showStatusMessage(`Error: ${error.message}`, true);
-    }
-    });
-    } else {
-    console.error('Sign up form not found. Check your HTML IDs.');
+        console.error('Create account form not found.');
     }
     
-    // Login Form Submission
-    const loginForm = document.getElementById('loginInputForm');
-    if (loginForm) {
-    loginForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    console.log('Login form submitted');
-    
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    
-    if (!username || !password) {
-    showStatusMessage('Please enter both username and password', true);
-    return;
-    }
-    
-    console.log('Attempting login with username:', username);
-    
-    try {
-    // Look up the user's email from profiles
-    const { data: profile, error: profileError } = await supabaseClient
-    .from('profiles')
-    .select('email')
-    .eq('username', username)
-    .single();
-    
-    if (profileError || !profile || !profile.email) {
-    console.error('Profile lookup error:', profileError);
-    showStatusMessage('Invalid username or password', true);
-    return;
-    }
-    
-    console.log('Found email for user:', profile.email);
-    
-    // Now sign in with the email
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email: profile.email,
-    password: password
-    });
-    
-    if (error) {
-    console.error('Auth error:', error);
-    showStatusMessage('Invalid username or password', true);
-    return;
-    }
-    
-    console.log('Login successful:', data);
-    
-    // Store auth data manually for better persistence
-    localStorage.setItem('supabase.auth.token', JSON.stringify({
-    access_token: data.session.access_token,
-    refresh_token: data.session.refresh_token,
-    expires_at: new Date().getTime() + (data.session.expires_in * 1000)
-    }));
-    
-    // Store user ID for verification
-    localStorage.setItem('user_id', data.user.id);
-    
-    // Get the complete profile data from Supabase to retrieve proper username/name
-    try {
-    // Get full profile data to get additional user info
-    const { data: fullProfile, error: profileFetchError } = await supabaseClient
-    .from('profiles')
-    .select('*')  // select all fields
-    .eq('id', data.user.id)
-    .single();
-    
-    if (profileFetchError) {
-    console.error('Error fetching profile:', profileFetchError);
-    // Still store the basic username as fallback
-    localStorage.setItem('currentUsername', username);
-    } else {
-    // Store the full name or preferred display name from profile
-    // Adjust these field names if needed to match your Supabase profiles table
-    if (fullProfile.full_name) {
-    localStorage.setItem('currentUsername', fullProfile.full_name);
-    } else if (fullProfile.username) {
-    localStorage.setItem('currentUsername', fullProfile.username);
-    } else {
-    // Fallback to login username
-    localStorage.setItem('currentUsername', username);
-    }
-    
-    // Store other user data
-    if (fullProfile.first_name) localStorage.setItem('user_firstName', fullProfile.first_name);
-    if (fullProfile.last_name) localStorage.setItem('user_lastName', fullProfile.last_name);
-    }
-    } catch (profileError) {
-    console.error('Profile fetch exception:', profileError);
-    // Fallback to login username
-    localStorage.setItem('currentUsername', username);
-    }
-    
-    showStatusMessage('Login successful!');
-    
-    // Clear any redirect loop protection
-    localStorage.removeItem('redirect_loop_protection');
-    
-    // Redirect after successful login using full URL path
-    setTimeout(() => {
-        // Use relative path instead of absolute path
-        const dashboardUrl = '../src-dashboard/src/aura.html';
-    console.log('Redirecting to dashboard:', dashboardUrl);
-    window.location.href = dashboardUrl;
-    }, 1500);
-    } catch (error) {
-    console.error('Login error:', error);
-    showStatusMessage(`Error: ${error.message}`, true);
-    }
-    });
-    } else {
-    console.error('Login form not found. Check your HTML IDs.');
-    }
-    
-    // Expose the logout function
+    // Logout function
     window.logout = async function() {
-    try {
-    const { error } = await supabaseClient.auth.signOut();
-    if (error) {
-    console.error('Logout error:', error);
-    showStatusMessage(`Error logging out: ${error.message}`, true);
-    return;
-    }
-    
-    // Clear auth data
-    localStorage.removeItem('supabase.auth.token');
-    localStorage.removeItem('user_id');
-    localStorage.removeItem('redirect_loop_protection');
-    // Also clear the username
-    localStorage.removeItem('currentUsername');
-    localStorage.removeItem('user_firstName');
-    localStorage.removeItem('user_lastName');
-    
-    showStatusMessage('Logged out successfully!');
-    
-    setTimeout(() => {
-                    window.location.href = 'login.html';
-    }, 1500);
-    } catch (error) {
-    console.error('Logout exception:', error);
-    showStatusMessage(`Error: ${error.message}`, true);
-}
-};
+        try {
+            const { error } = await supabaseClient.auth.signOut();
+            if (error) {
+                console.error('Logout error:', error);
+                showStatusMessage(`Error logging out: ${error.message}`, true);
+                return;
+            }
+            
+            // Clear user data
+            localStorage.removeItem('currentUsername');
+            localStorage.removeItem('user_firstName');
+            localStorage.removeItem('user_lastName');
+            localStorage.removeItem('user_id');
+            
+            showStatusMessage('Logged out successfully!');
+            
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 1500);
+        } catch (error) {
+            console.error('Logout exception:', error);
+            showStatusMessage(`Error: ${error.message}`, true);
+        }
+    };
 });
