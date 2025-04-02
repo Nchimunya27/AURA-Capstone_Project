@@ -392,8 +392,9 @@ Course Pages Styles
 
 .progress-fill {
   background-color: var(--primary-color);
-  width: 75%;
+  /* Remove the hardcoded width */
   height: 100%;
+  transition: width 0.5s ease-in-out;
 }
 
 
@@ -608,6 +609,8 @@ Course Pages Styles
   font-size: 15px;
   color: var(--text-primary);
   cursor: pointer;
+  position: relative;
+  padding-right: 30px;
 }
 
 .todo-checkbox {
@@ -649,6 +652,69 @@ Course Pages Styles
 
 .score.medium {
   color: var(--warning-color);
+}
+
+/* CSS for Checkbox Checkmarks */
+.todo-item input[type="checkbox"] {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 2px solid var(--border-color, #e5e7eb);
+  border-radius: 4px;
+  outline: none;
+  transition: all 0.3s;
+  cursor: pointer;
+  background-color: var(--background-secondary, #ffffff);
+}
+
+.todo-item input[type="checkbox"]:checked {
+  background-color: var(--primary-color, #5997ac);
+  border-color: var(--primary-color, #5997ac);
+}
+
+.todo-item input[type="checkbox"]:checked::before {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+}
+
+/* Add delete button for tasks */
+.delete-task-btn {
+  background: none;
+  border: none;
+  color: #d1d5db;
+  cursor: pointer;
+  padding: 5px;
+  margin-left: 5px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  opacity: 0.5;
+  font-size: 14px;
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.todo-item:hover .delete-task-btn {
+  opacity: 1;
+  color: #ef4444;
+}
+
+.delete-task-btn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
 }
 
 /* Enhanced Modal Styling */
@@ -738,81 +804,170 @@ Course Pages Styles
   gap: 15px;
 }
 
-/* Messages */
-.loading-documents,
-.no-documents, 
-.error-message {
-  text-align: center;
+/* Task Modal Popup Styling */
+.task-modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+.task-modal-container.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.task-modal {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: 400px;
+  max-width: 90%;
+  transform: translateY(20px);
+  transition: transform 0.3s;
+  overflow: hidden;
+}
+
+.task-modal-container.active .task-modal {
+  transform: translateY(0);
+}
+
+.task-modal-header {
+  background-color: var(--primary-color, #5997ac);
+  color: white;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.task-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.task-modal-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 20px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.task-modal-close:hover {
+  color: white;
+}
+
+.task-modal-body {
   padding: 20px;
-  color: var(--text-tertiary, #6b7280);
 }
 
-.loading-documents {
-  font-style: italic;
+.task-input-group {
+  margin-bottom: 20px;
 }
 
-.error-message {
-  color: #f44336;
+.task-input-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text-color, #333);
+  font-size: 14px;
 }
 
-/* Night mode compatibility */
-[data-theme="night"] .documents-modal {
-  background-color: #1e293b;
+.task-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 5px;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-[data-theme="night"] .modal-header {
-  background-color: #31456e;
-  border-bottom-color: #3b4a74;
+.task-input:focus {
+  outline: none;
+  border-color: var(--primary-color, #5997ac);
+  box-shadow: 0 0 0 2px rgba(89, 151, 172, 0.2);
 }
 
-[data-theme="night"] .loading-documents,
-[data-theme="night"] .no-documents {
-  color: #cbd5e1;
+.task-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
-[data-theme="night"] .error-message {
-  color: #ff8a80;
+.task-action-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-/* Responsive Styles */
-@media (max-width: 991px) {
-  .top-nav {
-    padding-right: 20px;
-  }
+.btn-cancel {
+  background-color: #f1f1f1;
+  color: #666;
+}
 
-  .brand-wrapper {
-    padding-right: 20px;
-  }
+.btn-cancel:hover {
+  background-color: #e1e1e1;
+}
 
-  .sidebar-column {
-    width: 220px; /* Fixed width for mobile */
-  }
+.btn-add {
+  background-color: var(--primary-color, #5997ac);
+  color: white;
+}
 
-  .main-content {
-    padding: 20px;
-  }
+.btn-add:hover {
+  background-color: var(--primary-hover, #4a8698);
+}
 
-  .progress-grid {
-    grid-template-columns: 1fr;
-  }
+/* Confetti Animation */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 999;
+}
 
-  .content-grid {
-    grid-template-columns: 1fr;
-  }
+.confetti {
+  position: absolute;
+  top: -10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  animation: confettiFall linear forwards;
+}
 
-  .action-buttons {
-    flex-direction: column;
+@keyframes confettiFall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
   }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
 
-  .practice-btn {
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-
-  .flashcard-grid {
-    grid-template-columns: 1fr;
-  }
-  /* Motivational Message Styling */
+/* Motivational Message */
 .motivation-message {
   margin-bottom: 20px;
   animation: slideDown 0.5s ease-out;
@@ -851,13 +1006,13 @@ Course Pages Styles
   color: white;
 }
 
-.motivation-message.fadeout {
-  animation: slideUp 0.3s ease-out forwards;
-}
-
 @keyframes slideDown {
   0% { transform: translateY(-20px); opacity: 0; }
   100% { transform: translateY(0); opacity: 1; }
+}
+
+.motivation-message.fadeout {
+  animation: slideUp 0.3s ease-out forwards;
 }
 
 @keyframes slideUp {
@@ -865,615 +1020,758 @@ Course Pages Styles
   100% { transform: translateY(-20px); opacity: 0; }
 }
 
-/* Separate confetti container for better positioning */
-.confetti-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 999;
+/* Messages */
+.loading-documents,
+.no-documents, 
+.error-message {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-tertiary, #6b7280);
 }
 
-.confetti {
-  position: absolute;
-  top: -10px;
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-  animation: confettiFall linear forwards;
+.loading-documents {
+  font-style: italic;
 }
 
-@keyframes confettiFall {
-  0% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 1;
-  }
-  80% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100vh) rotate(720deg);
-    opacity: 0;
-  }
+.error-message {
+  color: #f44336;
 }
 
-/* Improved animation for the motivational message */
-.motivation-message {
-  margin-bottom: 20px;
-  opacity: 0;
-  transform: translateY(-15px);
-  animation: fadeInDown 0.8s ease-out forwards;
-  max-width: 100%;
+/* Night mode enhancements */
+[data-theme="night"] body {
+  background-color: #1a1a2e;
+  color: #e5e7eb;
 }
 
-@keyframes fadeInDown {
-  0% { 
-    opacity: 0; 
-    transform: translateY(-15px);
-  }
-  50% {
-    opacity: 0.7;
-  }
-  100% { 
-    opacity: 1; 
-    transform: translateY(0);
-  }
-}
-/* CSS for Checkbox Checkmarks */
-.todo-item input[type="checkbox"] {
-  position: relative;
-  width: 18px;
-  height: 18px;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border: 2px solid var(--border-color, #e5e7eb);
-  border-radius: 4px;
-  outline: none;
-  transition: all 0.3s;
-  cursor: pointer;
-  background-color: var(--background-secondary, #ffffff);
+[data-theme="night"] .main-content {
+  background-color: #1a1a2e;
 }
 
-.todo-item input[type="checkbox"]:checked {
-  background-color: var(--primary-color, #5997ac);
-  border-color: var(--primary-color, #5997ac);
+[data-theme="night"] .course-header,
+[data-theme="night"] .progress-card,
+[data-theme="night"] .quiz-card,
+[data-theme="night"] .streak-card,
+[data-theme="night"] .featured-content-card,
+[data-theme="night"] .todo-card,
+[data-theme="night"] .scores-card,
+[data-theme="night"] .documents-section,
+[data-theme="night"] .upload-section,
+[data-theme="night"] .course-documents {
+  background-color: #1f2937;
+  border-color: #374151;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
-.todo-item input[type="checkbox"]:checked::before {
-  content: '✓';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  font-size: 12px;
+[data-theme="night"] .course-title h1,
+[data-theme="night"] .course-title h2,
+[data-theme="night"] h3,
+[data-theme="night"] h4,
+[data-theme="night"] .section-title {
+  color: #e5e7eb;
 }
 
-/* CSS for Add Task Feature */
-.add-task-section {
-  margin-bottom: 15px;
+[data-theme="night"] .progress-label {
+  background-color: rgba(123, 181, 245, 0.2);
+  color: #7bb5f5;
 }
 
-.add-task-input-container {
-  display: flex;
-  background-color: var(--bg-light, #f9fafb);
-  border: 1px solid var(--border-color, #e5e7eb);
-  border-radius: 6px;
-  overflow: hidden;
+[data-theme="night"] .progress-bar {
+  background-color: rgba(123, 181, 245, 0.2);
 }
 
-.add-task-input {
-  flex: 1;
-  padding: 10px 12px;
-  border: none;
-  background: transparent;
-  font-size: 14px;
-  color: var(--text-primary, #000000);
+[data-theme="night"] .progress-fill {
+  background-color: #5997ac;
 }
 
-.add-task-input:focus {
-  outline: none;
+/* To-Do List Night Mode Enhancements */
+[data-theme="night"] .todo-card {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2) !important;
 }
 
-.add-task-btn {
-  background-color: var(--primary-color, #5997ac);
-  color: white;
-  border: none;
-  width: 36px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s;
+[data-theme="night"] .todo-title {
+  color: #f3f4f6 !important;
+  font-weight: 600 !important;
 }
 
-.add-task-btn:hover {
-  background-color: #4a8697; /* Slightly darker shade */
+[data-theme="night"] .todo-item {
+  border-bottom: 1px solid #374151 !important;
+  background-color: #1f2937 !important;
+  padding: 15px !important;
+  border-radius: 6px !important;
+  margin-bottom: 8px !important;
 }
 
-/* Animate new tasks */
-.todo-list .todo-item.new-task {
-  animation: fadeInTask 0.5s ease-out forwards;
+[data-theme="night"] .todo-item span {
+  color: #e5e7eb !important;
+  font-weight: 500 !important;
 }
 
-@keyframes fadeInTask {
-  0% { 
-    opacity: 0; 
-    transform: translateY(-5px);
-  }
-  100% { 
-    opacity: 1; 
-    transform: translateY(0);
-  }
+[data-theme="night"] .todo-item.completed span,
+[data-theme="night"] .completed-tasks-list .todo-item span {
+  color: #9ca3af !important;
+  text-decoration: line-through !important;
+  opacity: 0.8 !important;
 }
 
-/* Night mode compatibility */
-[data-theme="night"] .add-task-input-container {
-  background-color: #31456e;
-  border-color: #7090cb;
-}
-
-[data-theme="night"] .add-task-input {
-  color: #ffffff;
-}
-
-[data-theme="night"] .add-task-btn {
-  background-color: #7bb5f5;
-}
-
-[data-theme="night"] .add-task-btn:hover {
-  background-color: #93c5fd;
-}
-
+/* Enhanced Checkbox Styling for Night Mode */
 [data-theme="night"] .todo-item input[type="checkbox"] {
-  border-color: #7090cb;
-  background-color: #31456e;
+  border: 2px solid #4b5563 !important;
+  background-color: #1f2937 !important;
 }
 
 [data-theme="night"] .todo-item input[type="checkbox"]:checked {
-  background-color: var(--primary-color, #7bb5f5);
-  border-color: var(--primary-color, #7bb5f5);
+  background-color: #5997ac !important;
+  border-color: #5997ac !important;
 }
 
-.motivation-message.fadeout {
-  animation: fadeOut 0.5s ease-out forwards;
+[data-theme="night"] .todo-item input[type="checkbox"]:checked::after {
+  color: #f3f4f6 !important;
 }
 
-@keyframes fadeOut {
-  0% { 
-    opacity: 1; 
-    transform: translateY(0);
-  }
-  100% { 
-    opacity: 0; 
-    transform: translateY(-15px);
-  }
+/* Enhanced Button Styling for Night Mode */
+[data-theme="night"] .action-btn {
+  background-color: #374151 !important;
+  color: #e5e7eb !important;
+  border: 1px solid #4b5563 !important;
 }
 
-/* Add task input styling */
-.add-task-section {
+[data-theme="night"] .action-btn:hover {
+  background-color: #4b5563 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+[data-theme="night"] .action-btn.upload-btn,
+[data-theme="night"] #add-task-btn {
+  background-color: #5997ac !important;
+  color: #f3f4f6 !important;
+  border: none !important;
+}
+
+[data-theme="night"] .action-btn.upload-btn:hover,
+[data-theme="night"] #add-task-btn:hover {
+  background-color: #4a8698 !important;
+}
+
+[data-theme="night"] #delete-all-btn,
+[data-theme="night"] .action-btn.danger {
+  background-color: #991b1b !important;
+  color: #f3f4f6 !important;
+}
+
+[data-theme="night"] #delete-all-btn:hover,
+[data-theme="night"] .action-btn.danger:hover {
+  background-color: #b91c1c !important;
+}
+
+/* Section Headers */
+[data-theme="night"] .section-title {
+  color: #e5e7eb !important;
+  border-bottom: 1px solid #374151 !important;
+  padding-bottom: 10px !important;
+}
+
+/* Enhanced Completed Tasks Section */
+[data-theme="night"] .completed-tasks-section {
+  border-top: 1px solid #374151 !important;
+  margin-top: 20px !important;
+  padding-top: 15px !important;
+}
+
+/* Empty List Messages */
+[data-theme="night"] .todo-list:empty::before,
+[data-theme="night"] .completed-tasks-list:empty::before {
+  color: #9ca3af !important;
+}
+
+/* Delete Task Button Enhancement */
+[data-theme="night"] .delete-task-btn {
+  color: #9ca3af !important;
+}
+
+[data-theme="night"] .todo-item:hover .delete-task-btn {
+  color: #f87171 !important;
+}
+
+[data-theme="night"] .delete-task-btn:hover {
+  background-color: rgba(248, 113, 113, 0.2) !important;
+}
+
+/* Fix for buttons and tab visibility */
+[data-theme="night"] .nav-button,
+[data-theme="night"] .nav-button.active {
+  color: #e5e7eb !important;
+  border-color: #5997ac !important;
+}
+
+[data-theme="night"] .nav-button.active {
+  border-bottom: 2px solid #5997ac !important;
+  font-weight: 600 !important;
+}
+
+/* Task Modal Night Mode */
+[data-theme="night"] .task-modal {
+  background-color: #1f2937;
+  border: 1px solid #374151;
+}
+
+[data-theme="night"] .task-modal-header {
+  background-color: #5997ac;
+}
+
+[data-theme="night"] .task-input-label {
+  color: #e5e7eb;
+}
+
+[data-theme="night"] .task-input {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: #e5e7eb;
+}
+
+[data-theme="night"] .task-input:focus {
+  border-color: #5997ac;
+  box-shadow: 0 0 0 2px rgba(89, 151, 172, 0.3);
+}
+
+[data-theme="night"] .btn-cancel {
+  background-color: #374151;
+  color: #e5e7eb;
+}
+
+[data-theme="night"] .btn-cancel:hover {
+  background-color: #4b5563;
+}
+
+/* Completed tasks and todo items */
+.todo-item.completed span, 
+.completed-tasks-list .todo-item span {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.completed-tasks-section {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #4b5563;
+}
+
+.todo-list:empty::before,
+.completed-tasks-list:empty::before {
+  content: "No tasks yet";
+  display: block;
+  padding: 10px 0;
+  text-align: center;
+  color: #9ca3af;
+  font-style: italic;
+  font-size: 13px;
+}
+
+.completed-tasks-list:empty::before {
+  content: "No completed tasks";
+}
+
+/* Task buttons */
+.todo-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
   margin-bottom: 15px;
 }
 
-.add-task-input-container {
-  display: flex;
-  background-color: var(--bg-light, #f9fafb);
-  border: 1px solid var(--border-color, #e5e7eb);
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.add-task-input {
+#add-task-btn {
+  background-color: #5997ac;
+  color: #ffffff;
   flex: 1;
-  padding: 10px 12px;
-  border: none;
-  background: transparent;
-  font-size: 14px;
-  color: var(--text-primary, #000000);
 }
 
-.add-task-input:focus {
-  outline: none;
+#delete-all-btn {
+  background-color: #ef4444;
+  color: #ffffff;
+  flex: 1;
 }
 
-.add-task-btn {
-  background-color: var(--primary-color, #5997ac);
-  color: white;
-  border: none;
-  width: 36px;
-  cursor: pointer;
+/* Featured Content Card (Learning Spotlight) */
+.featured-content-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+.featured-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.featured-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: #111827;
+}
+
+.featured-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.featured-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.featured-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.featured-icon {
+  width: 45px;
+  height: 45px;
+  border-radius: 8px;
+  background-color: #5997ac;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
-}
-
-.add-task-btn:hover {
-  background-color: #4a8697; /* Slightly darker shade */
-}
-
-/* Animate new tasks */
-.todo-list .todo-item.new-task {
-  animation: fadeInTask 0.5s ease-out forwards;
-}
-
-@keyframes fadeInTask {
-  0% { 
-    opacity: 0; 
-    transform: translateY(-5px);
-  }
-  100% { 
-    opacity: 1; 
-    transform: translateY(0);
-  }
-}
-
-/* Night mode compatibility */
-[data-theme="night"] .add-task-input-container {
-  background-color: #31456e;
-  border-color: #7090cb;
-}
-
-[data-theme="night"] .add-task-input {
-  color: #ffffff;
-}
-
-[data-theme="night"] .add-task-btn {
-  background-color: #7bb5f5;
-}
-
-[data-theme="night"] .add-task-btn:hover {
-  background-color: #93c5fd;
-}
-
-/* Task Modal Styling */
-.task-textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
-  font-family: inherit;
-  font-size: 14px;
-  resize: vertical;
-  margin-bottom: 15px;
-}
-
-.modal-instruction {
-  margin-bottom: 10px;
-  color: var(--text-secondary);
-  font-size: 14px;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.add-tasks-btn {
-  background-color: var(--primary-color);
   color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
+  font-size: 20px;
+}
+
+.featured-details {
+  flex: 1;
+}
+
+.featured-title {
   font-size: 14px;
-  transition: background-color 0.2s;
-}
-
-.add-tasks-btn:hover {
-  background-color: #4a8697;
-}
-
-/* For the tasks modal specifically */
-.tasks-modal-container .modal-header {
-  background-color: var(--primary-color);
-}
-/* Improved Task Modal Styling */
-.tasks-modal-container .documents-modal {
-  max-width: 550px;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-}
-
-.tasks-modal-container .modal-header {
-  background-color: var(--primary-color);
-  padding: 16px 24px;
-  position: relative;
-}
-
-.tasks-modal-container .modal-header h2 {
-  font-size: 18px;
   font-weight: 600;
-  color: white;
-  margin: 0;
+  margin: 0 0 5px 0;
+  color: #111827;
 }
 
-.tasks-modal-container .close-modal-btn {
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 24px;
-  color: rgba(255, 255, 255, 0.8);
+.featured-description {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0 0 8px 0;
+}
+
+.featured-action {
   background: none;
   border: none;
+  color: #5997ac;
+  font-size: 12px;
   cursor: pointer;
-  transition: color 0.2s;
-}
-
-.tasks-modal-container .close-modal-btn:hover {
-  color: white;
-}
-
-.tasks-modal-container .modal-body {
-  padding: 24px;
-  background-color: white;
-}
-
-.tasks-modal-container .modal-instruction {
-  margin-bottom: 16px;
-  color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-.tasks-modal-container .task-textarea {
-  width: 100%;
-  padding: 14px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 15px;
-  resize: vertical;
-  margin-bottom: 24px;
-  min-height: 150px;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.tasks-modal-container .task-textarea:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(89, 151, 172, 0.2);
-}
-
-.tasks-modal-container .modal-actions {
+  padding: 0;
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
 }
 
-.tasks-modal-container .add-tasks-btn {
-  background-color: var(--primary-color);
+.featured-action:hover {
+  text-decoration: underline;
+}
+
+[data-theme="night"] .featured-content-card {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="night"] .featured-item {
+  background-color: #2d3748 !important;
+}
+
+[data-theme="night"] .featured-title {
+  color: #e5e7eb !important;
+}
+
+[data-theme="night"] .featured-description {
+  color: #9ca3af !important;
+}
+
+[data-theme="night"] .featured-action {
+  color: #7bb5f5 !important;
+}
+
+/* Upload Card Styles for Quiz Upload Page */
+.upload-card {
+  background-color: var(--background-secondary, white);
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: var(--card-shadow, 0 4px 20px rgba(0, 0, 0, 0.1));
+  margin-bottom: 2rem;
+
+  width: 90%;
+  max-width: 800px;
+  margin: 2rem auto;
+}
+
+.upload-instruction {
+  margin-bottom: 2rem;
+  color: var(--text-tertiary, #555);
+}
+
+.upload-instruction p {
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.file-input-container {
+  margin-bottom: 2rem;
+}
+
+.file-input-label {
+  display: inline-block;
+  padding: 12px 20px;
+  background-color: var(--brand-color, #af5166);
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.file-input-label:hover {
+  background-color: var(--primary-color, #5997ac);
+}
+
+#file-input {
+  display: none;
+}
+
+.file-name {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: var(--text-tertiary, #555);
+}
+
+.upload-settings {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.upload-settings label {
+  color: var(--text-primary, #333);
+  font-weight: 500;
+}
+
+.upload-settings select {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 4px;
+  background-color: var(--background-primary, #f9fafb);
+  color: var(--text-primary, #333);
+  font-size: 14px;
+}
+
+.upload-form .submit-button {
+  background-color: var(--brand-color, #af5166);
   color: white;
   border: none;
-  padding: 12px 24px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 15px;
+  border-radius: 5px;
+  padding: 12px 25px;
+  font-size: 16px;
   font-weight: 500;
-  transition: background-color 0.2s, transform 0.1s;
-  display: flex;
-  align-items: center;
-}
-
-.tasks-modal-container .add-tasks-btn:hover {
-  background-color: #4a8697;
-}
-
-.tasks-modal-container .add-tasks-btn:active {
-  transform: translateY(1px);
-}
-
-.tasks-modal-container .add-tasks-btn i {
-  margin-right: 8px;
-}
-
-/* Task item styles - enhance these too */
-.todo-item {
-  display: flex;
-  align-items: center;
-  padding: 10px 12px;
-  border-radius: 6px;
+  cursor: pointer;
   transition: background-color 0.2s;
 }
 
-.todo-item:hover {
-  background-color: var(--bg-light);
+.upload-form .submit-button:hover {
+  background-color: var(--primary-color, #5997ac);
 }
 
-.todo-item span {
-  transition: opacity 0.3s, text-decoration 0.3s;
+.upload-form .submit-button:disabled {
+  background-color: var(--text-tertiary, #cccccc);
+  cursor: not-allowed;
 }
 
-/* Button ripple effect */
-.add-task-btn {
-  position: relative;
-  overflow: hidden;
+.loading-indicator {
+  text-align: center;
+  margin-top: 2rem;
+  color: var(--text-tertiary, #555);
 }
 
-.btn-ripple {
-  position: absolute;
+.spinner {
+  border: 4px solid var(--background-primary, #f3f3f3);
+  border-top: 4px solid var(--brand-color, #af5166);
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.5);
-  transform: scale(0);
-  animation: ripple 0.6s linear;
-  pointer-events: none;
+  width: 40px;
+  height: 40px;
+  animation: spin 2s linear infinite;
+  margin: 0 auto 1rem;
 }
 
-@keyframes ripple {
-  to {
-    transform: scale(4);
-    opacity: 0;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Text Preview Container */
+.text-preview-container {
+  margin: 15px 0;
+  padding: 15px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 8px;
+  background-color: var(--background-primary, #f9fafb);
+}
+
+.text-preview-container h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: var(--text-primary, #333);
+  font-weight: 600;
+}
+
+.text-preview-content {
+  max-height: 150px;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  background-color: var(--background-secondary, white);
+  padding: 15px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color, #eee);
+}
+
+.error-message {
+  color: var(--error-color, #ff3333);
+  margin-top: 8px;
+  font-size: 14px;
+  padding: 8px;
+  background-color: rgba(255, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+/* Night mode compatibility for upload card */
+[data-theme="night"] .upload-card {
+  background-color: #31456e;
+}
+
+[data-theme="night"] .upload-instruction,
+[data-theme="night"] .file-name {
+  color: #cbd5e1;
+}
+
+[data-theme="night"] .upload-settings select {
+  background-color: #31456e;
+  border-color: #4a5b82;
+  color: #e2e8f0;
+}
+
+[data-theme="night"] .text-preview-container {
+  background-color: #273555;
+  border-color: #4a5b82;
+}
+
+[data-theme="night"] .text-preview-content {
+  background-color: #31456e;
+  border-color: #4a5b82;
+  color: #e2e8f0;
+}
+
+[data-theme="night"] .error-message {
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+/* Responsive styles */
+@media (max-width: 991px) {
+  .top-nav {
+    padding-right: 20px;
+  }
+
+  .brand-wrapper {
+    padding-right: 20px;
+  }
+
+  .sidebar-column {
+    width: 220px; /* Fixed width for mobile */
+  }
+
+  .main-content {
+    padding: 20px;
+  }
+
+  .progress-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .practice-btn {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .flashcard-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Upload card responsive styles */
+  .upload-card {
+    width: 95%;
+    padding: 1.5rem;
+  }
+  
+  .upload-settings {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .upload-form .submit-button {
+    width: 100%;
   }
 }
 
-/* Additional styling for task items */
-.todo-list .todo-item.new-task {
-  background-color: rgba(89, 151, 172, 0.08);
-  animation: fadeInTask 0.5s ease-out forwards, highlightTask 1.5s ease-out forwards;
-}
-
-@keyframes highlightTask {
-  0% { background-color: rgba(89, 151, 172, 0.08); }
-  100% { background-color: transparent; }
-}
-
-/* Improved Task Modal Styling */
-.tasks-modal-container .documents-modal {
-  max-width: 550px;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-}
-
-.tasks-modal-container .modal-header {
-  background-color: var(--primary-color);
-  padding: 16px 24px;
-}
-
-.tasks-modal-container .modal-header h2 {
-  font-size: 18px;
-  font-weight: 600;
-  color: white;
-  margin: 0;
-}
-
-.tasks-modal-container .close-modal-btn {
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 24px;
-}
-
-.tasks-modal-container .modal-body {
-  padding: 24px;
-  background-color: white;
-}
-
-.tasks-modal-container .task-textarea {
-  width: 100%;
-  padding: 14px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 15px;
-  resize: vertical;
-  margin-bottom: 24px;
-  min-height: 150px;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.tasks-modal-container .task-textarea:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(89, 151, 172, 0.2);
-}
-
-.tasks-modal-container .add-tasks-btn {
-  background-color: var(--primary-color);
-  color: white;
+@media (max-width: 768px) {
+  .featured-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .featured-icon {
+    margin-bottom: 10px;
+  }
+  
+  .todo-buttons {
+    flex-direction: column;
+  }
+  
+  .course-nav-container {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .course-nav {
+    width: 100%;
+    overflow-x: auto;
+  }
+  /* Delete Task Button Styling */
+.delete-task-btn {
+  background: none;
   border: none;
-  padding: 12px 24px;
-  border-radius: 6px;
+  color: #d1d5db;
   cursor: pointer;
-  font-size: 15px;
-  font-weight: 500;
-  transition: background-color 0.2s, transform 0.1s;
-  display: flex;
-  align-items: center;
-}
-
-.tasks-modal-container .add-tasks-btn:hover {
-  background-color: #4a8697;
-}
-
-.tasks-modal-container .add-tasks-btn:active {
-  transform: translateY(1px);
-}
-
-.tasks-modal-container .add-tasks-btn i {
-  margin-right: 8px;
-}
-
-/* Animation for new tasks */
-.todo-list .todo-item.new-task {
-  opacity: 0;
-  transform: translateY(-10px);
-  transition: opacity 0.4s, transform 0.4s;
-}
-
-/* for the delete button */
-/* Document delete button styling */
-.document-actions {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.document-delete {
-  cursor: pointer;
-  color: #e53935;
-  opacity: 0.7;
-  transition: opacity 0.2s, transform 0.2s;
-}
-
-.document-delete:hover {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-.document-item {
-  transition: opacity 0.3s, height 0.3s, margin 0.3s, padding 0.3s;
-}
-
-/* addition to fix styling for the delete button */
-/* Improved document actions styling */
-.document-actions {
-  display: flex;
-  gap: 20px; /* Increased gap between buttons */
-  align-items: center;
-}
-
-.document-download, .document-delete {
-  width: 32px; /* Fixed width for buttons */
-  height: 32px; /* Fixed height for buttons */
+  padding: 5px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  transition: background-color 0.2s, opacity 0.2s, transform 0.2s;
-  cursor: pointer;
-}
-
-.document-download {
-  color: var(--primary-color);
-}
-
-.document-download:hover {
-  background-color: rgba(89, 151, 172, 0.1);
-  transform: translateY(-2px);
-}
-
-.document-delete {
-  color: #e53935; /* Red color for delete */
-}
-
-.document-delete:hover {
-  background-color: rgba(229, 57, 53, 0.1);
-  transform: translateY(-2px);
-}
-
-/* Add separator between actions */
-.document-download:after {
-  content: '';
+  transition: all 0.2s;
+  opacity: 0.5;
+  font-size: 14px;
+  width: 24px;
+  height: 24px;
   position: absolute;
-  right: -10px;
-  height: 20px;
-  width: 1px;
-  background-color: #e5e7eb;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
 }
+
+.todo-item:hover .delete-task-btn {
+  opacity: 1;
+  color: #ef4444;
+}
+
+.delete-task-btn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* Make sure todo items have position relative for absolute positioning of the delete button */
+.todo-item {
+  position: relative;
+  padding-right: 30px !important;
+}
+
+/* Night mode enhancements for delete button */
+[data-theme="night"] .delete-task-btn {
+  color: #9ca3af;
+}
+
+[data-theme="night"] .todo-item:hover .delete-task-btn {
+  color: #f87171;
+}
+
+[data-theme="night"] .delete-task-btn:hover {
+  background-color: rgba(248, 113, 113, 0.2);
+}
+/* Delete Task Button Styling */
+.delete-task-btn {
+  background: none;
+  border: none;
+  color: #d1d5db;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  opacity: 0.5;
+  font-size: 14px;
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.todo-item:hover .delete-task-btn {
+  opacity: 1;
+  color: #ef4444;
+}
+
+.delete-task-btn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* Make sure todo items have position relative for absolute positioning of the delete button */
+.todo-item {
+  position: relative;
+  padding-right: 30px !important;
+}
+
+/* Night mode enhancements for delete button */
+[data-theme="night"] .delete-task-btn {
+  color: #9ca3af;
+}
+
+[data-theme="night"] .todo-item:hover .delete-task-btn {
+  color: #f87171;
+}
+
+[data-theme="night"] .delete-task-btn:hover {
+  background-color: rgba(248, 113, 113, 0.2);
+}
+
+
+
+
 }

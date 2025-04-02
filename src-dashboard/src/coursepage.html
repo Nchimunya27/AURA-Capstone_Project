@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- CSS Files -->
   <link rel="stylesheet" href="notestab.css">
   <link rel="stylesheet" href="themefix.css">
   <link rel="stylesheet" href="coursepage.css">
@@ -10,14 +11,176 @@
   <link rel="stylesheet" href="coursetabs.css">
   <link rel="stylesheet" href="progress-bar.css">
   <link rel="stylesheet" href="profile-picture-styler.css">
-
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Night Mode Enhancements -->
+  <style>
+    /* Night Mode Enhancements for Better Readability */
+    [data-theme="night"] .todo-card {
+      background-color: #1f2937 !important;
+      border-color: #374151 !important;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    [data-theme="night"] .todo-title {
+      color: #f3f4f6 !important;
+      font-weight: 600 !important;
+    }
+
+    [data-theme="night"] .todo-item {
+      border-bottom: 1px solid #374151 !important;
+      background-color: #1f2937 !important;
+      padding: 15px !important;
+      border-radius: 6px !important;
+      margin-bottom: 8px !important;
+    }
+
+    [data-theme="night"] .todo-item span {
+      color: #e5e7eb !important;
+      font-weight: 500 !important;
+    }
+
+    [data-theme="night"] .todo-item.completed span,
+    [data-theme="night"] .completed-tasks-list .todo-item span {
+      color: #9ca3af !important;
+      text-decoration: line-through !important;
+      opacity: 0.8 !important;
+    }
+
+    /* Enhanced Checkbox Styling for Night Mode */
+    [data-theme="night"] .todo-item input[type="checkbox"] {
+      border: 2px solid #4b5563 !important;
+      background-color: #1f2937 !important;
+    }
+
+    [data-theme="night"] .todo-item input[type="checkbox"]:checked {
+      background-color: #5997ac !important;
+      border-color: #5997ac !important;
+    }
+
+    [data-theme="night"] .todo-item input[type="checkbox"]:checked::after {
+      color: #f3f4f6 !important;
+    }
+
+    /* Enhanced Button Styling for Night Mode */
+    [data-theme="night"] .action-btn {
+      background-color: #374151 !important;
+      color: #e5e7eb !important;
+      border: 1px solid #4b5563 !important;
+    }
+
+    [data-theme="night"] .action-btn:hover {
+      background-color: #4b5563 !important;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    [data-theme="night"] .action-btn.upload-btn,
+    [data-theme="night"] #add-task-btn {
+      background-color: #5997ac !important;
+      color: #f3f4f6 !important;
+      border: none !important;
+    }
+
+    [data-theme="night"] .action-btn.upload-btn:hover,
+    [data-theme="night"] #add-task-btn:hover {
+      background-color: #4a8698 !important;
+    }
+
+    [data-theme="night"] #delete-all-btn,
+    [data-theme="night"] .action-btn.danger {
+      background-color: #991b1b !important;
+      color: #f3f4f6 !important;
+    }
+
+    [data-theme="night"] #delete-all-btn:hover,
+    [data-theme="night"] .action-btn.danger:hover {
+      background-color: #b91c1c !important;
+    }
+
+    /* Section Headers */
+    [data-theme="night"] .section-title {
+      color: #e5e7eb !important;
+      border-bottom: 1px solid #374151 !important;
+      padding-bottom: 10px !important;
+    }
+
+    /* Enhanced Completed Tasks Section */
+    [data-theme="night"] .completed-tasks-section {
+      border-top: 1px solid #374151 !important;
+      margin-top: 20px !important;
+      padding-top: 15px !important;
+    }
+
+    /* Empty List Messages */
+    [data-theme="night"] .todo-list:empty::before,
+    [data-theme="night"] .completed-tasks-list:empty::before {
+      color: #9ca3af !important;
+    }
+
+    /* Delete Task Button Enhancement */
+    [data-theme="night"] .delete-task-btn {
+      color: #9ca3af !important;
+    }
+
+    [data-theme="night"] .todo-item:hover .delete-task-btn {
+      color: #f87171 !important;
+    }
+
+    [data-theme="night"] .delete-task-btn:hover {
+      background-color: rgba(248, 113, 113, 0.2) !important;
+    }
+
+    /* Fix for buttons and tab visibility */
+    [data-theme="night"] .nav-button,
+    [data-theme="night"] .nav-button.active {
+      color: #e5e7eb !important;
+      border-color: #5997ac !important;
+    }
+
+    [data-theme="night"] .nav-button.active {
+      border-bottom: 2px solid #5997ac !important;
+      font-weight: 600 !important;
+    }
+
+    /* Progress bar fix */
+    .progress-fill {
+      background-color: var(--primary-color);
+      /* Removing the hardcoded width */
+      /* width: 75%; */
+      height: 100%;
+      transition: width 0.5s ease-in-out;
+    }
+
+    /* Learning Spotlight Night Mode Enhancements */
+    [data-theme="night"] .featured-content-card {
+      background-color: #1f2937 !important;
+      border-color: #374151 !important;
+    }
+
+    [data-theme="night"] .featured-item {
+      background-color: #2d3748 !important;
+    }
+
+    [data-theme="night"] .featured-title {
+      color: #e5e7eb !important;
+    }
+
+    [data-theme="night"] .featured-description {
+      color: #9ca3af !important;
+    }
+
+    [data-theme="night"] .featured-action {
+      color: #5997ac !important;
+    }
+  </style>
+  
+  <!-- JS Files -->
   <script src="notestab-fix.js"></script>
   <script src="mycoursestocoursepage.js"></script>
   <script src="documentholder.js"></script>
   <script src="theme-init.js"></script>
   <script src="coursetitle-fix.js"></script>
+
   <script>
     // Set up PDF.js worker
     window.pdfjsLib = window.pdfjsLib || {};
@@ -28,386 +191,99 @@
 </head>
 <body>
   <div class="layout-container">
+    <!-- Sidebar -->
     <div class="sidebar-column">
-        <aside class="sidebar">
-          <div class="logo-container">
-            <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/85b806c20428e50d627989a267267af3238bd75b7ee336cfebd141753ef80322?placeholderIfAbsent=true" class="logo-image" alt="Aura logo" />
-            <div class="logo-text">AURA</div>
-          </div>
-          <div class="user-profile">
-            <div class="user-info">
-              <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/9dbfea57b8a729137111c79719a1c4f8e5573959547359abb4b9cbb79dbfb1bf?apiKey=5b35dfe34207418398a5304200905620&" class="user-avatar" alt="User avatar" />
-              <div class="user-details">
-                <div class="user-name">Sarah Johnson</div>
-                <!-- <div class="user-streak">
-                  <div class="streak-icon">
-                    <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/922e71e03a7cdb3fcdb6df0ef8c15850ff4a49e7e52fc56b1922c6ceb2eb460f?apiKey=5b35dfe34207418398a5304200905620&" class="streak-image" alt="Streak icon" />
-                  </div>
-                  <div class="streak-text">15 day streak</div>
-                </div> -->
-              </div>
+      <aside class="sidebar">
+        <div class="logo-container">
+          <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/85b806c20428e50d627989a267267af3238bd75b7ee336cfebd141753ef80322?placeholderIfAbsent=true" class="logo-image" alt="Aura logo" />
+          <div class="logo-text">AURA</div>
+        </div>
+        <div class="user-profile">
+          <div class="user-info">
+            <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/9dbfea57b8a729137111c79719a1c4f8e5573959547359abb4b9cbb79dbfb1bf?apiKey=5b35dfe34207418398a5304200905620&" class="user-avatar" alt="User avatar" />
+            <div class="user-details">
+              <div class="user-name">Sarah Johnson</div>
             </div>
           </div>
-          <nav class="main-nav">
-            <ul class="nav-list">
-              <li class="nav-item">
-                <div class="nav-link">
-                  <div class="nav-icon-wrapper">
-                    <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/5deccc49932436dfe94bb29496dfa738ad0db7b28471baa92df567c6713a85cb?placeholderIfAbsent=true" class="nav-icon" alt="Dashboard icon" />
-                  </div>
-                  <div class="nav-text">Dashboard</div>
+        </div>
+        <nav class="main-nav">
+          <ul class="nav-list">
+            <li class="nav-item">
+              <div class="nav-link">
+                <div class="nav-icon-wrapper">
+                  <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/5deccc49932436dfe94bb29496dfa738ad0db7b28471baa92df567c6713a85cb?placeholderIfAbsent=true" class="nav-icon" alt="Dashboard icon" />
                 </div>
-              </li>
-              <li class="nav-item active">
-                <div class="nav-link">
-                  <div class="nav-icon-wrapper">
-                    <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/7e4782e6f1f5afa6efe604f03bf1347075561660a5ea58537e1a7208704514c4?apiKey=5b35dfe34207418398a5304200905620&" class="nav-icon" alt="My Courses icon" />
-                  </div>
-                  <div class="nav-text">My Courses</div>
+                <div class="nav-text">Dashboard</div>
+              </div>
+            </li>
+            <li class="nav-item active">
+              <div class="nav-link">
+                <div class="nav-icon-wrapper">
+                  <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/7e4782e6f1f5afa6efe604f03bf1347075561660a5ea58537e1a7208704514c4?apiKey=5b35dfe34207418398a5304200905620&" class="nav-icon" alt="My Courses icon" />
                 </div>
-              </li>
-              <li class="nav-item">
-                <div class="nav-link">
-                  <div class="nav-icon-wrapper">
-                    <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/9447e2aa5c597dcd39d0a9bc7b4cabdf945a9cdbd8076eff279bc84f66090d2d?apiKey=5b35dfe34207418398a5304200905620&" class="nav-icon" alt="Calendar icon" />
-                  </div>
-                  <div class="nav-text">Calendar</div>
+                <div class="nav-text">My Courses</div>
+              </div>
+            </li>
+            <li class="nav-item">
+              <div class="nav-link">
+                <div class="nav-icon-wrapper">
+                  <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/9447e2aa5c597dcd39d0a9bc7b4cabdf945a9cdbd8076eff279bc84f66090d2d?apiKey=5b35dfe34207418398a5304200905620&" class="nav-icon" alt="Calendar icon" />
                 </div>
-              </li>
-              <li class="nav-item">
-                <div class="nav-link">
-                  <div class="nav-icon-wrapper">
-                    <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/6d682b869a1b0ede1e946d876b2ff1a8b81f16cec5c13220a34e44e9fc9e50eb?apiKey=5b35dfe34207418398a5304200905620&" class="nav-icon" alt="Progress Analytics icon" />
-                  </div>
-                  <div class="nav-text">Progress Analytics</div>
+                <div class="nav-text">Calendar</div>
+              </div>
+            </li>
+            <li class="nav-item">
+              <div class="nav-link">
+                <div class="nav-icon-wrapper">
+                  <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/6d682b869a1b0ede1e946d876b2ff1a8b81f16cec5c13220a34e44e9fc9e50eb?apiKey=5b35dfe34207418398a5304200905620&" class="nav-icon" alt="Progress Analytics icon" />
                 </div>
-              </li>
-              <li class="nav-item">
-                <div class="nav-link">
-                  <div class="nav-icon-wrapper">
-                    <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/be475ce0c5161593bab6cf3e27d8c506d27699bd1c854b69aceabe63f7401887?apiKey=5b35dfe34207418398a5304200905620&" class="nav-icon" alt="Settings icon" />
-                  </div>
-                  <div class="nav-text">Settings</div>
+                <div class="nav-text">Progress Analytics</div>
+              </div>
+            </li>
+            <li class="nav-item">
+              <div class="nav-link">
+                <div class="nav-icon-wrapper">
+                  <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/be475ce0c5161593bab6cf3e27d8c506d27699bd1c854b69aceabe63f7401887?apiKey=5b35dfe34207418398a5304200905620&" class="nav-icon" alt="Settings icon" />
                 </div>
-              </li>
-              <li class="nav-item">
-                <div class="nav-link">
-                  <div class="nav-icon-wrapper">
-                    <img loading="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA6ElEQVR4nN2UWwrCMBBFDxW7ALsb0TUoPtotqXUXii7JanURPv4jA/FHEzO2+fLChRIm95RJMvDvSoEC2AEV8LCu7FpuaxppClwAE/AZmPwS3AHWimDz5hJINIAm4cZ6qWmLaemxLzxV9LwHZIGa2nfwheLvMgVAPHcB9hHaY6y3LsApIqByAW6KjX1goKiTrA/dFRtfCtVdcegYEXBwAXYRARsXII8ImLkAqR1c3zYOgKHioXXxaBLhio4IqGwRvkAhGbmrhpM04QeNbT9DwbWmLT517eCS2SJ3Wx6jWL5lTW6L90D/Q08RqyheiFaw0QAAAABJRU5ErkJggg==" alt="info"></img>
-                  </div>
-                  <div class="nav-text">About Us</div>
+                <div class="nav-text">Settings</div>
+              </div>
+            </li>
+            <li class="nav-item">
+              <div class="nav-link">
+                <div class="nav-icon-wrapper">
+                  <img loading="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAAA6ElEQVR4nN2UWwrCMBBFDxW7ALsb0TUoPtotqXUXii7JanURPv4jA/FHEzO2+fLChRIm95RJMvDvSoEC2AEV8LCu7FpuaxppClwAE/AZmPwS3AHWimDz5hJINIAm4cZ6qWmLaemxLzxV9LwHZIGa2nfwheLvMgVAPHcB9hHaY6y3LsApIqByAW6KjX1goKiTrA/dFRtfCtVdcegYEXBwAXYRARsXII8ImLkAqR1c3zYOgKHioXXxaBLhio4IqGwRvkAhGbmrhpM04QeNbT9DwbWmLT517eCS2SJ3Wx6jWL5lTW6L90D/Q08RqyheiFaw0QAAAABJRU5ErkJggg==" alt="info">
                 </div>
-              </li>
-            </ul>
-          </nav>
-        </aside>
-      </div>
-  
+                <div class="nav-text">About Us</div>
+              </div>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+    </div>
+    
+    <!-- Main Content -->
     <main class="main-content">
       <header class="course-header">
         <div class="course-title">
           <h1>Web Development</h1>
           <h2>Introduction to Web Applications</h2>
         </div>
-  
         <div class="course-nav-container">
           <nav class="course-nav">
             <button class="nav-button active">Overview</button>
             <button class="nav-button">Notes</button>
             <button class="nav-button">Quizzes</button>
-            <button class="nav-button">Flashcards</button>
           </nav>
           <div class="action-buttons">
             <button class="action-btn upload-btn">
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/ff9f4150dfea655825ef9b103158be35ff42e4d932412b325fe36bf2306c5e51?placeholderIfAbsent=true"
-                alt="Upload"
-                class="btn-icon"
-              />
+              <img src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/ff9f4150dfea655825ef9b103158be35ff42e4d932412b325fe36bf2306c5e51?placeholderIfAbsent=true" alt="Upload" class="btn-icon">
               <span>Upload Document</span>
             </button>
           </div>
         </div>
-
-<!-- Tab Content Sections -->
-<!-- Notes Tab Content -->
-<div id="notes-tab" class="tab-content" style="display: none;">
-  <!-- Top row with Recent Documents and Quick Upload side by side -->
-  <div class="top-row">
-    <!-- Recent Documents (left panel) -->
-    <div class="recent-documents-panel">
-      <h2 class="panel-title">Recent Documents</h2>
-      <div class="documents-grid">
-        <div class="no-documents-message">
-          <i class="fas fa-folder-open"></i>
-          <p>No recent documents</p>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Quick Upload (right panel) -->
-    <div class="upload-panel">
-      <h2 class="panel-title">Quick Upload</h2>
-      <div class="upload-area">
-        <div class="upload-icon">
-          <i class="fas fa-cloud-upload-alt"></i>
-        </div>
-        <p class="upload-text">Drag and drop files here or</p>
-        <button class="browse-btn">Browse Files</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Course Documents (bottom panel) -->
-  <div class="course-documents-panel">
-    <h2 class="panel-title">Course Documents</h2>
-    <div class="document-list">
-      <div class="no-documents-message">
-        <i class="fas fa-folder-open"></i>
-        <p>No course documents available</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-        <div id="flashcard-generator-container" class="flashcard-generator-section">
-          <p id="generation-status"></p>
-          <div id="loading-indicator" style="display: none;">
-            <i class="fas fa-spinner fa-spin"></i> Processing...
-          </div>
-        </div>
-
-                <!-- Flashcards Tab Content -->
-        <div class="tab-content" id="flashcards-tab" style="display: none;">
-          <div class="flashcard-actions">
-            <button class="action-btn upload-for-flashcards-btn">
-              <i class="fas fa-upload"></i>
-              Upload Document
-            </button>
-            <button class="action-btn timer-btn">
-              <i class="fas fa-stopwatch"></i>
-              Time Set
-            </button>
-            <button class="action-btn filter-btn">
-              <i class="fas fa-filter"></i>
-              Filter
-            </button>
-          </div>
-          
-          <!-- Hidden file input for document upload -->
-          <input type="file" id="flashcard-document-input" style="display: none;" accept=".txt,.doc,.docx,.pdf">
-          
-          <div class="flashcard-container">
-            <div class="flashcard-item">
-              <div class="flashcard-front">
-                <h3 class="flashcard-question">Loading flashcards...</h3>
-                
-                <div class="flashcard-controls">
-                  <button class="show-answer-btn">Show Answer</button>
-                  <button class="rotate-btn">
-                    <i class="fas fa-sync-alt"></i>
-                  </button>
-                </div>
-              </div>
-              <div class="flashcard-back">
-                <h3 class="flashcard-answer">Please wait...</h3>
-
-                <div class="flashcard-controls">
-                  <button class="show-answer-btn">Show Question</button>
-                  <button class="rotate-btn">
-                    <i class="fas fa-sync-alt"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="flashcard-nav">
-            <button class="nav-arrow prev-card">
-              <i class="fas fa-arrow-left"></i>
-            </button>
-            
-            <span class="card-count">0 / 0</span>
-            
-            <div class="nav-controls">
-              <button class="nav-arrow next-card">
-                <i class="fas fa-arrow-right"></i>
-              </button>
-              <button class="control-btn shuffle-btn">
-                <i class="fas fa-random"></i>
-              </button>
-            </div>
-          </div>
-          
-          <div class="progress-section">
-            <div class="progress-grid">
-              <div class="progress-card">
-                <h4 class="progress-title">Today's Progress</h4>
-                <div class="progress-info">
-                  <div class="progress-icon">
-                    <i class="fas fa-clock"></i>
-                  </div>
-                  <div class="progress-number">0</div>
-                  <div class="progress-label">Cards Reviewed</div>
-                </div>
-              </div>
-              
-              <div class="progress-card">
-                <h4 class="progress-title">Next Review</h4>
-                <div class="next-review">
-                  <div class="time-info">
-                    <div class="clock-icon">
-                      <i class="far fa-clock"></i>
-                    </div>
-                    <span>Not scheduled</span>
-                  </div>
-                  <div class="arrow-btn">
-                    <i class="fas fa-arrow-right"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-
-
-                <!-- Notes Tab Content -->
-        <div class="tab-content" id="notes-tab" style="display: none;">
-          <div class="section-content">
-            <!-- Recent Documents Section -->
-            <div class="documents-section">
-              <h2 class="section-title">Recent Documents</h2>
-              
-              <div class="documents-grid">
-                <div class="document-card">
-                  <div class="document-icon pdf-icon">
-                    <i class="fas fa-file-pdf"></i>
-                  </div>
-                  <div class="document-info">
-                    <h3 class="document-title">Week 5 Notes.pdf</h3>
-                    <p class="document-date">Updated 2 days ago</p>
-                  </div>
-                </div>
-                
-                <div class="document-card">
-                  <div class="document-icon docx-icon">
-                    <i class="fas fa-file-word"></i>
-                  </div>
-                  <div class="document-info">
-                    <h3 class="document-title">Assignment 3.docx</h3>
-                    <p class="document-date">Updated 5 days ago</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Quick Upload Section -->
-            <div class="upload-section">
-              <h2 class="section-title">Quick Upload</h2>
-              
-              <div class="upload-area">
-                <div class="upload-icon">
-                  <i class="fas fa-cloud-upload-alt"></i>
-                </div>
-                <p class="upload-text">Drag and drop files here or</p>
-                <button class="browse-btn">Browse Files</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Course Documents Section -->
-          <div class="course-documents">
-            <h2 class="section-title">Course Documents</h2>        
-          </div>
-        </div>
       </header>
-
-            <!-- Quizzes Tab Content -->
-      <div class="tab-content" id="quizzes-tab" style="display: none;">
-          <div class="quizzes-grid">
-            <!-- Next Quiz Section -->
-            <div class="quiz-card next-quiz">
-              <h3 class="quiz-section-title">Next Quiz</h3>
-              <div class="next-quiz-content">
-                <div class="quiz-icon">
-                  <i class="fas fa-question-circle"></i>
-                </div>
-                <div class="quiz-info">
-                  <h4 class="quiz-title">Arrays and Loops</h4>
-                  <p class="quiz-date">Tomorrow at 10:00 AM</p>
-                </div>
-              </div>
-              <button class="practice-quiz-btn">Start Practice Quiz</button>
-            </div>
-            
-            <!-- Upcoming Quizzes Section -->
-            <div class="quiz-card upcoming-quizzes">
-              <h3 class="quiz-section-title">Upcoming Quizzes</h3>
-              <div class="upcoming-list">
-                <div class="upcoming-item">
-                  <div class="quiz-icon locked">
-                    <i class="fas fa-lock"></i>
-                  </div>
-                  <div class="quiz-info">
-                    <h4 class="quiz-title">Chapter 5 Quiz</h4>
-                    <p class="quiz-date">Tomorrow, 2:00 PM</p>
-                  </div>
-                  <div class="quiz-status pending">Pending</div>
-                </div>
-                
-                <div class="upcoming-item">
-                  <div class="quiz-icon locked">
-                    <i class="fas fa-lock"></i>
-                  </div>
-                  <div class="quiz-info">
-                    <h4 class="quiz-title">Mid-term Review</h4>
-                    <p class="quiz-date">Next Week</p>
-                  </div>
-                  <div class="quiz-status scheduled">Scheduled</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Past Quizzes Section -->
-          <div class="past-quizzes">
-            <h3 class="quiz-section-title">Past Quizzes</h3>
-            
-            <div class="past-quiz-list">
-              <div class="past-quiz-item">
-                <div class="quiz-left">
-                  <div class="quiz-icon locked">
-                    <i class="fas fa-lock"></i>
-                  </div>
-                  <div class="quiz-info">
-                    <h4 class="quiz-title">Quiz 1</h4>
-                    <p class="quiz-subject">Chapter 5: Binary Trees</p>
-                  </div>
-                </div>
-                <div class="quiz-right">
-                  <p class="quiz-date">Tomorrow<br>10:00 AM</p>
-                </div>
-              </div>
-              
-              <div class="past-quiz-item">
-                <div class="quiz-left">
-                  <div class="quiz-icon question">
-                    <i class="fas fa-question-circle"></i>
-                  </div>
-                  <div class="quiz-info">
-                    <h4 class="quiz-title">Quiz 2</h4>
-                    <p class="quiz-subject">Advanced Mathematics</p>
-                  </div>
-                </div>
-                <div class="quiz-right">
-                  <p class="quiz-date">Wed, Mar 15<br>2:30 PM</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-  
+      
+      <!-- Progress Section -->
       <section class="progress-section">
         <div class="progress-grid">
           <article class="progress-card">
@@ -415,126 +291,194 @@
             <div class="progress-info">
               <div class="progress-header">
                 <span class="progress-label">Course Progress</span>
-                <span class="progress-percentage">75%</span>
+                <span class="progress-percentage"></span>
               </div>
               <div class="progress-bar">
                 <div class="progress-fill"></div>
               </div>
             </div>
             <div class="progress-stats">
-              <p>Completed Modules: 6/8</p>
-              <p>Hours Studied: 24h</p>
+              <p></p>
+              <p></p>
             </div>
           </article>
-  
           <article class="quiz-card">
             <h3>Next Quiz</h3>
             <div class="quiz-info">
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/39434e688f82cec3ddfd191fd01b539932198f3f4c7ac461793ade5aaf8f9f1f?placeholderIfAbsent=true"
-                alt="Quiz"
-                class="quiz-icon"
-              />
+              <img src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/39434e688f82cec3ddfd191fd01b539932198f3f4c7ac461793ade5aaf8f9f1f?placeholderIfAbsent=true" alt="Quiz" class="quiz-icon" />
               <div class="quiz-details">
-                <h4>Arrays and Loops</h4>
-                <p>Tomorrow at 10:00 AM</p>
+                <!-- Quiz details -->
               </div>
             </div>
             <button class="practice-btn">Start Practice Quiz</button>
           </article>
-  
           <article class="streak-card">
             <h3>Study Streak</h3>
             <div class="streak-info">
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/2fada8ae84efcbd1017bbb759c6a9a3265490d2620ea31a6942ee1daa464adcb?placeholderIfAbsent=true"
-                alt="Streak"
-                class="streak-icon"
-              />
-              <p>Days in a row</p>
+              <img src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/2fada8ae84efcbd1017bbb759c6a9a3265490d2620ea31a6942ee1daa464adcb?placeholderIfAbsent=true" alt="Streak" class="streak-icon" />
+              <p></p>
             </div>
-            <img
-              src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/c30aa1e65a36abb8cb0450aaa30f572be99d7036f7b3ac7104951fbba1dc6cb8?placeholderIfAbsent=true"
-              alt="Streak chart"
-              class="streak-chart"
-            />
+            <img src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/c30aa1e65a36abb8cb0450aaa30f572be99d7036f7b3ac7104951fbba1dc6cb8?placeholderIfAbsent=true" alt="Streak chart" class="streak-chart" />
           </article>
         </div>
       </section>
-  
+      
+      <!-- Learning Spotlight Section (Populated later via API) -->
       <section class="content-section">
         <div class="content-grid">
           <div class="main-column">
-            <article class="documents-card">
-              <header class="card-header">
-                <h3>Course Documents</h3>
-                <button class="link-btn">View All</button>
+            <article class="featured-content-card">
+              <header class="featured-header">
+                <h3>Learning Spotlight</h3>
+                <button class="link-btn">Explore More</button>
               </header>
-              <div class="document-list">
-                <!-- Documents will be added dynamically -->
-              </div>
-            </article>
-  
-            <article class="flashcards-card">
-              <header class="card-header">
-                <h3>Flashcards</h3>
-                <div class="card-actions">
-                  <button class="link-btn">View All</button>
+              <div class="featured-content">
+                <div class="featured-item">
+                  <div class="featured-icon">
+                    <i class="fas fa-lightbulb"></i>
+                  </div>
+                  <div class="featured-details">
+                    <h4 class="featured-title">Daily Challenge</h4>
+                    <p class="featured-description">
+                      Coming soon…
+                    </p>
+                    <button class="featured-action">Try Now</button>
+                  </div>
                 </div>
-              </header>
-              <div class="flashcard-grid">
-                <div class="flashcard">
-                  <h4>What is a variable?</h4>
-                  <p>A container for storing data values</p>
+                <div class="featured-item">
+                  <div class="featured-icon">
+                    <i class="fas fa-book-open"></i>
+                  </div>
+                  <div class="featured-details">
+                    <h4 class="featured-title">Recommended Read</h4>
+                    <p class="featured-description">
+                      Coming soon…
+                    </p>
+                    <button class="featured-action">Read More</button>
+                  </div>
                 </div>
-                <div class="flashcard">
-                  <h4>What is an array?</h4>
-                  <p>
-                    A data structure that stores multiple values in a single
-                    variable
-                  </p>
+                <div class="featured-item">
+                  <div class="featured-icon">
+                    <i class="fas fa-video"></i>
+                  </div>
+                  <div class="featured-details">
+                    <h4 class="featured-title">Tutorial Spotlight</h4>
+                    <p class="featured-description">
+                      Coming soon…
+                    </p>
+                    <button class="featured-action">Watch Now</button>
+                  </div>
                 </div>
               </div>
             </article>
           </div>
-  
+          
+          <!-- Side Column: To-Do List and Quiz Scores -->
           <div class="side-column">
             <article class="todo-card">
-              <h3>To-Do List</h3>
+              <div class="todo-buttons">
+                <button id="add-task-btn" class="action-btn"><i class="fas fa-plus"></i> Add Task</button>
+                <button id="delete-all-btn" class="action-btn danger"><i class="fas fa-trash"></i> Clear All</button>
+              </div>
+              <h3 class="todo-title">To-Do List</h3>
               <div class="todo-list">
-                
+                <!-- Tasks will be added dynamically -->
+              </div>
+              <div class="completed-tasks-section">
+                <h3 class="section-title">Completed Tasks</h3>
+                <div class="completed-tasks-list">
+                  <!-- Completed tasks will be added dynamically -->
+                </div>
               </div>
             </article>
-  
             <article class="scores-card">
               <h3>Recent Quiz Scores</h3>
               <div class="scores-list">
-                <div class="score-item">
-                  <span class="quiz-name">Variables Quiz</span>
-                  <span class="score high"></span>
-                </div>
-                <div class="score-item">
-                  <span class="quiz-name">Functions Quiz</span>
-                  <span class="score high"></span>
-                </div>
-                <div class="score-item">
-                  <span class="quiz-name">Loops Quiz</span>
-                  <span class="score medium"></span>
-                </div>
+                <!-- Quiz scores will be added dynamically -->
               </div>
             </article>
           </div>
         </div>
       </section>
+      
+      <!-- Tab Content: Notes -->
+      <div class="tab-content" id="notes-tab" style="display: none;">
+        <div class="section-content">
+          <div class="documents-section">
+            <h2 class="section-title">Recent Documents</h2>
+            <div class="documents-grid">
+              <div class="no-documents-message">
+                <i class="fas fa-folder-open"></i>
+                <p>No recent documents</p>
+              </div>
+            </div>
+          </div>
+          <div class="upload-section">
+            <h2 class="section-title">Quick Upload</h2>
+            <div class="upload-area">
+              <div class="upload-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+              </div>
+              <p class="upload-text">Drag and drop files here or</p>
+              <button class="browse-btn">Browse Files</button>
+            </div>
+          </div>
+        </div>
+        <div class="course-documents">
+          <h2 class="section-title">Course Documents</h2>
+        </div>
+      </div>
+      
+      <!-- Tab Content: Quizzes -->
+      <div class="tab-content" id="quizzes-tab" style="display: none;">
+        <!-- Although a tab-content is here, clicking "Quizzes" will redirect to the Quiz page -->
+      </div>
+      
     </main>
   </div>
-<script src="coursepage.js"></script>
-<script src="flashcard-generator.js"></script>
-<script src= "aura.js" ></script>
-<script src="tab-system-fix.js"></script>
-<script src="task-bar.js"></script>
-<script src="profile-picture-manager.js"></script>
-
-
+  
+  
+  <!-- Quiz Tab Navigation Fix -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Check for buttons outside of initialization function to ensure they're found
+      const navButtons = document.querySelectorAll(".course-nav .nav-button");
+      const practiceBtn = document.querySelector(".practice-btn");
+      const practiceQuizBtn = document.querySelector(".practice-quiz-btn");
+      
+      // Add event listener to all nav buttons
+      navButtons.forEach((button) => {
+        button.addEventListener("click", function() {
+          const tabName = this.textContent.trim().toLowerCase();
+          if (tabName === "quizzes") {
+            console.log("Redirecting to quiz page...");
+            window.location.href = "quiz.html";
+          }
+        });
+      });
+      
+      // Make sure the practice button redirects too
+      if (practiceBtn) {
+        practiceBtn.addEventListener("click", function() {
+          console.log("Starting practice quiz");
+          window.location.href = "quiz.html";
+        });
+      }
+      
+      if (practiceQuizBtn) {
+        practiceQuizBtn.addEventListener("click", function() {
+          console.log("Starting practice quiz");
+          window.location.href = "quiz.html";
+        });
+      }
+    });
+  </script>
+  <!-- JavaScript Files -->
+  <script src="coursepage.js"></script>
+  <script src="flashcard-generator.js"></script>
+  <script src="aura.js"></script>
+  <script src="tab-system-fix.js"></script>
+  <script src="profile-picture-manager.js"></script>
+  
 </body>
 </html>
