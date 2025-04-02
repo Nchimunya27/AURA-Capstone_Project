@@ -4,10 +4,64 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize Supabase client 
     const supabaseClient = supabase.createClient(
         'https://uumdfsnboqkounadxijq.supabase.co', //URL
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1bWRmc25ib3Frb3VuYWR4aWpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIzNDc5NzMsImV4cCI6MjA1NzkyMzk3M30.s3IDgE3c4kpaiRhCpaKATKdaZzdlTb91heIhrwDZrU0' //anon key
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1bWRmc25ib3Frb3VuYWR4aWpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIzNDc5NzMsImV4cCI6MjA1NzkyMzk3M30.s3IDgE3c4kpaiRhCpaKATKdaZzdlTb91heIhrwDZrU0', //anon key
+        {
+            // Add persistSession option to ensure Supabase persists sessions
+            auth: {
+                persistSession: true,
+                autoRefreshToken: true,
+                storageKey: 'supabase.auth.token'
+            }
+        }
     );
     
-    //console.log('Supabase client initialized');
+    // Check for existing session on page load
+    checkAndHandleSession();
+    
+    // Function to check and handle existing session
+    async function checkAndHandleSession() {
+        try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            
+            if (session) {
+                console.log('Existing session found:', session);
+                
+                // Get user profile data including username
+                const { data: profile, error: profileError } = await supabaseClient
+                    .from('profiles')
+                    .select('username, email')
+                    .eq('id', session.user.id)
+                    .single();
+                    
+                if (profileError) {
+                    console.error('Error fetching profile for session:', profileError);
+                    return;
+                }
+                
+                if (profile) {
+                    console.log('User is logged in as:', profile.username);
+                    
+                    // Store essential user data in localStorage
+                    // This is just for UI purposes, authentication still relies on Supabase session
+                    localStorage.setItem('currentUsername', profile.username);
+                    localStorage.setItem('user_id', session.user.id);
+                    
+                    // Redirect to dashboard if on login page
+                    if (window.location.pathname.includes('login.html')) {
+                        window.location.href = '../src-dashboard/src/aura.html';
+                    }
+                }
+            } else {
+                console.log('No active session found');
+                // If on a protected page, redirect to login
+                if (!window.location.pathname.includes('login.html')) {
+                    window.location.href = 'login.html';
+                }
+            }
+        } catch (error) {
+            console.error('Session check error:', error);
+        }
+    }
     
     // Show the status message function 
     function showStatusMessage(message, isError = false) {
@@ -129,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Login successful!');
                 showStatusMessage('Login successful!');
                 
-                // Store user data
+                // Store minimal user data - authentication will use Supabase session
                 localStorage.setItem('user_id', authData.user.id);
                 localStorage.setItem('currentUsername', username);
                 
@@ -252,23 +306,32 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Create account form not found.');
     }
     
-    // Logout function
+    // Improved Logout function
     window.logout = async function() {
         try {
-            const { error } = await supabaseClient.auth.signOut();
+            // First, clear localStorage
+            localStorage.removeItem('currentUsername');
+            localStorage.removeItem('user_firstName');
+            localStorage.removeItem('user_lastName');
+            localStorage.removeItem('user_id');
+            
+            // Then, sign out with Supabase
+            const { error } = await supabaseClient.auth.signOut({
+                scope: 'global' // Sign out from all tabs/windows
+            });
+            
             if (error) {
                 console.error('Logout error:', error);
                 showStatusMessage(`Error logging out: ${error.message}`, true);
                 return;
             }
             
-            // Clear user data
-            localStorage.removeItem('currentUsername');
-            localStorage.removeItem('user_firstName');
-            localStorage.removeItem('user_lastName');
-            localStorage.removeItem('user_id');
-            
+            console.log('Successfully logged out from Supabase');
             showStatusMessage('Logged out successfully!');
+            
+            // Verify that session is gone
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            console.log('Session after logout:', session); // Should be null
             
             setTimeout(() => {
                 window.location.href = 'login.html';
@@ -278,4 +341,20 @@ document.addEventListener('DOMContentLoaded', function() {
             showStatusMessage(`Error: ${error.message}`, true);
         }
     };
+    
+    // Add session listener to handle changes in auth state
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+        console.log('Auth state changed:', event, session ? 'Session exists' : 'No session');
+        
+        if (event === 'SIGNED_OUT') {
+            // Additional cleanup on sign out
+            console.log('User signed out, performing cleanup');
+            localStorage.clear(); // Clear all localStorage for complete cleanup
+            
+            // Redirect to login if not already there
+            if (!window.location.pathname.includes('login.html')) {
+                window.location.href = 'login.html';
+            }
+        }
+    });
 });

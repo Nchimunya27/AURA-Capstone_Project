@@ -2741,4 +2741,452 @@ element.innerHTML = `
     
     // Rest of your initialization code...
   });
+
+  // Add this JavaScript to your existing task-bar.js file or create a new one
+document.addEventListener("DOMContentLoaded", function() {
+  // DOM Elements for Task functionality
+  const addTaskBtn = document.getElementById("add-task-btn");
+  const deleteAllBtn = document.getElementById("delete-all-btn");
+  const taskModal = document.getElementById("task-modal");
+  const closeTaskModal = document.getElementById("close-task-modal");
+  const cancelTaskBtn = document.getElementById("cancel-task-btn");
+  const confirmAddTaskBtn = document.getElementById("confirm-add-task");
+  const taskInput = document.getElementById("task-input");
+  const todoList = document.querySelector(".todo-list");
+  const completedTasksList = document.querySelector(".completed-tasks-list");
+
+  // DOM Elements for Quiz navigation
+  const navButtons = document.querySelectorAll(".course-nav .nav-button");
+  const practiceBtn = document.querySelector(".practice-btn");
+  const practiceQuizBtn = document.querySelector(".practice-quiz-btn");
+  
+  // Add event listener to all nav buttons for quiz navigation
+  if (navButtons) {
+    navButtons.forEach((button) => {
+      button.addEventListener("click", function() {
+        const tabName = this.textContent.trim().toLowerCase();
+        if (tabName === "quizzes") {
+          console.log("Redirecting to upload page...");
+          window.location.href = "upload.html";
+        }
+      });
+    });
+  }
+  
+  // Make sure the practice buttons redirect to upload page
+  if (practiceBtn) {
+    practiceBtn.addEventListener("click", function() {
+      console.log("Starting practice quiz - redirecting to upload page");
+      window.location.href = "upload.html";
+    });
+  }
+  
+  if (practiceQuizBtn) {
+    practiceQuizBtn.addEventListener("click", function() {
+      console.log("Starting practice quiz - redirecting to upload page");
+      window.location.href = "upload.html";
+    });
+  }
+
+  // Task Management Functions
+  
+  // Open task modal
+  if (addTaskBtn) {
+    addTaskBtn.addEventListener("click", function() {
+      if (taskModal) {
+        taskModal.classList.add("active");
+        setTimeout(() => {
+          if (taskInput) taskInput.focus();
+        }, 300);
+      }
+    });
+  }
+
+  // Close task modal
+  function closeModal() {
+    if (taskModal) {
+      taskModal.classList.remove("active");
+      if (taskInput) taskInput.value = "";
+    }
+  }
+  
+  if (closeTaskModal) {
+    closeTaskModal.addEventListener("click", closeModal);
+  }
+  
+  if (cancelTaskBtn) {
+    cancelTaskBtn.addEventListener("click", closeModal);
+  }
+
+  // Add task from modal
+  if (confirmAddTaskBtn && taskInput) {
+    confirmAddTaskBtn.addEventListener("click", function() {
+      const taskText = taskInput.value.trim();
+      if (taskText !== "") {
+        addNewTask(taskText);
+        closeModal();
+        
+        // Save tasks to localStorage or your preferred storage method
+        saveTasks();
+      }
+    });
+  }
+  
+  // Add Enter key support
+  if (taskInput) {
+    taskInput.addEventListener("keyup", function(event) {
+      if (event.key === "Enter") {
+        const taskText = taskInput.value.trim();
+        if (taskText !== "") {
+          addNewTask(taskText);
+          closeModal();
+          
+          // Save tasks to localStorage or your preferred storage method
+          saveTasks();
+        }
+      }
+    });
+  }
+  
+  // Add new task
+  function addNewTask(text) {
+    if (!todoList) return;
+    
+    const taskItem = document.createElement("div");
+    taskItem.className = "todo-item";
+    taskItem.dataset.taskId = `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.addEventListener("change", function() {
+      if (this.checked) {
+        moveToCompleted(taskItem);
+      } else {
+        moveToActive(taskItem);
+      }
+      
+      // Save tasks to localStorage or your preferred storage method
+      saveTasks();
+    });
+    
+    const taskText = document.createElement("span");
+    taskText.textContent = text;
+    
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete-task-btn";
+    deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+    deleteBtn.setAttribute("title", "Delete task");
+    deleteBtn.addEventListener("click", function() {
+      deleteTask(taskItem);
+    });
+    
+    taskItem.appendChild(checkbox);
+    taskItem.appendChild(taskText);
+    taskItem.appendChild(deleteBtn);
+    
+    todoList.appendChild(taskItem);
+    
+    // Update your progress indicators if needed
+    updateProgress();
+  }
+  
+  // Move task to completed list
+  function moveToCompleted(taskItem) {
+    if (!completedTasksList) return;
+    
+    taskItem.classList.add("completed");
+    if (taskItem.parentElement) {
+      taskItem.parentElement.removeChild(taskItem);
+    }
+    completedTasksList.appendChild(taskItem);
+    
+    // Update your progress indicators if needed
+    updateProgress();
+  }
+  
+  // Move task back to active list
+  function moveToActive(taskItem) {
+    if (!todoList) return;
+    
+    taskItem.classList.remove("completed");
+    if (taskItem.parentElement) {
+      taskItem.parentElement.removeChild(taskItem);
+    }
+    todoList.appendChild(taskItem);
+    
+    // Update your progress indicators if needed
+    updateProgress();
+  }
+  
+  // Delete task
+  function deleteTask(taskItem) {
+    if (taskItem && taskItem.parentElement) {
+      // Optional: Add fade-out animation
+      taskItem.style.opacity = "0";
+      taskItem.style.transform = "translateX(20px)";
+      taskItem.style.transition = "opacity 0.3s, transform 0.3s";
+      
+      setTimeout(() => {
+        if (taskItem.parentElement) {
+          taskItem.parentElement.removeChild(taskItem);
+          
+          // Save tasks to localStorage or your preferred storage method
+          saveTasks();
+          
+          // Update your progress indicators if needed
+          updateProgress();
+        }
+      }, 300);
+    }
+  }
+  
+  // Delete all tasks
+  if (deleteAllBtn) {
+    deleteAllBtn.addEventListener("click", function() {
+      if (confirm("Are you sure you want to delete all tasks?")) {
+        if (todoList) todoList.innerHTML = "";
+        if (completedTasksList) completedTasksList.innerHTML = "";
+        
+        // Save tasks to localStorage or your preferred storage method
+        saveTasks();
+        
+        // Update your progress indicators if needed
+        updateProgress();
+      }
+    });
+  }
+  
+  // Save tasks to localStorage
+  function saveTasks() {
+    const allTasks = [];
+    
+    // Get active tasks
+    if (todoList) {
+      todoList.querySelectorAll('.todo-item').forEach(item => {
+        allTasks.push({
+          id: item.dataset.taskId,
+          text: item.querySelector('span').textContent,
+          completed: false
+        });
+      });
+    }
+    
+    // Get completed tasks
+    if (completedTasksList) {
+      completedTasksList.querySelectorAll('.todo-item').forEach(item => {
+        allTasks.push({
+          id: item.dataset.taskId,
+          text: item.querySelector('span').textContent,
+          completed: true
+        });
+      });
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('aura_tasks', JSON.stringify(allTasks));
+  }
+  
+  // Load tasks from localStorage
+  function loadTasks() {
+    try {
+      const savedTasks = JSON.parse(localStorage.getItem('aura_tasks'));
+      
+      if (savedTasks && savedTasks.length > 0) {
+        savedTasks.forEach(task => {
+          // Create task element
+          const taskItem = document.createElement("div");
+          taskItem.className = "todo-item";
+          if (task.completed) taskItem.classList.add("completed");
+          taskItem.dataset.taskId = task.id || `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.checked = task.completed;
+          checkbox.addEventListener("change", function() {
+            if (this.checked) {
+              moveToCompleted(taskItem);
+            } else {
+              moveToActive(taskItem);
+            }
+            
+            saveTasks();
+          });
+          
+          const taskText = document.createElement("span");
+          taskText.textContent = task.text;
+          
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "delete-task-btn";
+          deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+          deleteBtn.setAttribute("title", "Delete task");
+          deleteBtn.addEventListener("click", function() {
+            deleteTask(taskItem);
+          });
+          
+          taskItem.appendChild(checkbox);
+          taskItem.appendChild(taskText);
+          taskItem.appendChild(deleteBtn);
+          
+          // Add to appropriate list
+          if (task.completed && completedTasksList) {
+            completedTasksList.appendChild(taskItem);
+          } else if (!task.completed && todoList) {
+            todoList.appendChild(taskItem);
+          }
+        });
+        
+        // Update your progress indicators if needed
+        updateProgress();
+      }
+    } catch (e) {
+      console.error('Error loading tasks:', e);
+    }
+  }
+  
+  // Update progress indicators
+  function updateProgress() {
+    // Count tasks
+    const totalActive = todoList ? todoList.querySelectorAll('.todo-item').length : 0;
+    const totalCompleted = completedTasksList ? completedTasksList.querySelectorAll('.todo-item').length : 0;
+    const totalTasks = totalActive + totalCompleted;
+    
+    // Update progress bar if exists
+    const progressFill = document.querySelector('.progress-fill');
+    const progressPercentage = document.querySelector('.progress-percentage');
+    
+    if (progressFill && totalTasks > 0) {
+      const percentage = Math.round((totalCompleted / totalTasks) * 100);
+      progressFill.style.width = `${percentage}%`;
+      
+      if (progressPercentage) {
+        progressPercentage.textContent = `${percentage}%`;
+      }
+    }
+    
+    // Update other progress indicators if needed
+    const completedModulesText = document.querySelector('.progress-stats p:first-child');
+    const hoursStudiedText = document.querySelector('.progress-stats p:last-child');
+    
+    if (completedModulesText) {
+      completedModulesText.textContent = `Completed Tasks: ${totalCompleted}/${totalTasks}`;
+    }
+    
+    if (hoursStudiedText) {
+      // Approximate hours based on number of completed tasks (just an example)
+      const hours = (totalCompleted * 0.5).toFixed(1);
+      hoursStudiedText.textContent = `Hours Studied: ${hours}h`;
+    }
+  }
+  
+  // Initialize tasks
+  loadTasks();
+  
+  // When clicking outside the modal, close it
+  if (taskModal) {
+    window.addEventListener("click", function(event) {
+      if (event.target === taskModal) {
+        closeModal();
+      }
+    });
+  }
+});
+
+// Add this to your existing JavaScript or task-bar.js file
+
+// Function to add delete buttons to all existing tasks
+function addDeleteButtonsToTasks() {
+  const todoItems = document.querySelectorAll('.todo-item');
+  
+  todoItems.forEach(item => {
+    // Only add if delete button doesn't already exist
+    if (!item.querySelector('.delete-task-btn')) {
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-task-btn';
+      deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+      deleteBtn.setAttribute('title', 'Delete task');
+      
+      // Add click event to delete the task
+      deleteBtn.addEventListener('click', function(e) {
+        e.stopPropagation(); // Prevent event bubbling
+        deleteTask(item);
+      });
+      
+      item.appendChild(deleteBtn);
+    }
+  });
+}
+
+// Function to delete a task
+function deleteTask(taskItem) {
+  if (taskItem && taskItem.parentElement) {
+    // Add fade-out animation
+    taskItem.style.opacity = "0";
+    taskItem.style.transform = "translateX(20px)";
+    taskItem.style.transition = "opacity 0.3s, transform 0.3s";
+    
+    setTimeout(() => {
+      if (taskItem.parentElement) {
+        taskItem.parentElement.removeChild(taskItem);
+        
+        // If you have a save function, call it here
+        if (typeof saveTasks === 'function') {
+          saveTasks();
+        }
+        
+        // If you have a progress update function, call it here
+        if (typeof updateProgress === 'function') {
+          updateProgress();
+        }
+      }
+    }, 300);
+  }
+}
+
+// When adding a new task, make sure to add the delete button
+function addNewTaskWithDeleteButton(text) {
+  // This assumes you have a todoList element
+  const todoList = document.querySelector('.todo-list');
+  if (!todoList) return;
+  
+  // Create the task item
+  const taskItem = document.createElement('div');
+  taskItem.className = 'todo-item';
+  
+  // Add checkbox
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  
+  // Add task text
+  const taskText = document.createElement('span');
+  taskText.textContent = text;
+  
+  // Add delete button
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'delete-task-btn';
+  deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+  deleteBtn.setAttribute('title', 'Delete task');
+  deleteBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    deleteTask(taskItem);
+  });
+  
+  // Assemble the task item
+  taskItem.appendChild(checkbox);
+  taskItem.appendChild(taskText);
+  taskItem.appendChild(deleteBtn);
+  
+  // Add to the list
+  todoList.appendChild(taskItem);
+  
+  return taskItem;
+}
+
+// Initialize - run this when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+  // Add delete buttons to existing tasks
+  addDeleteButtonsToTasks();
+  
+  // Optional: If you have a task creation function, modify it to include the delete button
+  // or replace it with addNewTaskWithDeleteButton
+});
 })();
