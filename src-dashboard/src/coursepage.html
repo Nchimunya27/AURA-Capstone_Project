@@ -158,16 +158,6 @@
     </div>
   </div>
 
-  <!-- Course Documents (bottom panel) -->
-  <div class="course-documents-panel">
-    <h2 class="panel-title">Course Documents</h2>
-    <div class="document-list">
-      <div class="no-documents-message">
-        <i class="fas fa-folder-open"></i>
-        <p>No course documents available</p>
-      </div>
-    </div>
-  </div>
 </div>
 
         <div id="flashcard-generator-container" class="flashcard-generator-section">
@@ -408,124 +398,154 @@
           </div>
         </div>
   
-      <section class="progress-section">
-        <div class="progress-grid">
-          <article class="progress-card">
-            <h3>Overall Progress</h3>
-            <div class="progress-info">
-              <div class="progress-header">
-                <span class="progress-label">Course Progress</span>
-                <span class="progress-percentage">75%</span>
-              </div>
-              <div class="progress-bar">
-                <div class="progress-fill"></div>
-              </div>
-            </div>
-            <div class="progress-stats">
-              <p>Completed Modules: 6/8</p>
-              <p>Hours Studied: 24h</p>
-            </div>
-          </article>
-  
-          <article class="quiz-card">
-            <h3>Next Quiz</h3>
-            <div class="quiz-info">
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/39434e688f82cec3ddfd191fd01b539932198f3f4c7ac461793ade5aaf8f9f1f?placeholderIfAbsent=true"
-                alt="Quiz"
-                class="quiz-icon"
-              />
-              <div class="quiz-details">
-                <h4>Arrays and Loops</h4>
-                <p>Tomorrow at 10:00 AM</p>
-              </div>
-            </div>
-            <button class="practice-btn">Start Practice Quiz</button>
-          </article>
-  
-          <article class="streak-card">
-            <h3>Study Streak</h3>
-            <div class="streak-info">
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/2fada8ae84efcbd1017bbb759c6a9a3265490d2620ea31a6942ee1daa464adcb?placeholderIfAbsent=true"
-                alt="Streak"
-                class="streak-icon"
-              />
-              <p>Days in a row</p>
-            </div>
-            <img
-              src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/c30aa1e65a36abb8cb0450aaa30f572be99d7036f7b3ac7104951fbba1dc6cb8?placeholderIfAbsent=true"
-              alt="Streak chart"
-              class="streak-chart"
-            />
-          </article>
+  <!-- Modified Overview section for the course page -->
+<section class="progress-section">
+  <div class="progress-grid">
+    <article class="progress-card">
+      <h3>Overall Progress</h3>
+      <div class="progress-info">
+        <div class="progress-header">
+          <span class="progress-label">Course Progress</span>
+          <span class="progress-percentage" id="progress-percentage">0%</span>
         </div>
-      </section>
-  
-      <section class="content-section">
-        <div class="content-grid">
-          <div class="main-column">
-            <article class="documents-card">
-              <header class="card-header">
-                <h3>Course Documents</h3>
-                <button class="link-btn">View All</button>
-              </header>
-              <div class="document-list">
-                <!-- Documents will be added dynamically -->
-              </div>
-            </article>
-  
-            <article class="flashcards-card">
-              <header class="card-header">
-                <h3>Flashcards</h3>
-                <div class="card-actions">
-                  <button class="link-btn">View All</button>
-                </div>
-              </header>
-              <div class="flashcard-grid">
-                <div class="flashcard">
-                  <h4>What is a variable?</h4>
-                  <p>A container for storing data values</p>
-                </div>
-                <div class="flashcard">
-                  <h4>What is an array?</h4>
-                  <p>
-                    A data structure that stores multiple values in a single
-                    variable
-                  </p>
-                </div>
-              </div>
-            </article>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+      <div class="progress-stats">
+        <p id="completed-modules">Completed Modules: 0/8</p>
+        <p id="hours-studied">Hours Studied: 0h</p>
+      </div>
+    </article>
+
+    <article class="quiz-card">
+      <h3>Next Quiz</h3>
+      <div class="quiz-info" id="quiz-info">
+        <img
+          src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/39434e688f82cec3ddfd191fd01b539932198f3f4c7ac461793ade5aaf8f9f1f?placeholderIfAbsent=true"
+          alt="Quiz"
+          class="quiz-icon"
+        />
+        <div class="quiz-details">
+          <h4 id="quiz-title">No Quiz Available</h4>
+          <p id="quiz-date"></p>
+        </div>
+      </div>
+      <button class="practice-btn" id="practice-btn" disabled>Start Practice Quiz</button>
+    </article>
+
+    <article class="streak-card">
+      <h3>Study Streak</h3>
+      <div class="streak-info">
+        <img
+          src="https://cdn.builder.io/api/v1/image/assets/5b35dfe34207418398a5304200905620/b3491cd45f9406679e1482b630bd2f51c186936e7f33c5260ef268c12455a1b1?apiKey=5b35dfe34207418398a5304200905620&"
+          alt="Streak"
+          class="streak-icon"
+        />
+        <p id="streak-count">0 days in a row</p>
+      </div>
+      <div class="streak-chart-container">
+        <div class="streak-day" data-active="false"></div>
+        <div class="streak-day" data-active="false"></div>
+        <div class="streak-day" data-active="false"></div>
+        <div class="streak-day" data-active="false"></div>
+        <div class="streak-day" data-active="false"></div>
+        <div class="streak-day" data-active="false"></div>
+        <div class="streak-day" data-active="false"></div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="content-section">
+  <div class="content-grid">
+    <div class="main-column">
+      <!-- Learning Spotlight Section (New) -->
+      <article class="learning-spotlight-card">
+        <header class="card-header">
+          <h3>Learning Spotlight</h3>
+          <button class="link-btn">Explore More</button>
+        </header>
+        <div class="spotlight-items">
+          <!-- Daily Challenge -->
+          <div class="spotlight-item">
+            <div class="spotlight-icon challenge-icon">
+              <i class="fas fa-lightbulb"></i>
+            </div>
+            <div class="spotlight-content">
+              <h4>Daily Challenge</h4>
+              <p>Coming soon...</p>
+              <a href="#" class="spotlight-link">Try Now</a>
+            </div>
           </div>
-  
-          <div class="side-column">
-            <article class="todo-card">
-              <h3>To-Do List</h3>
-              <div class="todo-list">
-                
-              </div>
-            </article>
-  
-            <article class="scores-card">
-              <h3>Recent Quiz Scores</h3>
-              <div class="scores-list">
-                <div class="score-item">
-                  <span class="quiz-name">Variables Quiz</span>
-                  <span class="score high"></span>
-                </div>
-                <div class="score-item">
-                  <span class="quiz-name">Functions Quiz</span>
-                  <span class="score high"></span>
-                </div>
-                <div class="score-item">
-                  <span class="quiz-name">Loops Quiz</span>
-                  <span class="score medium"></span>
-                </div>
-              </div>
-            </article>
+          
+          <!-- Recommended Read -->
+          <div class="spotlight-item">
+            <div class="spotlight-icon read-icon">
+              <i class="fas fa-book"></i>
+            </div>
+            <div class="spotlight-content">
+              <h4>Recommended Read</h4>
+              <p>Coming soon...</p>
+              <a href="#" class="spotlight-link">Read More</a>
+            </div>
+          </div>
+          
+          <!-- Tutorial Spotlight -->
+          <div class="spotlight-item">
+            <div class="spotlight-icon tutorial-icon">
+              <i class="fas fa-video"></i>
+            </div>
+            <div class="spotlight-content">
+              <h4>Tutorial Spotlight</h4>
+              <p>Coming soon...</p>
+              <a href="#" class="spotlight-link">Watch Now</a>
+            </div>
           </div>
         </div>
-      </section>
+      </article>
+
+      <!-- Documents Section (Kept) -->
+      <!-- <article class="documents-card">
+        <header class="card-header">
+          <h3>Course Documents</h3>
+          <button class="link-btn">View All</button>
+        </header>
+        <div class="document-list"> -->
+          <!-- Documents will be added dynamically -->
+        <!-- </div>
+      </article> -->
+    </div>
+
+    <div class="side-column">
+      <article class="todo-card">
+        <header class="card-header">
+          <h3>To-Do List</h3>
+          <div class="card-actions">
+            <button class="link-btn add-multiple-btn">Add Multiple</button>
+          </div>
+        </header>
+        <div class="add-task-section">
+          <div class="add-task-input-container">
+            <input type="text" class="add-task-input" placeholder="Add a new task...">
+            <button class="add-task-btn" title="Add Task"><i class="fas fa-plus"></i></button>
+          </div>
+        </div>
+        <div class="todo-list">
+          <!-- Tasks will be added dynamically -->
+          <div class="empty-tasks-message">No tasks yet</div>
+        </div>
+      </article>
+
+      <article class="scores-card">
+        <h3>Recent Quiz Scores</h3>
+        <div class="scores-list">
+          <div class="empty-scores-message">No quiz scores yet</div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
     </main>
   </div>
 <script src="coursepage.js"></script>
