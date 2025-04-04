@@ -40,11 +40,7 @@ body {
 .logo-container {
   display: flex;
   align-items: center;
-<<<<<<< HEAD
   width: 119.5%;
-=======
-  width: 118%;
->>>>>>> 317c4ae56ee74c392f7d3fd6e12afa96693f4a5d
   gap: 5px;
   padding: 15px;
   border-bottom: 1px solid #e5e7eb;
@@ -1293,7 +1289,6 @@ Course Pages Styles
 #add-task-btn {
   background-color: #5997ac;
   color: #ffffff;
-<<<<<<< HEAD
   flex: 1;
 }
 
@@ -1429,18 +1424,12 @@ Course Pages Styles
   background: transparent;
   font-size: 14px;
   color: var(--text-primary);
-=======
-  flex: 1;
->>>>>>> 317c4ae56ee74c392f7d3fd6e12afa96693f4a5d
 }
 
-#delete-all-btn {
-  background-color: #ef4444;
-  color: #ffffff;
-  flex: 1;
+.add-task-input:focus {
+  outline: none;
 }
 
-<<<<<<< HEAD
 .add-task-btn {
   width: 42px;
   background-color: var(--primary-color);
@@ -1660,80 +1649,6 @@ Course Pages Styles
 
 .add-multiple-btn i {
   font-size: 12px;
-=======
-/* Featured Content Card (Learning Spotlight) */
-.featured-content-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-  margin-bottom: 20px;
-}
-
-.featured-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.featured-header h3 {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0;
-  color: #111827;
-}
-
-.featured-content {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.featured-item {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  padding: 15px;
-  border-radius: 8px;
-  background-color: #f9fafb;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.featured-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.featured-icon {
-  width: 45px;
-  height: 45px;
-  border-radius: 8px;
-  background-color: #5997ac;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 20px;
-}
-
-.featured-details {
-  flex: 1;
-}
-
-.featured-title {
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0 0 5px 0;
-  color: #111827;
-}
-
-.featured-description {
-  font-size: 12px;
-  color: #6b7280;
-  margin: 0 0 8px 0;
->>>>>>> 317c4ae56ee74c392f7d3fd6e12afa96693f4a5d
 }
 
 .featured-action {
@@ -1886,7 +1801,6 @@ Course Pages Styles
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
-<<<<<<< HEAD
 }
 
 /* Text Preview Container */
@@ -1957,164 +1871,10 @@ Course Pages Styles
 .tasks-modal-container .add-tasks-btn {
   background-color: var(--primary-color);
   color: white;
-=======
-}
-
-/* Text Preview Container */
-.text-preview-container {
-  margin: 15px 0;
-  padding: 15px;
-  border: 1px solid var(--border-color, #ddd);
-  border-radius: 8px;
-  background-color: var(--background-primary, #f9fafb);
-}
-
-.text-preview-container h3 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  font-size: 16px;
-  color: var(--text-primary, #333);
-  font-weight: 600;
-}
-
-.text-preview-content {
-  max-height: 150px;
-  overflow-y: auto;
-  font-size: 14px;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  background-color: var(--background-secondary, white);
-  padding: 15px;
-  border-radius: 4px;
-  border: 1px solid var(--border-color, #eee);
-}
-
-.error-message {
-  color: var(--error-color, #ff3333);
-  margin-top: 8px;
-  font-size: 14px;
-  padding: 8px;
-  background-color: rgba(255, 0, 0, 0.05);
-  border-radius: 4px;
-}
-
-/* Night mode compatibility for upload card */
-[data-theme="night"] .upload-card {
-  background-color: #31456e;
-}
-
-[data-theme="night"] .upload-instruction,
-[data-theme="night"] .file-name {
-  color: #cbd5e1;
-}
-
-[data-theme="night"] .upload-settings select {
-  background-color: #31456e;
-  border-color: #4a5b82;
-  color: #e2e8f0;
-}
-
-[data-theme="night"] .text-preview-container {
-  background-color: #273555;
-  border-color: #4a5b82;
-}
-
-[data-theme="night"] .text-preview-content {
-  background-color: #31456e;
-  border-color: #4a5b82;
-  color: #e2e8f0;
-}
-
-[data-theme="night"] .error-message {
-  background-color: rgba(255, 0, 0, 0.1);
-}
-
-/* Responsive styles */
-@media (max-width: 991px) {
-  .top-nav {
-    padding-right: 20px;
-  }
-
-  .brand-wrapper {
-    padding-right: 20px;
-  }
-
-  .sidebar-column {
-    width: 220px; /* Fixed width for mobile */
-  }
-
-  .main-content {
-    padding: 20px;
-  }
-
-  .progress-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .content-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .action-buttons {
-    flex-direction: column;
-  }
-
-  .practice-btn {
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-
-  .flashcard-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  /* Upload card responsive styles */
-  .upload-card {
-    width: 95%;
-    padding: 1.5rem;
-  }
-  
-  .upload-settings {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .upload-form .submit-button {
-    width: 100%;
-  }
-}
-
-@media (max-width: 768px) {
-  .featured-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .featured-icon {
-    margin-bottom: 10px;
-  }
-  
-  .todo-buttons {
-    flex-direction: column;
-  }
-  
-  .course-nav-container {
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .course-nav {
-    width: 100%;
-    overflow-x: auto;
-  }
-  /* Delete Task Button Styling */
-.delete-task-btn {
-  background: none;
->>>>>>> 317c4ae56ee74c392f7d3fd6e12afa96693f4a5d
   border: none;
-  color: #d1d5db;
+  padding: 12px 24px;
+  border-radius: 6px;
   cursor: pointer;
-<<<<<<< HEAD
   font-size: 15px;
   font-weight: 500;
   transition: background-color 0.2s, transform 0.1s;
@@ -2217,8 +1977,6 @@ Course Pages Styles
   border: none;
   color: #d1d5db;
   cursor: pointer;
-=======
->>>>>>> 317c4ae56ee74c392f7d3fd6e12afa96693f4a5d
   padding: 5px;
   border-radius: 50%;
   display: flex;
@@ -2262,63 +2020,7 @@ Course Pages Styles
 [data-theme="night"] .delete-task-btn:hover {
   background-color: rgba(248, 113, 113, 0.2);
 }
-<<<<<<< HEAD
-=======
-/* Delete Task Button Styling */
-.delete-task-btn {
-  background: none;
-  border: none;
-  color: #d1d5db;
-  cursor: pointer;
-  padding: 5px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  opacity: 0.5;
-  font-size: 14px;
-  width: 24px;
-  height: 24px;
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.todo-item:hover .delete-task-btn {
-  opacity: 1;
-  color: #ef4444;
-}
-
-.delete-task-btn:hover {
-  background-color: rgba(239, 68, 68, 0.1);
-}
-
-/* Make sure todo items have position relative for absolute positioning of the delete button */
-.todo-item {
-  position: relative;
-  padding-right: 30px !important;
-}
-
-/* Night mode enhancements for delete button */
-[data-theme="night"] .delete-task-btn {
-  color: #9ca3af;
-}
-
-[data-theme="night"] .todo-item:hover .delete-task-btn {
-  color: #f87171;
-}
-
-[data-theme="night"] .delete-task-btn:hover {
-  background-color: rgba(248, 113, 113, 0.2);
-}
->>>>>>> 317c4ae56ee74c392f7d3fd6e12afa96693f4a5d
 
 
 
 
-<<<<<<< HEAD
-=======
-}
->>>>>>> 317c4ae56ee74c392f7d3fd6e12afa96693f4a5d
