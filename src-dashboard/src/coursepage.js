@@ -964,72 +964,31 @@
 
 
   // Enhanced document upload function
-async function uploadDocument(file) {
-  try {
-    // Get current authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      console.error('Authentication error:', authError);
-      throw new Error('User not authenticated');
-    }
-
-    // Generate a unique filename to prevent overwriting
-    const fileExtension = file.name.split('.').pop();
-    const uniqueFileName = `${user.id}/${Date.now()}_${file.name}`;
-
-    // Upload to storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('documents')
-      .upload(uniqueFileName, file, {
-        cacheControl: '3600',
-        upsert: false
-      });
-
-    if (uploadError) {
-      console.error('Storage upload error:', uploadError);
-      throw uploadError;
-    }
-
-    // Get public URL (optional, but useful)
-    const { data: urlData } = supabase.storage
-      .from('documents')
-      .getPublicUrl(uniqueFileName);
-
-    // Save document metadata to documents table
-    const { data: docData, error: docError } = await supabase
-      .from('documents')
-      .insert({
-        user_id: user.id,
-        filename: file.name,
-        file_path: uniqueFileName,
-        file_size: file.size,
-        mime_type: file.type
-      })
-      .select()
-      .single();
-
-    if (docError) {
-      console.error('Document metadata insert error:', docError);
-      throw docError;
-    }
-
-    return {
-      success: true,
-      document: {
-        ...docData,
-        publicUrl: urlData?.publicUrl
+  async function uploadDocument(file) {
+    try {
+      // Use the debug upload method
+      const result = await window.supabaseClient.documents.debugUpload(file);
+      
+      if (result.success) {
+        // Existing success handling
+        console.log('Document uploaded successfully:', result.document);
+        
+        // Add to UI
+        await addDocumentToUI(result.document, "both");
+        
+        return result.document;
+      } else {
+        console.error('Upload failed:', result.error);
+        // Show error to user
+        alert(`Upload failed: ${result.error}`);
+        throw new Error(result.error);
       }
-    };
-
-  } catch (error) {
-    console.error('Complete upload process error:', error);
-    return {
-      success: false,
-      error: error.message
-    };
+    } catch (error) {
+      console.error('Upload process error:', error);
+      alert('Failed to upload document. Please try again.');
+      throw error;
+    }
   }
-}
 
 // Download a document from Supabase
 async function downloadDocument(docId) {

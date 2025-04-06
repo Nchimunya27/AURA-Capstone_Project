@@ -151,7 +151,96 @@ const documents = {
       console.error('Error uploading document:', error.message);
       return { success: false, error: error.message };
     }
+
+
+    async function debugUpload(file) {
+      try {
+        console.log('Starting upload debug...');
+        
+        // 1. Check authentication
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+        if (userError) {
+          console.error('Authentication Error:', userError);
+          return;
+        }
+        console.log('User authenticated:', userData.user.id);
+    
+        const userId = userData.user.id;
+        const timestamp = Date.now();
+        const fileExtension = file.name.split('.').pop();
+        const safeFileName = file.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        
+        const filePath = `${userId}/${safeFileName}_${timestamp}.${fileExtension}`;
+        
+        console.log('Attempting to upload with path:', filePath);
+    
+        // 2. Direct storage upload
+        const { data: storageData, error: storageError } = await supabase.storage
+          .from('documents')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+    
+        if (storageError) {
+          console.error('Storage Upload Error:', storageError);
+          console.log('Error Details:', {
+            code: storageError.code,
+            message: storageError.message,
+            status: storageError.status
+          });
+          return;
+        }
+    
+        console.log('Storage Upload Successful:', storageData);
+    
+        // 3. Database record insertion
+        const { data: documentData, error: documentError } = await supabase
+          .from('documents')
+          .insert([
+            {
+              user_id: userId,
+              filename: file.name,
+              file_path: filePath,
+              file_size: file.size,
+              mime_type: file.type
+            }
+          ])
+          .select()
+          .single();
+    
+        if (documentError) {
+          console.error('Document Metadata Insert Error:', documentError);
+          return;
+        }
+    
+        console.log('Document Metadata Inserted Successfully:', documentData);
+    
+        return { 
+          success: true, 
+          document: documentData 
+        };
+    
+      } catch (error) {
+        console.error('Complete Upload Process Error:', error);
+      }
+    }
+    
+    // Example usage
+    document.querySelector('.upload-btn').addEventListener('click', async () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          await debugUpload(file);
+        }
+      };
+      input.click();
+    });
   },
+
+  
   
   // Get all documents for the current user
   getUserDocuments: async (courseId = null) => {
