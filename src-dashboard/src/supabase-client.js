@@ -94,7 +94,7 @@ const auth = {
 
 // Document Functions
 const documents = {
-  // Upload a document to Supabase Storage and save metadata to the documents table
+  // Enhanced document upload method
   uploadDocument: async (file, courseId = null, description = '') => {
     try {
       // Get current user
@@ -102,146 +102,273 @@ const documents = {
       if (userError) throw userError;
       
       const userId = userData.user.id;
-      
-      // Create a unique file path: userId/optional-courseId/filename_timestamp
       const timestamp = Date.now();
       const fileExtension = file.name.split('.').pop();
       const safeFileName = file.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
       
-      // Modify file path to be more flexible
+      // Create unique file path
       const filePath = courseId 
         ? `${userId}/${courseId}/${safeFileName}_${timestamp}.${fileExtension}`
         : `${userId}/${safeFileName}_${timestamp}.${fileExtension}`;
       
+      // Prepare metadata
+      const metadata = {
+        size: file.size,
+        mimetype: file.type,
+        lastModified: file.lastModified,
+        uploadTimestamp: new Date().toISOString()
+      };
+      
       // Upload file to storage
       const { data: storageData, error: storageError } = await supabase.storage
         .from('documents')
-        .upload(filePath, file);
-        
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: file.type,
+          metadata: metadata
+        });
+      
       if (storageError) throw storageError;
       
-      // Save metadata to documents table
+      // Get the public URL
+      const { data: urlData } = supabase.storage
+        .from('documents')
+        .getPublicUrl(filePath);
+      
+      // If this is a note (text file), extract content
+      let content = null;
+      if (file.type === 'text/plain') {
+        content = await file.text();
+      }
+      
+      // Save document metadata
       const { data: documentData, error: documentError } = await supabase
         .from('documents')
-        .insert([
-          {
-            user_id: userId,
-            filename: file.name,
-            file_path: filePath,
-            file_size: file.size,
-            mime_type: file.type,
-            description: description,
-            course_id: courseId // Optional course association
-          }
-        ])
+        .insert({
+          user_id: userId,
+          filename: file.name,
+          file_path: filePath,
+          bucket_id: 'documents',
+          file_size: file.size,
+          mime_type: file.type,
+          description: description || '',
+          content: content,
+          is_note: file.type === 'text/plain',
+          course_id: courseId,
+          storage_metadata: metadata
+        })
         .select()
         .single();
-        
+      
       if (documentError) throw documentError;
       
-      // Return the document data
       return { 
         success: true, 
         document: {
           ...documentData,
-          url: `${SUPABASE_URL}/storage/v1/object/public/documents/${filePath}`
+          publicUrl: urlData?.publicUrl
         }
       };
     } catch (error) {
-      console.error('Error uploading document:', error.message);
-      return { success: false, error: error.message };
-    }
-
-
-    async function debugUpload(file) {
-      try {
-        console.log('Starting upload debug...');
-        
-        // 1. Check authentication
-        const { data: userData, error: userError } = await supabase.auth.getUser();
-        if (userError) {
-          console.error('Authentication Error:', userError);
-          return;
-        }
-        console.log('User authenticated:', userData.user.id);
-    
-        const userId = userData.user.id;
-        const timestamp = Date.now();
-        const fileExtension = file.name.split('.').pop();
-        const safeFileName = file.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        
-        const filePath = `${userId}/${safeFileName}_${timestamp}.${fileExtension}`;
-        
-        console.log('Attempting to upload with path:', filePath);
-    
-        // 2. Direct storage upload
-        const { data: storageData, error: storageError } = await supabase.storage
-          .from('documents')
-          .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: false
-          });
-    
-        if (storageError) {
-          console.error('Storage Upload Error:', storageError);
-          console.log('Error Details:', {
-            code: storageError.code,
-            message: storageError.message,
-            status: storageError.status
-          });
-          return;
-        }
-    
-        console.log('Storage Upload Successful:', storageData);
-    
-        // 3. Database record insertion
-        const { data: documentData, error: documentError } = await supabase
-          .from('documents')
-          .insert([
-            {
-              user_id: userId,
-              filename: file.name,
-              file_path: filePath,
-              file_size: file.size,
-              mime_type: file.type
-            }
-          ])
-          .select()
-          .single();
-    
-        if (documentError) {
-          console.error('Document Metadata Insert Error:', documentError);
-          return;
-        }
-    
-        console.log('Document Metadata Inserted Successfully:', documentData);
-    
-        return { 
-          success: true, 
-          document: documentData 
-        };
-    
-      } catch (error) {
-        console.error('Complete Upload Process Error:', error);
-      }
-    }
-    
-    // Example usage
-    document.querySelector('.upload-btn').addEventListener('click', async () => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.onchange = async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          await debugUpload(file);
-        }
+      console.error('Complete document upload error:', error);
+      return { 
+        success: false, 
+        error: error.message 
       };
-      input.click();
-    });
+    }
   },
 
-  
-  
+  // Method to save notes directly
+  saveNote: async (noteContent, tags = [], courseId = null) => {
+    try {
+      // Get current user
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError) throw userError;
+      
+      const userId = userData.user.id;
+      const timestamp = new Date().toISOString();
+      const safeFileName = `Note_${timestamp.slice(0, 10)}.txt`;
+      
+      // Prepare file path
+      const filePath = courseId 
+        ? `${userId}/${courseId}/${safeFileName}`
+        : `${userId}/${safeFileName}`;
+      
+      // Prepare metadata
+      const metadata = {
+        size: noteContent.length,
+        mimetype: 'text/plain',
+        uploadTimestamp: timestamp
+      };
+      
+      // Upload note content as a text file
+      const { data: storageData, error: storageError } = await supabase.storage
+        .from('documents')
+        .upload(filePath, new Blob([noteContent], {type: 'text/plain'}), {
+          contentType: 'text/plain',
+          metadata: metadata
+        });
+      
+      if (storageError) throw storageError;
+      
+      // Save document metadata
+      const { data: documentData, error: documentError } = await supabase
+        .from('documents')
+        .insert({
+          user_id: userId,
+          filename: safeFileName,
+          file_path: filePath,
+          bucket_id: 'documents',
+          file_size: noteContent.length,
+          mime_type: 'text/plain',
+          description: noteContent.slice(0, 100), // First 100 chars as description
+          content: noteContent,
+          tags: tags,
+          is_note: true,
+          course_id: courseId,
+          storage_metadata: metadata
+        })
+        .select()
+        .single();
+      
+      if (documentError) throw documentError;
+      
+      return { 
+        success: true, 
+        note: documentData 
+      };
+    } catch (error) {
+      console.error('Error saving note:', error);
+      return { 
+        success: false, 
+        error: error.message 
+      };
+    }
+  },
+
+  // Method to retrieve notes
+  getNotes: async (tags = [], courseId = null) => {
+    try {
+      let query = supabase
+        .from('documents')
+        .select('*')
+        .eq('is_note', true)
+        .order('created_at', { ascending: false });
+      
+      // Optional: filter by tags if provided
+      if (tags.length > 0) {
+        query = query.contains('tags', tags);
+      }
+      
+      // Optional: filter by course ID
+      if (courseId) {
+        query = query.eq('course_id', courseId);
+      }
+      
+      const { data, error } = await query;
+      
+      if (error) throw error;
+      
+      return { 
+        success: true, 
+        notes: data 
+      };
+    } catch (error) {
+      console.error('Error retrieving notes:', error);
+      return { 
+        success: false, 
+        error: error.message 
+      };
+    }
+  },
+
+  // Method to update a note
+  updateNote: async (noteId, updatedContent, tags = []) => {
+    try {
+      // Get current user for verification
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError) throw userError;
+      
+      // Update note content and metadata
+      const { data, error } = await supabase
+        .from('documents')
+        .update({
+          content: updatedContent,
+          tags: tags,
+          description: updatedContent.slice(0, 100),
+          updated_at: new Date().toISOString(),
+          file_size: updatedContent.length
+        })
+        .eq('id', noteId)
+        .eq('is_note', true)
+        .eq('user_id', userData.user.id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      // Also update the file in storage
+      const { error: storageError } = await supabase.storage
+        .from('documents')
+        .update(data.file_path, new Blob([updatedContent], {type: 'text/plain'}), {
+          contentType: 'text/plain'
+        });
+      
+      if (storageError) throw storageError;
+      
+      return { 
+        success: true, 
+        note: data 
+      };
+    } catch (error) {
+      console.error('Error updating note:', error);
+      return { 
+        success: false, 
+        error: error.message 
+      };
+    }
+  },
+
+  // Method to delete a note
+  deleteNote: async (noteId) => {
+    try {
+      // Get note details first to get file path
+      const { data: noteData, error: fetchError } = await supabase
+        .from('documents')
+        .select('file_path')
+        .eq('id', noteId)
+        .eq('is_note', true)
+        .single();
+      
+      if (fetchError) throw fetchError;
+      
+      // Delete from storage
+      const { error: storageError } = await supabase.storage
+        .from('documents')
+        .remove([noteData.file_path]);
+      
+      if (storageError) throw storageError;
+      
+      // Delete from documents table
+      const { error: dbError } = await supabase
+        .from('documents')
+        .delete()
+        .eq('id', noteId)
+        .eq('is_note', true);
+      
+      if (dbError) throw dbError;
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Error deleting note:', error);
+      return { 
+        success: false, 
+        error: error.message 
+      };
+    }
+  },
+
   // Get all documents for the current user
   getUserDocuments: async (courseId = null) => {
     try {
