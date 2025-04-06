@@ -95,7 +95,7 @@ const auth = {
 // Document Functions
 const documents = {
   // Upload a document to Supabase Storage and save metadata to the documents table
-  uploadDocument: async (file, courseId = 'web-development-intro', description = '') => {
+  uploadDocument: async (file, courseId = null, description = '') => {
     try {
       // Get current user
       const { data: userData, error: userError } = await supabase.auth.getUser();
@@ -103,11 +103,15 @@ const documents = {
       
       const userId = userData.user.id;
       
-      // Create a unique file path: userId/courseId/filename_timestamp
+      // Create a unique file path: userId/optional-courseId/filename_timestamp
       const timestamp = Date.now();
       const fileExtension = file.name.split('.').pop();
       const safeFileName = file.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-      const filePath = `${userId}/${courseId}/${safeFileName}_${timestamp}.${fileExtension}`;
+      
+      // Modify file path to be more flexible
+      const filePath = courseId 
+        ? `${userId}/${courseId}/${safeFileName}_${timestamp}.${fileExtension}`
+        : `${userId}/${safeFileName}_${timestamp}.${fileExtension}`;
       
       // Upload file to storage
       const { data: storageData, error: storageError } = await supabase.storage
@@ -126,7 +130,8 @@ const documents = {
             file_path: filePath,
             file_size: file.size,
             mime_type: file.type,
-            description: description
+            description: description,
+            course_id: courseId // Optional course association
           }
         ])
         .select()
@@ -158,7 +163,7 @@ const documents = {
       
       // If courseId is provided, filter by courseId
       if (courseId) {
-        query = query.ilike('file_path', `%/${courseId}/%`);
+        query = query.eq('course_id', courseId);
       }
       
       const { data, error } = await query;
