@@ -1,0 +1,703 @@
+/* Supabase Integration Styles */
+
+/* Authentication Styles */
+.auth-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 30px;
+    background-color: var(--background-secondary, #ffffff);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .auth-logo {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .auth-logo img {
+    max-width: 120px;
+  }
+  
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .auth-input {
+    padding: 12px 15px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+  }
+  
+  .auth-input:focus {
+    border-color: var(--link-color, #5997ac);
+    outline: none;
+  }
+  
+  .auth-button {
+    padding: 12px;
+    background-color: var(--link-color, #5997ac);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .auth-button:hover {
+    background-color: var(--primary-color, #5997ac);
+  }
+  
+  .auth-link {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+    color: var(--text-tertiary, #6b7280);
+  }
+  
+  .auth-link a {
+    color: var(--link-color, #5997ac);
+    text-decoration: none;
+  }
+  
+  .auth-link a:hover {
+    text-decoration: underline;
+  }
+  
+  .auth-error {
+    background-color: rgba(255, 87, 87, 0.1);
+    color: #ff5757;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
+  
+  .auth-success {
+    background-color: rgba(76, 175, 80, 0.1);
+    color: #4caf50;
+    padding: 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    text-align: center;
+  }
+  
+  .auth-success i {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+  
+  /* Loading States */
+  .loading-tasks,
+  .loading-documents,
+  .loading-flashcards {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    color: var(--text-tertiary, #6b7280);
+    font-size: 16px;
+    text-align: center;
+  }
+  
+  .loading-tasks i,
+  .loading-documents i,
+  .loading-flashcards i {
+    margin-right: 10px;
+    color: var(--link-color, #5997ac);
+  }
+  
+  .task-loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    color: var(--text-tertiary, #6b7280);
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  
+  .task-loading-indicator i {
+    margin-right: 8px;
+    color: var(--link-color, #5997ac);
+  }
+  
+  /* Error Messages */
+  .error-message,
+  .error-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #ff5757;
+    font-size: 16px;
+    text-align: center;
+    background-color: rgba(255, 87, 87, 0.05);
+    border-radius: 8px;
+    margin: 10px 0;
+  }
+  
+  .error-message i,
+  .error-loading i {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  .retry-btn {
+    background-color: var(--link-color, #5997ac);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    margin-top: 15px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+  }
+  
+  .retry-btn:hover {
+    background-color: var(--primary-color, #5997ac);
+  }
+  
+  /* Todo Items with Error State */
+  .todo-item.error-saving {
+    background-color: rgba(255, 87, 87, 0.05);
+    border-left: 3px solid #ff5757;
+  }
+  
+  .todo-item.loading {
+    opacity: 0.7;
+  }
+  
+  .error-icon {
+    color: #ff5757;
+    margin-left: 10px;
+    cursor: help;
+  }
+  
+  /* Status Indicators */
+  .status-indicator {
+    display: inline-flex;
+    margin-left: 10px;
+    font-size: 14px;
+    color: var(--text-tertiary, #6b7280);
+  }
+  
+  .status-indicator.error {
+    color: #ff5757;
+  }
+  
+  /* Upload Progress */
+  .upload-progress {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--background-secondary, #ffffff);
+    padding: 15px;
+    border-radius: 8px;
+    width: 300px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: opacity 0.3s;
+  }
+  
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  
+  .progress-bar {
+    height: 5px;
+    background-color: #f0f0f0;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    background-color: var(--link-color, #5997ac);
+    transition: width 0.3s;
+  }
+  
+  .upload-progress.success .progress-fill {
+    background-color: #4caf50;
+  }
+  
+  .upload-progress.error .progress-fill {
+    background-color: #ff5757;
+  }
+  
+  .upload-progress.success {
+    border-left: 4px solid #4caf50;
+  }
+  
+  .upload-progress.error {
+    border-left: 4px solid #ff5757;
+  }
+  
+  /* Download Status */
+  .download-status {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--background-secondary, #ffffff);
+    padding: 15px;
+    border-radius: 8px;
+    width: 300px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    font-size: 14px;
+    transition: opacity 0.3s;
+    display: flex;
+    align-items: center;
+  }
+  
+  .download-status i {
+    margin-right: 10px;
+  }
+  
+  .download-status.error {
+    color: #ff5757;
+    border-left: 4px solid #ff5757;
+  }
+  
+  /* Flashcard Generation Status */
+  .flashcard-generation-status {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--background-secondary, #ffffff);
+    padding: 15px;
+    border-radius: 8px;
+    width: 300px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    font-size: 14px;
+    transition: opacity 0.3s;
+    display: flex;
+    align-items: center;
+  }
+  
+  .flashcard-generation-status i {
+    margin-right: 10px;
+  }
+  
+  .flashcard-generation-status.error {
+    color: #ff5757;
+    border-left: 4px solid #ff5757;
+  }
+  
+  /* Button Ripple Effect */
+  .btn-ripple {
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0);
+  }
+  
+  .btn-ripple.active {
+    animation: ripple 0.6s linear;
+  }
+  
+  @keyframes ripple {
+    0% {
+      transform: scale(0);
+      opacity: 0.2;
+    }
+    100% {
+      transform: scale(2.5);
+      opacity: 0;
+    }
+  }
+  
+  /* New Task Animation */
+  .todo-item.new-task {
+    animation: slideIn 0.3s ease-out forwards;
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Confetti Animation for Task Completion */
+  .confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+    overflow: hidden;
+  }
+  
+  .confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: -10px;
+    border-radius: 0;
+    animation: confetti-fall 3s linear, confetti-shake 2s ease-in-out infinite alternate;
+  }
+  
+  @keyframes confetti-fall {
+    0% {
+      top: -10px;
+      transform: translateX(0) rotateZ(0deg);
+    }
+    100% {
+      top: 100vh;
+      transform: translateX(20px) rotateZ(90deg);
+    }
+  }
+  
+  @keyframes confetti-shake {
+    0% {
+      transform: translateX(0) rotateZ(0deg);
+    }
+    25% {
+      transform: translateX(-15px) rotateZ(-5deg);
+    }
+    50% {
+      transform: translateX(0) rotateZ(0deg);
+    }
+    75% {
+      transform: translateX(15px) rotateZ(5deg);
+    }
+    100% {
+      transform: translateX(0) rotateZ(0deg);
+    }
+  }
+  
+  /* Motivation Message for Task Completion */
+  .motivation-message {
+    background-color: var(--background-secondary, #ffffff);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.5s ease-out;
+    border-left: 4px solid #4caf50;
+  }
+  
+  .motivation-content {
+    display: flex;
+    align-items: center;
+  }
+  
+  .motivation-content i {
+    color: #4caf50;
+    font-size: 18px;
+    margin-right: 10px;
+  }
+  
+  .motivation-content span {
+    flex: 1;
+  }
+  
+  .close-motivation-btn {
+    background: none;
+    border: none;
+    color: var(--text-tertiary, #6b7280);
+    cursor: pointer;
+  }
+  
+  .motivation-message.fadeout {
+    animation: fadeOut 0.5s ease-out forwards;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+  }
+  
+  /* Document Modal */
+  .documents-modal-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .documents-modal-container.active {
+    opacity: 1;
+  }
+  
+  .documents-modal {
+    background-color: var(--background-secondary, #ffffff);
+    border-radius: 10px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    transform: translateY(20px);
+    transition: transform 0.3s;
+  }
+  
+  .documents-modal-container.active .documents-modal {
+    transform: translateY(0);
+  }
+  
+  .modal-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  .close-modal-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--text-tertiary, #6b7280);
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  
+  .close-modal-btn:hover {
+    color: var(--text-primary, #000000);
+  }
+  
+  .modal-body {
+    padding: 20px;
+    max-height: calc(80vh - 60px);
+    overflow-y: auto;
+  }
+  
+  .modal-documents-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .loading-documents {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-tertiary, #6b7280);
+  }
+  
+  .no-documents {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-tertiary, #6b7280);
+    font-style: italic;
+  }
+  
+  /* Application Error Message */
+  .app-error-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--background-secondary, #ffffff);
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 2000;
+    text-align: center;
+    max-width: 400px;
+    border-top: 4px solid #ff5757;
+  }
+  
+  .app-error-message i {
+    font-size: 32px;
+    color: #ff5757;
+    margin-bottom: 15px;
+  }
+  
+  .app-error-message p {
+    margin-bottom: 20px;
+    color: var(--text-primary, #000000);
+  }
+  
+  /* Modal instruction */
+  .modal-instruction {
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: var(--text-tertiary, #6b7280);
+  }
+  
+  .task-textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 150px;
+    margin-bottom: 20px;
+  }
+  
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .add-tasks-btn {
+    background-color: var(--link-color, #5997ac);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .add-tasks-btn i {
+    font-size: 12px;
+  }
+  
+  /* Media queries for responsive design */
+  @media (max-width: 768px) {
+    .upload-progress,
+    .download-status,
+    .flashcard-generation-status {
+      width: calc(100% - 40px);
+      right: 20px;
+      left: 20px;
+    }
+    
+    .documents-modal {
+      width: 95%;
+      max-height: 90vh;
+    }
+    
+    .modal-body {
+      max-height: calc(90vh - 60px);
+    }
+    
+    .auth-container {
+      width: 90%;
+      margin: 50px auto;
+      padding: 20px;
+    }
+  }
+  
+  /* Night mode compatibility */
+  [data-theme="night"] .auth-container,
+  [data-theme="night"] .documents-modal,
+  [data-theme="night"] .upload-progress,
+  [data-theme="night"] .download-status,
+  [data-theme="night"] .flashcard-generation-status,
+  [data-theme="night"] .motivation-message,
+  [data-theme="night"] .app-error-message {
+    background-color: #1e293b;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  [data-theme="night"] .auth-input {
+    background-color: #1e293b;
+    color: #e2e8f0;
+    border-color: #475569;
+  }
+  
+  [data-theme="night"] .auth-input:focus {
+    border-color: var(--link-color, #5997ac);
+  }
+  
+  [data-theme="night"] .error-message,
+  [data-theme="night"] .error-loading {
+    background-color: rgba(255, 87, 87, 0.1);
+  }
+  
+  [data-theme="night"] .todo-item.error-saving {
+    background-color: rgba(255, 87, 87, 0.1);
+  }
+  
+  [data-theme="night"] .task-textarea {
+    background-color: #1e293b;
+    color: #e2e8f0;
+    border-color: #475569;
+  }
+  
+  [data-theme="night"] .progress-bar {
+    background-color: #334155;
+  }
+  
+  [data-theme="night"] .modal-header {
+    border-color: #334155;
+  }
+  
+  [data-theme="night"] .close-modal-btn:hover {
+    color: #e2e8f0;
+  }
+  
+  [data-theme="night"] .motivation-content i {
+    color: #4ade80;
+  }
+  
+  [data-theme="night"] .app-error-message p {
+    color: #e2e8f0;
+  }
+  
+  /* Fix for dark theme text */
+  [data-theme="night"] .modal-instruction,
+  [data-theme="night"] .progress-info,
+  [data-theme="night"] .loading-tasks,
+  [data-theme="night"] .loading-documents,
+  [data-theme="night"] .loading-flashcards,
+  [data-theme="night"] .no-documents,
+  [data-theme="night"] .modal-header h2 {
+    color: #e2e8f0;
+  }
+  
+  /* Fix for confetti contrast in dark mode */
+  [data-theme="night"] .confetti {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+  }
