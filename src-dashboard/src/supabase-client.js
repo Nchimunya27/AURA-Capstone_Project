@@ -179,6 +179,138 @@ const documents = {
     }
   },
 
+  debugUpload: async (file, courseId = null, description = '') => {
+    try {
+      // Get current user
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError) throw userError;
+      
+      const userId = userData.user.id;
+      const timestamp = Date.now();
+      const fileExtension = file.name.split('.').pop();
+      const safeFileName = file.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      
+      // Create unique file path
+      const filePath = courseId 
+        ? `${userId}/${courseId}/${safeFileName}_${timestamp}.${fileExtension}`
+        : `${userId}/${safeFileName}_${timestamp}.${fileExtension}`;
+      
+      // Prepare comprehensive metadata
+      const metadata = {
+        size: file.size.toString(), // Convert to string to ensure compatibility
+        mimetype: file.type,
+        lastModified: file.lastModified.toString(),
+        filename: file.name,
+        uploadTimestamp: new Date().toISOString()
+      };
+      
+      console.log("Uploading file with metadata:", metadata);
+      
+      // Upload file to storage with explicit metadata formatting
+      const { data: storageData, error: storageError } = await supabase.storage
+        .from('documents')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: file.type,
+          metadata: metadata
+        });
+      
+      if (storageError) {
+        console.error("Storage error:", storageError);
+        throw storageError;
+      }
+      
+      console.log("File uploaded successfully to storage:", storageData);
+      
+      // Wait briefly to give trigger time to run
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Check if document was created by the trigger
+      const { data: checkData, error: checkError } = await supabase
+        .from('documents')
+        .select('*')
+        .eq('file_path', filePath)
+        .limit(1);
+      
+      if (checkError) {
+        console.error("Error checking for document:", checkError);
+      }
+      
+      console.log("Document check result:", checkData);
+      
+      // If the trigger didn't create the document, create it manually
+      if (!checkData || checkData.length === 0) {
+        console.log("Trigger did not create document record. Creating manually...");
+        
+        // Get the public URL
+        const { data: urlData } = supabase.storage
+          .from('documents')
+          .getPublicUrl(filePath);
+        
+        // If this is a note (text file), extract content
+        let content = null;
+        if (file.type === 'text/plain') {
+          content = await file.text();
+        }
+        
+        // Save document metadata manually
+        const { data: documentData, error: documentError } = await supabase
+          .from('documents')
+          .insert({
+            user_id: userId,
+            filename: file.name,
+            file_path: filePath,
+            bucket_id: 'documents',
+            file_size: file.size,
+            mime_type: file.type,
+            description: description || '',
+            content: content,
+            is_note: file.type === 'text/plain',
+            course_id: courseId,
+            storage_metadata: metadata // Save the metadata we created
+          })
+          .select()
+          .single();
+        
+        if (documentError) {
+          console.error("Error creating document record:", documentError);
+          throw documentError;
+        }
+        
+        console.log("Document record created manually:", documentData);
+        
+        return { 
+          success: true, 
+          document: {
+            ...documentData,
+            publicUrl: urlData?.publicUrl,
+            fromTrigger: false
+          }
+        };
+      }
+      
+      // Return the document created by the trigger
+      return { 
+        success: true, 
+        document: {
+          ...checkData[0],
+          publicUrl: supabase.storage.from('documents').getPublicUrl(filePath).data?.publicUrl,
+          fromTrigger: true
+        }
+      };
+    } catch (error) {
+      console.error('Complete document upload error:', error);
+      return { 
+        success: false, 
+        error: error.message 
+      };
+    }
+  },
+
+
+
+
   // Method to save notes directly
   saveNote: async (noteContent, tags = [], courseId = null) => {
     try {

@@ -966,12 +966,13 @@
   // Enhanced document upload function
   async function uploadDocument(file) {
     try {
-      // Use the debug upload method
+      // Use the debug upload method instead of the regular upload method
       const result = await window.supabaseClient.documents.debugUpload(file);
       
       if (result.success) {
-        // Existing success handling
+        // Log whether the document was created by trigger or manually
         console.log('Document uploaded successfully:', result.document);
+        console.log('Created by trigger:', result.document.fromTrigger ? 'Yes' : 'No');
         
         // Add to UI
         await addDocumentToUI(result.document, "both");
