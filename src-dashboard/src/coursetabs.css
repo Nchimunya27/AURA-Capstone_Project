@@ -821,7 +821,7 @@
   border-radius: 11px;
   padding: 24px;
   margin-bottom: 24px;
-  margin-top: 30px;
+  margin-top: 24px;
 }
 
 .create-set-container {
@@ -975,4 +975,39 @@
 [data-theme="night"] .set-card-count,
 [data-theme="night"] .set-last-studied {
   color: #9ca3af;
+}
+
+.set-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.delete-set-btn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  opacity: 0;
+  transition: opacity 0.2s, color 0.2s;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.flashcard-set-card:hover .delete-set-btn {
+  opacity: 0.7;
+}
+
+.delete-set-btn:hover {
+  opacity: 1 !important;
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* Night mode compatibility */
+[data-theme="night"] .delete-set-btn {
+  color: #f87171;
+}
+
+[data-theme="night"] .delete-set-btn:hover {
+  background-color: rgba(248, 113, 113, 0.1);
 }

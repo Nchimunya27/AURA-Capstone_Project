@@ -100,13 +100,13 @@ document.addEventListener("DOMContentLoaded", function () {
     
     setCard.innerHTML = `
       <div class="set-card-header">
-        <div class="set-card-title-container">
-          <h3 class="set-card-title">${set.name}</h3>
+        <h3 class="set-card-title">${set.name}</h3>
+        <div class="set-card-actions">
           <span class="set-card-count">${set.cardCount} cards</span>
+          <button class="delete-set-btn" title="Delete set">
+            <i class="fas fa-trash-alt"></i>
+          </button>
         </div>
-        <button class="delete-set-btn" title="Delete Set">
-          <i class="fas fa-trash-alt"></i>
-        </button>
       </div>
       <div class="set-card-footer">
         <div class="set-last-studied">
@@ -120,26 +120,30 @@ document.addEventListener("DOMContentLoaded", function () {
       </div>
     `;
     
-    // Add event listener for study button
+    // Add study button click handler
     setCard.querySelector('.study-btn').addEventListener('click', (e) => {
       e.stopPropagation();
       openStudyView(set);
     });
 
-    // Add event listener for delete button
+    // Add delete button click handler
     setCard.querySelector('.delete-set-btn').addEventListener('click', async (e) => {
       e.stopPropagation();
-      if (confirm(`Are you sure you want to delete "${set.name}"? This cannot be undone.`)) {
+      if (confirm(`Are you sure you want to delete "${set.name}"? This action cannot be undone.`)) {
         try {
           await deleteFlashcardSet(set.id);
           setCard.style.opacity = '0';
-          setCard.style.transform = 'scale(0.9)';
+          setCard.style.transform = 'translateY(20px)';
           setTimeout(() => {
             setCard.remove();
+            // If this was the current set being studied, close study view
+            if (currentSetId === set.id) {
+              closeStudyView();
+            }
           }, 300);
         } catch (error) {
-          console.error('Error deleting set:', error);
-          alert('Failed to delete set. Please try again.');
+          console.error('Error deleting flashcard set:', error);
+          alert('Failed to delete flashcard set. Please try again.');
         }
       }
     });
@@ -275,7 +279,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
   }
 
-  // Function to delete a flashcard set from IndexedDB
+  // Function to delete a flashcard set
   async function deleteFlashcardSet(setId) {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open("auraLearningDB", 1);
@@ -289,8 +293,15 @@ document.addEventListener("DOMContentLoaded", function () {
         
         const deleteRequest = store.delete(setId);
         
-        deleteRequest.onsuccess = () => resolve();
-        deleteRequest.onerror = () => reject(deleteRequest.error);
+        deleteRequest.onsuccess = () => {
+          console.log(`Flashcard set ${setId} deleted successfully`);
+          resolve();
+        };
+        
+        deleteRequest.onerror = () => {
+          console.error(`Error deleting flashcard set ${setId}:`, deleteRequest.error);
+          reject(deleteRequest.error);
+        };
       };
     });
   }
