@@ -10,12 +10,193 @@ document.addEventListener("DOMContentLoaded", function () {
   scriptMammoth.src = 'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
   document.head.appendChild(scriptMammoth);
   
-  // Set up file upload functionality
+  // Initialize UI elements
   const uploadButton = document.querySelector('.upload-for-flashcards-btn');
   const fileInput = document.getElementById('flashcard-document-input');
+  const createSetBtn = document.querySelector('.create-set-btn');
+  const setNameInput = document.querySelector('.set-name-input');
+  const flashcardSetsGrid = document.querySelector('.flashcard-sets-grid');
+  const flashcardStudyView = document.querySelector('.flashcard-study-view');
+  const backToSetsBtn = document.querySelector('.back-to-sets-btn');
+  const setTitle = document.querySelector('.set-title');
   
+  let currentSetId = null;
+
+  // Function to create a new flashcard set
+  async function createFlashcardSet(name) {
+    if (!name.trim()) return;
+
+    const setId = `set_${Date.now()}`;
+    const newSet = {
+      id: setId,
+      name: name.trim(),
+      cards: [],
+      created: Date.now(),
+      lastStudied: null,
+      cardCount: 0
+    };
+
+    try {
+      await saveFlashcardSet(newSet);
+      renderFlashcardSet(newSet);
+      setNameInput.value = '';
+      return setId;
+    } catch (error) {
+      console.error('Error creating flashcard set:', error);
+      alert('Failed to create flashcard set. Please try again.');
+    }
+  }
+
+  // Function to save flashcard set to IndexedDB
+  async function saveFlashcardSet(set) {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open("auraLearningDB", 1);
+      
+      request.onerror = () => reject(request.error);
+      
+      request.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(["flashcards"], "readwrite");
+        const store = transaction.objectStore("flashcards");
+        
+        const request = store.put(set);
+        
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      };
+    });
+  }
+
+  // Function to load flashcard sets from IndexedDB
+  async function loadFlashcardSets() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open("auraLearningDB", 1);
+      
+      request.onerror = () => reject(request.error);
+      
+      request.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction(["flashcards"], "readonly");
+        const store = transaction.objectStore("flashcards");
+        const request = store.getAll();
+        
+        request.onsuccess = () => {
+          const sets = request.result.filter(item => item.id.startsWith('set_'));
+          resolve(sets);
+        };
+        
+        request.onerror = () => reject(request.error);
+      };
+    });
+  }
+
+  // Function to render a flashcard set card
+  function renderFlashcardSet(set) {
+    const setCard = document.createElement('div');
+    setCard.className = 'flashcard-set-card';
+    setCard.dataset.setId = set.id;
+    
+    const lastStudied = set.lastStudied ? new Date(set.lastStudied).toLocaleDateString() : 'Never';
+    
+    setCard.innerHTML = `
+      <div class="set-card-header">
+        <div class="set-card-title-container">
+          <h3 class="set-card-title">${set.name}</h3>
+          <span class="set-card-count">${set.cardCount} cards</span>
+        </div>
+        <button class="delete-set-btn" title="Delete Set">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </div>
+      <div class="set-card-footer">
+        <div class="set-last-studied">
+          <i class="far fa-clock"></i>
+          Last studied: ${lastStudied}
+        </div>
+        <button class="study-btn">
+          <i class="fas fa-play"></i>
+          Study
+        </button>
+      </div>
+    `;
+    
+    // Add event listener for study button
+    setCard.querySelector('.study-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      openStudyView(set);
+    });
+
+    // Add event listener for delete button
+    setCard.querySelector('.delete-set-btn').addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (confirm(`Are you sure you want to delete "${set.name}"? This cannot be undone.`)) {
+        try {
+          await deleteFlashcardSet(set.id);
+          setCard.style.opacity = '0';
+          setCard.style.transform = 'scale(0.9)';
+          setTimeout(() => {
+            setCard.remove();
+          }, 300);
+        } catch (error) {
+          console.error('Error deleting set:', error);
+          alert('Failed to delete set. Please try again.');
+        }
+      }
+    });
+    
+    flashcardSetsGrid.appendChild(setCard);
+  }
+
+  // Function to open study view for a set
+  function openStudyView(set) {
+    currentSetId = set.id;
+    setTitle.textContent = set.name;
+    flashcardSetsGrid.style.display = 'none';
+    document.querySelector('.create-flashcard-section').style.display = 'none';
+    flashcardStudyView.style.display = 'block';
+    
+    // Load and display the flashcards
+    if (set.cards && set.cards.length > 0) {
+      updateFlashcardsDisplay(set.cards);
+    } else {
+      showNoFlashcardsState();
+    }
+  }
+
+  // Function to close study view
+  function closeStudyView() {
+    currentSetId = null;
+    flashcardStudyView.style.display = 'none';
+    flashcardSetsGrid.style.display = 'grid';
+    document.querySelector('.create-flashcard-section').style.display = 'block';
+  }
+
+  // Event Listeners
+  if (createSetBtn) {
+    createSetBtn.addEventListener('click', () => {
+      createFlashcardSet(setNameInput.value);
+    });
+  }
+
+  if (setNameInput) {
+    setNameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        createFlashcardSet(setNameInput.value);
+      }
+    });
+  }
+
+  if (backToSetsBtn) {
+    backToSetsBtn.addEventListener('click', closeStudyView);
+  }
+
+  // Modified file upload handler to work with sets
   if (uploadButton && fileInput) {
     uploadButton.addEventListener('click', () => {
+      if (!currentSetId) {
+        alert('Please select or create a flashcard set first');
+        return;
+      }
       fileInput.click();
     });
 
@@ -39,8 +220,8 @@ document.addEventListener("DOMContentLoaded", function () {
         // Generate flashcards from the content
         const flashcards = await generateFlashcardsFromText(content);
         
-        // Store generated flashcards in IndexedDB
-        await saveFlashcardsToIndexedDB(flashcards);
+        // Update the current set with new flashcards
+        await updateSetWithFlashcards(currentSetId, flashcards);
         
         // Update the display
         updateFlashcardsDisplay(flashcards);
@@ -64,8 +245,38 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Function to save flashcards to IndexedDB
-  async function saveFlashcardsToIndexedDB(flashcards) {
+  // Function to update a set with new flashcards
+  async function updateSetWithFlashcards(setId, flashcards) {
+    const request = indexedDB.open("auraLearningDB", 1);
+    
+    request.onsuccess = (event) => {
+      const db = event.target.result;
+      const transaction = db.transaction(["flashcards"], "readwrite");
+      const store = transaction.objectStore("flashcards");
+      
+      const getRequest = store.get(setId);
+      
+      getRequest.onsuccess = () => {
+        const set = getRequest.result;
+        if (set) {
+          set.cards = flashcards;
+          set.cardCount = flashcards.length;
+          set.lastModified = Date.now();
+          
+          store.put(set);
+          
+          // Update the card count in the UI
+          const setCard = document.querySelector(`[data-set-id="${setId}"]`);
+          if (setCard) {
+            setCard.querySelector('.set-card-count').textContent = `${flashcards.length} cards`;
+          }
+        }
+      };
+    };
+  }
+
+  // Function to delete a flashcard set from IndexedDB
+  async function deleteFlashcardSet(setId) {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open("auraLearningDB", 1);
       
@@ -76,28 +287,20 @@ document.addEventListener("DOMContentLoaded", function () {
         const transaction = db.transaction(["flashcards"], "readwrite");
         const store = transaction.objectStore("flashcards");
         
-        // Clear existing flashcards
-        store.clear();
+        const deleteRequest = store.delete(setId);
         
-        // Add new flashcards
-        flashcards.forEach((card, index) => {
-          store.add({
-            id: `flashcard_${Date.now()}_${index}`,
-            front: card.front,
-            back: card.back,
-            timestamp: Date.now()
-          });
-        });
-        
-        transaction.oncomplete = () => {
-          console.log("Flashcards saved to IndexedDB");
-          resolve();
-        };
-        
-        transaction.onerror = () => reject(transaction.error);
+        deleteRequest.onsuccess = () => resolve();
+        deleteRequest.onerror = () => reject(deleteRequest.error);
       };
     });
   }
+
+  // Initialize - load existing flashcard sets
+  loadFlashcardSets().then(sets => {
+    sets.forEach(set => renderFlashcardSet(set));
+  }).catch(error => {
+    console.error('Error loading flashcard sets:', error);
+  });
 
   // Function to read file content based on file type
   async function readFileContent(file) {

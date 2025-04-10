@@ -483,10 +483,21 @@
           console.log("Tasks store created");
         }
 
-        // Create a store for flashcards
+        // Create a store for flashcard sets
+        if (!db.objectStoreNames.contains("flashcardSets")) {
+          const flashcardSetsStore = db.createObjectStore("flashcardSets", { keyPath: "id" });
+          flashcardSetsStore.createIndex("courseId", "courseId", { unique: false });
+          flashcardSetsStore.createIndex("timestamp", "timestamp", { unique: false });
+          flashcardSetsStore.createIndex("name", "name", { unique: false });
+          console.log("Flashcard Sets store created");
+        }
+
+        // Create a store for individual flashcards
         if (!db.objectStoreNames.contains("flashcards")) {
           const flashcardStore = db.createObjectStore("flashcards", { keyPath: "id" });
+          flashcardStore.createIndex("setId", "setId", { unique: false });
           flashcardStore.createIndex("timestamp", "timestamp", { unique: false });
+          flashcardStore.createIndex("position", "position", { unique: false });
           console.log("Flashcards store created");
         }
       };

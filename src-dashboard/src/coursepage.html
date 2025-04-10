@@ -169,90 +169,112 @@
 
                 <!-- Flashcards Tab Content -->
         <div class="tab-content" id="flashcards-tab" style="display: none;">
-          <div class="flashcard-actions">
-            <button class="action-btn upload-for-flashcards-btn">
-              <i class="fas fa-upload"></i>
-              Upload Document
-            </button>
-            <button class="action-btn timer-btn">
-              <i class="fas fa-stopwatch"></i>
-              Time Set
-            </button>
-            <button class="action-btn filter-btn">
-              <i class="fas fa-filter"></i>
-              Filter
-            </button>
+          <!-- Create New Flashcard Set Section -->
+          <div class="create-flashcard-section">
+            <h2 class="section-title">Create New Flashcard Set</h2>
+            <div class="create-set-container">
+              <input type="text" class="set-name-input" placeholder="Enter set name">
+              <button class="create-set-btn">+ Create Set</button>
+            </div>
           </div>
-          
-          <!-- Hidden file input for document upload -->
-          <input type="file" id="flashcard-document-input" style="display: none;" accept=".txt,.doc,.docx,.pdf">
-          
-          <div class="flashcard-container">
-            <div class="flashcard-item">
-              <div class="flashcard-front">
-                <h3 class="flashcard-question">Loading flashcards...</h3>
-                
-                <div class="flashcard-controls">
-                  <button class="show-answer-btn">Show Answer</button>
-                  <button class="rotate-btn">
-                    <i class="fas fa-sync-alt"></i>
-                  </button>
-                </div>
-              </div>
-              <div class="flashcard-back">
-                <h3 class="flashcard-answer">Please wait...</h3>
 
-                <div class="flashcard-controls">
-                  <button class="show-answer-btn">Show Question</button>
-                  <button class="rotate-btn">
-                    <i class="fas fa-sync-alt"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
+          <!-- Flashcard Sets Grid -->
+          <div class="flashcard-sets-grid">
+            <!-- Sets will be added here dynamically -->
           </div>
-          
-          <div class="flashcard-nav">
-            <button class="nav-arrow prev-card">
-              <i class="fas fa-arrow-left"></i>
-            </button>
-            
-            <span class="card-count">0 / 0</span>
-            
-            <div class="nav-controls">
-              <button class="nav-arrow next-card">
-                <i class="fas fa-arrow-right"></i>
+
+          <!-- Hidden Flashcard Study View (shows when a set is selected) -->
+          <div class="flashcard-study-view" style="display: none;">
+            <div class="study-header">
+              <button class="back-to-sets-btn"><i class="fas fa-arrow-left"></i> Back to Sets</button>
+              <h2 class="set-title">Set Name</h2>
+            </div>
+
+            <div class="flashcard-actions">
+              <button class="action-btn upload-for-flashcards-btn">
+                <i class="fas fa-upload"></i>
+                Upload Document
               </button>
-              <button class="control-btn shuffle-btn">
-                <i class="fas fa-random"></i>
+              <button class="action-btn timer-btn">
+                <i class="fas fa-stopwatch"></i>
+                Time Set
+              </button>
+              <button class="action-btn filter-btn">
+                <i class="fas fa-filter"></i>
+                Filter
               </button>
             </div>
-          </div>
-          
-          <div class="progress-section">
-            <div class="progress-grid">
-              <div class="progress-card">
-                <h4 class="progress-title">Today's Progress</h4>
-                <div class="progress-info">
-                  <div class="progress-icon">
-                    <i class="fas fa-clock"></i>
+            
+            <!-- Hidden file input for document upload -->
+            <input type="file" id="flashcard-document-input" style="display: none;" accept=".txt,.doc,.docx,.pdf">
+            
+            <div class="flashcard-container">
+              <div class="flashcard-item">
+                <div class="flashcard-front">
+                  <h3 class="flashcard-question">Loading flashcards...</h3>
+                  
+                  <div class="flashcard-controls">
+                    <button class="show-answer-btn">Show Answer</button>
+                    <button class="rotate-btn">
+                      <i class="fas fa-sync-alt"></i>
+                    </button>
                   </div>
-                  <div class="progress-number">0</div>
-                  <div class="progress-label">Cards Reviewed</div>
+                </div>
+                <div class="flashcard-back">
+                  <h3 class="flashcard-answer">Please wait...</h3>
+
+                  <div class="flashcard-controls">
+                    <button class="show-answer-btn">Show Question</button>
+                    <button class="rotate-btn">
+                      <i class="fas fa-sync-alt"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
+            </div>
+            
+            <div class="flashcard-nav">
+              <button class="nav-arrow prev-card">
+                <i class="fas fa-arrow-left"></i>
+              </button>
               
-              <div class="progress-card">
-                <h4 class="progress-title">Next Review</h4>
-                <div class="next-review">
-                  <div class="time-info">
-                    <div class="clock-icon">
-                      <i class="far fa-clock"></i>
+              <span class="card-count">0 / 0</span>
+              
+              <div class="nav-controls">
+                <button class="nav-arrow next-card">
+                  <i class="fas fa-arrow-right"></i>
+                </button>
+                <button class="control-btn shuffle-btn">
+                  <i class="fas fa-random"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="progress-section">
+              <div class="progress-grid">
+                <div class="progress-card">
+                  <h4 class="progress-title">Today's Progress</h4>
+                  <div class="progress-info">
+                    <div class="progress-icon">
+                      <i class="fas fa-clock"></i>
                     </div>
-                    <span>Not scheduled</span>
+                    <div class="progress-number">0</div>
+                    <div class="progress-label">Cards Reviewed</div>
                   </div>
-                  <div class="arrow-btn">
-                    <i class="fas fa-arrow-right"></i>
+                </div>
+                
+                <div class="progress-card">
+                  <h4 class="progress-title">Next Review</h4>
+                  <div class="next-review">
+                    <div class="time-info">
+                      <div class="clock-icon">
+                        <i class="far fa-clock"></i>
+                      </div>
+                      <span>Not scheduled</span>
+                    </div>
+                    <div class="arrow-btn">
+                      <i class="fas fa-arrow-right"></i>
+                    </div>
                   </div>
                 </div>
               </div>

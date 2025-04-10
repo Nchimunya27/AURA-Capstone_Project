@@ -813,3 +813,166 @@
   [data-theme="night"] .loading-overlay {
     background-color: rgba(0, 0, 0, 0.7);
   }
+
+/* Create New Flashcard Set Section */
+.create-flashcard-section {
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 11px;
+  padding: 24px;
+  margin-bottom: 24px;
+  margin-top: 30px;
+}
+
+.create-set-container {
+  display: flex;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.set-name-input {
+  flex: 1;
+  padding: 12px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.create-set-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 24px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.create-set-btn:hover {
+  background-color: #4a8697;
+}
+
+/* Flashcard Sets Grid */
+.flashcard-sets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.flashcard-set-card {
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 11px;
+  padding: 20px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.flashcard-set-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.set-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.set-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.set-card-count {
+  font-size: 14px;
+  color: var(--text-tertiary);
+}
+
+.set-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.set-last-studied {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.study-btn {
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+/* Study View */
+.flashcard-study-view {
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 11px;
+  padding: 24px;
+}
+
+.study-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.back-to-sets-btn {
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.back-to-sets-btn:hover {
+  color: var(--primary-color);
+}
+
+.set-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Night mode compatibility */
+[data-theme="night"] .create-flashcard-section,
+[data-theme="night"] .flashcard-set-card,
+[data-theme="night"] .flashcard-study-view {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+[data-theme="night"] .set-name-input {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: #e5e7eb;
+}
+
+[data-theme="night"] .set-card-title {
+  color: #e5e7eb;
+}
+
+[data-theme="night"] .set-card-count,
+[data-theme="night"] .set-last-studied {
+  color: #9ca3af;
+}
