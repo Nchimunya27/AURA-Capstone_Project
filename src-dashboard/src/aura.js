@@ -265,13 +265,37 @@ class Dashboard {
     }
 
     /**
-     * Get color based on progress percentage
+     * Get color based on progress percentage (original method)
      */
     getProgressColor(percentage) {
         if (percentage >= 75) return '#22c55e'; // Green
         if (percentage >= 50) return '#f59e0b'; // Orange
         if (percentage >= 25) return '#f97316'; // Light Red
         return '#ef4444'; // Red
+    }
+
+    /**
+     * Get color based on progress percentage using the new color palette
+     */
+    getProgressColorUpdated(percentage) {
+        let progressColor;
+        let progressClass = '';
+        
+        if (percentage >= 75) {
+            progressColor = '#5997ac'; // Primary - teal blue
+            progressClass = 'progress-high';
+        } else if (percentage >= 50) {
+            progressColor = '#a1cbdd'; // Primary light - lighter blue
+            progressClass = 'progress-medium';
+        } else if (percentage >= 25) {
+            progressColor = '#f7aec2'; // Accent - light pink
+            progressClass = 'progress-low';
+        } else {
+            progressColor = '#af5166'; // Accent dark - darker pink/red
+            progressClass = 'progress-very-low';
+        }
+        
+        return progressColor;
     }
 
     /**
@@ -369,6 +393,9 @@ class Dashboard {
         setInterval(this.updateStreak, 300000);
     }
 
+    /**
+     * UPDATED: Load recent courses with circular donut chart and updated color palette
+     */
     async loadRecentCourses() {
         try {
             // Try to get courses from localStorage first
@@ -402,11 +429,16 @@ class Dashboard {
                     courseRow.className = 'course-row';
                     
                     const courseCard = document.createElement('div');
-                    courseCard.className = 'course-card';
+                    courseCard.className = 'course-card interactive-card';
                     courseCard.dataset.id = course.id;
                     
-                    // Calculate progress color based on knowledge level
-                    const progressColor = this.getProgressColor(course.knowledgeLevel);
+                    // Calculate progress color based on knowledge level using new color palette
+                    const progressColor = this.getProgressColorUpdated(course.knowledgeLevel);
+                    
+                    // Add high-progress class for courses with high progress
+                    if (course.knowledgeLevel >= 80) {
+                        courseCard.classList.add('high-progress');
+                    }
                     
                     courseCard.innerHTML = `
                         <div class="course-header">
@@ -414,8 +446,9 @@ class Dashboard {
                             <div class="course-progress">${course.knowledgeLevel}%</div>
                         </div>
                         <div class="course-details">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${course.knowledgeLevel}%; background-color: ${progressColor};"></div>
+                            <div class="progress-donut-container">
+                                <div class="progress-donut" style="--progress: ${course.knowledgeLevel}%; --progress-color: ${progressColor};"></div>
+                                <div class="progress-percentage">${course.knowledgeLevel}%</div>
                             </div>
                             <div class="next-quiz">
                                 <div class="quiz-icon">
@@ -423,14 +456,59 @@ class Dashboard {
                                 </div>
                                 <div class="quiz-date">Next Quiz: ${course.examDate || 'Not set'}</div>
                             </div>
+                            <div class="course-actions hidden">
+                                <button class="details-button">View Details</button>
+                            </div>
+                            <div class="course-stats hidden">
+                                <div class="stat-item">
+                                    <span class="stat-label">Last Studied</span>
+                                    <span class="stat-value">${course.lastStudied || 'Never'}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Total Hours</span>
+                                    <span class="stat-value">${course.studyHours || '0'}h</span>
+                                </div>
+                            </div>
                         </div>
                     `;
 
+                    // Add hover event listeners
+                    courseCard.addEventListener('mouseenter', () => {
+                        const actionsElement = courseCard.querySelector('.course-actions');
+                        const statsElement = courseCard.querySelector('.course-stats');
+                        
+                        if (actionsElement) actionsElement.classList.remove('hidden');
+                        if (statsElement) statsElement.classList.remove('hidden');
+                        
+                        // Add card highlight effect
+                        courseCard.classList.add('card-highlight');
+                    });
+
+                    courseCard.addEventListener('mouseleave', () => {
+                        const actionsElement = courseCard.querySelector('.course-actions');
+                        const statsElement = courseCard.querySelector('.course-stats');
+                        
+                        if (actionsElement) actionsElement.classList.add('hidden');
+                        if (statsElement) statsElement.classList.add('hidden');
+                        
+                        // Remove card highlight effect
+                        courseCard.classList.remove('card-highlight');
+                    });
+
                     // Add click handler to navigate to course page
-                    courseCard.addEventListener('click', () => {
-                        // Store current course data
+                    courseCard.addEventListener('click', (e) => {
+                        // Don't navigate if clicking on action buttons
+                        if (e.target.classList.contains('details-button')) {
+                            e.stopPropagation();
+                            
+                            // Navigate to course details
+                            localStorage.setItem('currentCourse', JSON.stringify(course));
+                            window.location.href = `coursepage.html?id=${course.id}`;
+                            return;
+                        }
+                        
+                        // Default navigation to course page
                         localStorage.setItem('currentCourse', JSON.stringify(course));
-                        // Navigate to course page
                         window.location.href = `coursepage.html?id=${course.id}`;
                     });
 
@@ -462,6 +540,32 @@ class Dashboard {
                 `;
             }
         }
+    }
+
+    /**
+     * UPDATED: Handle course action - simplified for single button
+     */
+    handleCourseAction(actionType, courseId) {
+        const course = this.getCourseById(courseId);
+        if (!course) return;
+        
+        // Now we only have a 'details' action type
+        if (actionType === 'details') {
+            // Navigate to course details
+            localStorage.setItem('currentCourse', JSON.stringify(course));
+            window.location.href = `coursepage.html?id=${course.id}`;
+        }
+    }
+
+    /**
+     * Helper method to get course by ID
+     */
+    getCourseById(courseId) {
+        const coursesData = localStorage.getItem('courses');
+        if (!coursesData) return null;
+        
+        const courses = JSON.parse(coursesData);
+        return courses.find(course => course.id === courseId);
     }
 
     async handleLogout() {
@@ -692,11 +796,14 @@ document.addEventListener('DOMContentLoaded', function() {
 // Initialize dashboard when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     const dashboard = new Dashboard();
+    window.dashboard = dashboard; // Make dashboard accessible globally
 });
 
 // initialize navigation links
 document.addEventListener('DOMContentLoaded', function() {
-    initializeNavigation();
+    if (typeof initializeNavigation === 'function') {
+        initializeNavigation();
+    }
 });
 
 // Progress Analytics navigation handler - works from any page
@@ -706,6 +813,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const dashboardContent = document.querySelector('.dashboard > .body > .content-wrapper > .layout-container > .main-content-column');
     const sidebarColumn = document.querySelector('.dashboard > .body > .content-wrapper > .layout-container > .sidebar-column');
     const progressAnalyticsPage = document.querySelector('.progress-analytics-page');
+    
+    // For jQuery-like :contains selector
+    const getElementByContainedText = (selector, text) => {
+        const elements = document.querySelectorAll(selector);
+        return Array.from(elements).find(element => 
+            element.textContent.trim().includes(text)
+        );
+    };
+    
+    const progressAnalyticsItem = getElementByContainedText('.nav-item .nav-text', 'Progress Analytics')?.closest('.nav-item');
     
     // Check if Progress Analytics page exists, if not, add it to the DOM
     let analyticsPageExists = !!progressAnalyticsPage;
@@ -735,16 +852,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Override the Dashboard.handleNavigation for Progress Analytics
     setTimeout(function() {
-      if (window.dashboard && typeof dashboard.handleNavigation === 'function') {
-        const originalHandleNavigation = dashboard.handleNavigation;
+      if (window.dashboard && typeof window.dashboard.handleNavigation === 'function') {
+        const originalHandleNavigation = window.dashboard.handleNavigation;
         
-        dashboard.handleNavigation = function(event) {
+        window.dashboard.handleNavigation = function(event) {
           const clickedItem = event.currentTarget;
           const navText = clickedItem.querySelector('.nav-text').textContent.trim();
           
           // Only call original handler if NOT Progress Analytics
           if (navText !== 'Progress Analytics') {
-            originalHandleNavigation.call(dashboard, event);
+            originalHandleNavigation.call(window.dashboard, event);
           }
         };
         
@@ -765,4 +882,64 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }, 300); // Allow time for dashboard to initialize
     }
+});
+
+// Add sample courses if none exist (for demo purposes)
+document.addEventListener('DOMContentLoaded', function() {
+  if (!localStorage.getItem('courses')) {
+    const demoData = [
+      {
+        id: 'course1',
+        name: 'Web Development',
+        knowledgeLevel: 65,
+        examDate: 'Feb 10, 2025',
+        timestamp: Date.now(),
+        lastStudied: 'Yesterday',
+        studyHours: 12
+      },
+      {
+        id: 'course2',
+        name: 'Advanced Mathematics',
+        knowledgeLevel: 48,
+        examDate: 'Feb 15, 2025',
+        timestamp: Date.now() - 100000,
+        lastStudied: '2 days ago',
+        studyHours: 8
+      },
+      {
+        id: 'course3',
+        name: 'UI/UX Design',
+        knowledgeLevel: 89,
+        examDate: 'Mar 5, 2025',
+        timestamp: Date.now() - 200000,
+        lastStudied: 'Today',
+        studyHours: 20
+      },
+      {
+        id: 'course4',
+        name: 'Data Science',
+        knowledgeLevel: 32,
+        examDate: 'Mar 22, 2025',
+        timestamp: Date.now() - 300000,
+        lastStudied: '5 days ago',
+        studyHours: 5
+      }
+    ];
+    
+    localStorage.setItem('courses', JSON.stringify(demoData));
+  }
+  
+  // Add event delegation for course details button
+  const dashboardInstance = window.dashboard;
+  if (dashboardInstance && dashboardInstance.elements && dashboardInstance.elements.recentCoursesGrid) {
+    dashboardInstance.elements.recentCoursesGrid.addEventListener('click', (e) => {
+      if (e.target.classList.contains('details-button')) {
+        const courseCard = e.target.closest('.course-card');
+        if (courseCard) {
+          const courseId = courseCard.dataset.id;
+          dashboardInstance.handleCourseAction('details', courseId);
+        }
+      }
+    });
+  }
 });
