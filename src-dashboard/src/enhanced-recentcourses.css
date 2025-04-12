@@ -1,0 +1,327 @@
+/* enhanced-courses.css - Complete file with circular donut */
+
+/* Color palette variables - ONLY for Recent Courses section */
+.courses-grid {
+    /* Custom color palette */
+    --rc-primary: #5997ac;
+    --rc-primary-light: #a1cbdd;
+    --rc-neutral: #eeede7;
+    --rc-accent: #f7aec2;
+    --rc-accent-dark: #af5166;
+    
+    /* Light mode (default) with explicit white backgrounds */
+    --rc-card-bg: #ffffff;
+    --rc-card-shadow: rgba(0, 0, 0, 0.1);
+    --rc-border-color: rgba(0, 0, 0, 0.1);
+    --rc-hover-bg: #f8f9fa;
+    --rc-button-shadow: rgba(89, 151, 172, 0.3);
+    --rc-text-primary: #333333;
+    --rc-text-light: #ffffff;
+    --rc-card-inner-bg: #ffffff;
+  }
+  
+  /* Dark mode overrides - will only apply when system is in dark mode */
+  @media (prefers-color-scheme: dark) {
+    .courses-grid {
+      --rc-card-bg: #2d2d2d;
+      --rc-card-shadow: rgba(0, 0, 0, 0.25);
+      --rc-border-color: rgba(255, 255, 255, 0.1);
+      --rc-hover-bg: #383838;
+      --rc-button-shadow: rgba(89, 151, 172, 0.5);
+      --rc-text-primary: #f0f0f0;
+      --rc-card-inner-bg: #333333;
+    }
+  }
+  
+  /* Interactive course card styles - specifically scoped to course cards */
+  .courses-grid .course-card.interactive-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px var(--rc-card-shadow);
+    background-color: var(--rc-card-bg) !important; /* Important to override any inherited styles */
+    color: var(--rc-text-primary);
+    border: 1px solid var(--rc-border-color);
+  }
+  
+  .courses-grid .course-card.interactive-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px var(--rc-card-shadow);
+    background-color: var(--rc-hover-bg) !important;
+  }
+  
+  .courses-grid .course-card.card-highlight {
+    border-color: var(--rc-primary-light);
+  }
+  
+  /* Course card animation and transition effects */
+  .courses-grid .course-card.interactive-card .course-header {
+    padding: 18px;
+    border-bottom: 1px solid var(--rc-border-color);
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--rc-card-bg) !important;
+  }
+  
+  .courses-grid .course-card.interactive-card:hover .course-header {
+    border-bottom-color: var(--rc-primary-light);
+  }
+  
+  .courses-grid .course-card.interactive-card .course-title {
+    font-weight: 600;
+    transition: color 0.3s ease;
+    font-size: 16px;
+    color: var(--rc-text-primary);
+  }
+  
+  .courses-grid .course-card.interactive-card:hover .course-title {
+    color: var(--rc-primary);
+  }
+  
+  .courses-grid .course-card.interactive-card .course-progress {
+    font-size: 14px;
+    font-weight: 500;
+    transition: opacity 0.3s ease;
+    color: var(--rc-text-primary);
+  }
+  
+  /* Donut chart - Updated for more circular appearance */
+  .courses-grid .progress-donut-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin: 15px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .courses-grid .progress-donut {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent !important;
+    position: relative;
+    transition: transform 1s ease;
+  }
+  
+  /* Outer stroke for donut - made more circular */
+  .courses-grid .progress-donut::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(var(--progress-color) var(--progress), rgba(0,0,0,0.1) 0) !important;
+    mask: radial-gradient(transparent 62%, black 63%, black 90%, transparent 91%);
+    -webkit-mask: radial-gradient(transparent 62%, black 63%, black 90%, transparent 91%);
+    transform: rotate(-90deg);
+  }
+  
+  /* Inner circle */
+  .courses-grid .progress-donut::after {
+    content: "";
+    position: absolute;
+    width: 75%;
+    height: 75%;
+    border-radius: 50%;
+    background-color: var(--rc-card-inner-bg) !important;
+    z-index: 0;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  }
+  
+  .courses-grid .progress-percentage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--progress-color);
+    z-index: 1;
+  }
+  
+  /* Add subtle shadow to enhance the circular effect */
+  .courses-grid .progress-donut-container::after {
+    content: "";
+    position: absolute;
+    width: 84%;
+    height: 84%;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  /* Course details styling */
+  .courses-grid .course-details {
+    padding: 16px;
+    transition: background-color 0.3s ease;
+    background-color: var(--rc-card-bg) !important;
+  }
+  
+  .courses-grid .next-quiz {
+    display: flex;
+    align-items: center;
+    margin: 12px 0;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--rc-border-color);
+  }
+  
+  .courses-grid .quiz-icon {
+    margin-right: 10px;
+    opacity: 0.7;
+    color: var(--rc-primary);
+  }
+  
+  .courses-grid .quiz-date {
+    font-size: 14px;
+    color: var(--rc-text-primary);
+  }
+  
+  /* Course actions styling */
+  .courses-grid .course-actions {
+    margin-top: 16px;
+    padding: 0 0 8px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    text-align: center;
+  }
+  
+  .courses-grid .course-card.interactive-card:hover .course-actions:not(.hidden) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .courses-grid .details-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    background-color: var(--rc-primary) !important;
+    color: var(--rc-text-light) !important;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px var(--rc-button-shadow);
+    display: inline-block;
+  }
+  
+  .courses-grid .details-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--rc-button-shadow);
+    background-color: var(--rc-primary-light) !important;
+  }
+  
+  /* Course stats styling */
+  .courses-grid .course-stats {
+    padding: 0 10px 10px;
+    margin-top: 14px;
+    display: flex;
+    justify-content: space-around;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    border-top: 1px solid var(--rc-border-color);
+    padding-top: 14px;
+  }
+  
+  .courses-grid .course-card.interactive-card:hover .course-stats:not(.hidden) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .courses-grid .course-stats .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .courses-grid .course-stats .stat-label {
+    font-size: 11px;
+    color: var(--rc-text-primary);
+    opacity: 0.7;
+    margin-bottom: 4px;
+  }
+  
+  .courses-grid .course-stats .stat-value {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--rc-text-primary);
+  }
+  
+  /* Helper class to hide elements */
+  .courses-grid .hidden {
+    display: none;
+  }
+  
+  /* Add a subtle glow animation to nearly complete courses */
+  @keyframes glow {
+    0% { box-shadow: 0 0 5px var(--rc-button-shadow); }
+    50% { box-shadow: 0 0 15px var(--rc-button-shadow); }
+    100% { box-shadow: 0 0 5px var(--rc-button-shadow); }
+  }
+  
+  .courses-grid .course-card.high-progress {
+    animation: glow 3s infinite;
+  }
+  
+  /* Improve the empty state styling */
+  .courses-grid .no-courses-message {
+    text-align: center;
+    padding: 30px 20px;
+    background-color: var(--rc-card-bg) !important;
+    color: var(--rc-text-primary);
+    border-radius: 12px;
+    border: 1px dashed var(--rc-border-color);
+  }
+  
+  .courses-grid .add-course-btn {
+    margin-top: 15px;
+    background-color: var(--rc-primary) !important;
+    color: var(--rc-text-light) !important;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px var(--rc-button-shadow);
+  }
+  
+  .courses-grid .add-course-btn:hover {
+    background-color: var(--rc-primary-light) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--rc-button-shadow);
+  }
+  
+  /* Apply smooth fade-in animation to course cards when the page loads */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .courses-grid .course-row {
+    animation: fadeIn 0.5s ease forwards;
+  }
+  
+  .courses-grid .course-row:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+  
+  .courses-grid .course-row:nth-child(3) {
+    animation-delay: 0.2s;
+  }
+  
+  .courses-grid .course-row:nth-child(4) {
+    animation-delay: 0.3s;
+  }
