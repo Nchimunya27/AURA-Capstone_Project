@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Notes - AURA</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../common/styles.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <div class="sidebar">
+        <div class="logo-container">
+          <span class="logo-text">AURA</span>
+        </div>
+
+        <nav class="nav-menu">
+          <a href="#" class="nav-item" data-page="upload">
+            <i class="fas fa-upload"></i>
+            <span>Upload Notes</span>
+          </a>
+          <a href="#" class="nav-item" data-page="history">
+            <i class="fas fa-history"></i>
+            <span>Quiz History</span>
+          </a>
+          <a href="#" class="nav-item" data-page="profile">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <a href="#" class="nav-item logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+          <div class="user-info">
+            <span class="username"
+              >Logged in as <span id="current-user">User</span></span
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div class="page-header">
+          <h1>Upload Course Notes</h1>
+          <p>Upload your course materials to generate custom quizzes</p>
+        </div>
+
+        <div class="card upload-card">
+          <form id="upload-form">
+            <div class="upload-dropzone" id="upload-dropzone">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <h3>Drag & Drop Files Here</h3>
+              <p>or</p>
+              <label for="file-input" class="btn btn-primary"
+                >Browse Files</label
+              >
+              <input
+                type="file"
+                id="file-input"
+                accept=".pdf,.txt,.docx"
+                hidden
+              />
+              <p class="file-info">Supported formats: PDF, TXT, DOCX</p>
+            </div>
+
+            <div class="file-preview" id="file-preview" style="display: none">
+              <div class="file-preview-header">
+                <div class="file-info">
+                  <i class="fas fa-file-alt"></i>
+                  <span id="file-name">document.pdf</span>
+                </div>
+                <button type="button" id="remove-file" class="btn-icon">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <div class="text-preview-container">
+                <h4>Text Preview</h4>
+                <div class="text-preview-content" id="text-preview"></div>
+              </div>
+            </div>
+
+            <div class="form-group quiz-options">
+              <label class="form-label">Quiz Options</label>
+              <div class="options-grid">
+                <div class="option-item">
+                  <label for="num-questions">Number of Questions</label>
+                  <select id="num-questions" class="form-control">
+                    <option value="5">5 Questions</option>
+                    <option value="10" selected>10 Questions</option>
+                    <option value="15">15 Questions</option>
+                    <option value="20">20 Questions</option>
+                  </select>
+                </div>
+                <div class="option-item">
+                  <label for="quiz-title">Quiz Title</label>
+                  <input
+                    type="text"
+                    id="quiz-title"
+                    class="form-control"
+                    placeholder="e.g. History Chapter 5"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button
+                type="submit"
+                id="generate-button"
+                class="btn btn-primary"
+                disabled
+              >
+                Generate Quiz
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="../common/supabase.js"></script>
+    <script src="../common/auth.js"></script>
+    <script src="../common/ui.js"></script>
+    <script src="upload.js"></script>
+  </body>
+</html>

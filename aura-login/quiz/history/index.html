@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz History - AURA</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../common/styles.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <div class="sidebar">
+        <div class="logo-container">
+          <span class="logo-text">AURA</span>
+        </div>
+
+        <nav class="nav-menu">
+          <a href="#" class="nav-item" data-page="upload">
+            <i class="fas fa-upload"></i>
+            <span>Upload Notes</span>
+          </a>
+          <a href="#" class="nav-item" data-page="history">
+            <i class="fas fa-history"></i>
+            <span>Quiz History</span>
+          </a>
+          <a href="#" class="nav-item" data-page="profile">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <a href="#" class="nav-item logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+          <div class="user-info">
+            <span class="username"
+              >Logged in as <span id="current-user">User</span></span
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div class="page-header">
+          <h1>Your Quiz History</h1>
+          <button id="create-quiz-btn" class="btn btn-primary">
+            Create New Quiz
+          </button>
+        </div>
+
+        <div class="quiz-filters">
+          <div class="search-container">
+            <input
+              type="text"
+              id="search-input"
+              class="form-control"
+              placeholder="Search quizzes..."
+            />
+            <i class="fas fa-search search-icon"></i>
+          </div>
+
+          <div class="filter-container">
+            <select id="status-filter" class="form-control">
+              <option value="all">All Status</option>
+              <option value="completed">Completed</option>
+              <option value="in-progress">In Progress</option>
+              <option value="not-started">Not Started</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="quizzes-container" class="quizzes-container">
+          <!-- Quizzes will be loaded here -->
+          <div class="skeleton-loader">
+            <div class="skeleton-item"></div>
+            <div class="skeleton-item"></div>
+            <div class="skeleton-item"></div>
+          </div>
+        </div>
+
+        <div id="empty-state" class="empty-state" style="display: none">
+          <div class="empty-icon">
+            <i class="fas fa-book"></i>
+          </div>
+          <h3>No Quizzes Found</h3>
+          <p>Upload some notes to create your first quiz!</p>
+          <button id="empty-create-btn" class="btn btn-primary">
+            Create Quiz
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="../common/supabase.js"></script>
+    <script src="../common/auth.js"></script>
+    <script src="../common/ui.js"></script>
+    <script src="history.js"></script>
+  </body>
+</html>
