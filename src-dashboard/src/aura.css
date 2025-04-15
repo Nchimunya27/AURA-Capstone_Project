@@ -234,11 +234,7 @@ body {
     display: flex;
     align-items: center;
     width: 118%;
-<<<<<<< HEAD
-    gap: 5px;  
-=======
     gap: 5px;
->>>>>>> 317c4ae56ee74c392f7d3fd6e12afa96693f4a5d
     padding: 15px;
     border-bottom: 1px solid var(--border-color);
     transition: border-color 0.3s ease;
@@ -457,7 +453,7 @@ body {
 
 .achievements-section {
     position: absolute;
-    top: 30px;
+    top: 20px;
     right: 20px;
     width: 350px;  /* Adjust based on your needs */
     background-color: var(--background-secondary);

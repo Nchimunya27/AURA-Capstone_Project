@@ -413,15 +413,29 @@ class Dashboard {
                 }
             }
 
-            // Sort courses by last accessed/modified date
-            courses.sort((a, b) => b.timestamp - a.timestamp);
-
-            // Take only the most recent 4 courses
-            const recentCourses = courses.slice(0, 4);
-
             // Clear existing courses grid
             if (this.elements.recentCoursesGrid) {
                 this.elements.recentCoursesGrid.innerHTML = '';
+
+                // If no courses exist, show a message
+                if (!courses || courses.length === 0) {
+                    const noCourseMessage = document.createElement('div');
+                    noCourseMessage.className = 'no-courses-message';
+                    noCourseMessage.innerHTML = `
+                        <p>No courses yet! Get started by adding a course in the My Courses section.</p>
+                        <button class="add-course-btn" onclick="window.location.href='mycourses.html'">
+                            Add Your First Course
+                        </button>
+                    `;
+                    this.elements.recentCoursesGrid.appendChild(noCourseMessage);
+                    return;
+                }
+
+                // Sort courses by last accessed/modified date
+                courses.sort((a, b) => b.timestamp - a.timestamp);
+
+                // Take only the most recent 4 courses
+                const recentCourses = courses.slice(0, 4);
 
                 // Add courses to the grid
                 recentCourses.forEach(course => {
@@ -515,19 +529,6 @@ class Dashboard {
                     courseRow.appendChild(courseCard);
                     this.elements.recentCoursesGrid.appendChild(courseRow);
                 });
-
-                // If no courses exist, show a message
-                if (recentCourses.length === 0) {
-                    const noCourseMessage = document.createElement('div');
-                    noCourseMessage.className = 'no-courses-message';
-                    noCourseMessage.innerHTML = `
-                        <p>No courses yet! Get started by adding a course in the My Courses section.</p>
-                        <button class="add-course-btn" onclick="window.location.href='mycourses.html'">
-                            Add Your First Course
-                        </button>
-                    `;
-                    this.elements.recentCoursesGrid.appendChild(noCourseMessage);
-                }
             }
         } catch (error) {
             console.error('Error loading recent courses:', error);
@@ -884,62 +885,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Add sample courses if none exist (for demo purposes)
+// Remove the demo data initialization code
 document.addEventListener('DOMContentLoaded', function() {
-  if (!localStorage.getItem('courses')) {
-    const demoData = [
-      {
-        id: 'course1',
-        name: 'Web Development',
-        knowledgeLevel: 65,
-        examDate: 'Feb 10, 2025',
-        timestamp: Date.now(),
-        lastStudied: 'Yesterday',
-        studyHours: 12
-      },
-      {
-        id: 'course2',
-        name: 'Advanced Mathematics',
-        knowledgeLevel: 48,
-        examDate: 'Feb 15, 2025',
-        timestamp: Date.now() - 100000,
-        lastStudied: '2 days ago',
-        studyHours: 8
-      },
-      {
-        id: 'course3',
-        name: 'UI/UX Design',
-        knowledgeLevel: 89,
-        examDate: 'Mar 5, 2025',
-        timestamp: Date.now() - 200000,
-        lastStudied: 'Today',
-        studyHours: 20
-      },
-      {
-        id: 'course4',
-        name: 'Data Science',
-        knowledgeLevel: 32,
-        examDate: 'Mar 22, 2025',
-        timestamp: Date.now() - 300000,
-        lastStudied: '5 days ago',
-        studyHours: 5
-      }
-    ];
-    
-    localStorage.setItem('courses', JSON.stringify(demoData));
-  }
-  
-  // Add event delegation for course details button
-  const dashboardInstance = window.dashboard;
-  if (dashboardInstance && dashboardInstance.elements && dashboardInstance.elements.recentCoursesGrid) {
-    dashboardInstance.elements.recentCoursesGrid.addEventListener('click', (e) => {
-      if (e.target.classList.contains('details-button')) {
-        const courseCard = e.target.closest('.course-card');
-        if (courseCard) {
-          const courseId = courseCard.dataset.id;
-          dashboardInstance.handleCourseAction('details', courseId);
-        }
-      }
-    });
-  }
+    // Add event delegation for course details button
+    const dashboardInstance = window.dashboard;
+    if (dashboardInstance && dashboardInstance.elements && dashboardInstance.elements.recentCoursesGrid) {
+        dashboardInstance.elements.recentCoursesGrid.addEventListener('click', (e) => {
+            if (e.target.classList.contains('details-button')) {
+                const courseCard = e.target.closest('.course-card');
+                if (courseCard) {
+                    const courseId = courseCard.dataset.id;
+                    dashboardInstance.handleCourseAction('details', courseId);
+                }
+            }
+        });
+    }
 });
