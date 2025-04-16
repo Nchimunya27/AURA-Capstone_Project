@@ -1,7 +1,7 @@
 // Enhanced Weather Widget for AURA Dashboard
 document.addEventListener('DOMContentLoaded', function() {
     // Your AccuWeather API Key 
-    const API_KEY = 'YOUR_API_KEY_HERE'; // Replace with your actual API key
+    const API_KEY = 'G9fV1lohZJ0pWoGGC9PJcXOt5AGIG88r'; // Replace with your actual API key
     
     // Weather messages based on conditions and temperature
     const weatherMessages = {
