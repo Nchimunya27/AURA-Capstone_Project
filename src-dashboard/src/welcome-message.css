@@ -1,0 +1,27 @@
+/* Welcome Message Animation */
+.welcome-text {
+    position: relative;
+    display: inline-block;
+    border-right: 2px solid var(--accent-color);
+    white-space: nowrap;
+    overflow: hidden;
+    animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+    margin-right: 5px;
+  }
+  
+  /* Typing animation */
+  @keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+  }
+  
+  /* Cursor blinking animation */
+  @keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: var(--accent-color) }
+  }
+  
+  /* Ensure the text is visible in all themes */
+  [data-theme="night"] .welcome-text {
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
