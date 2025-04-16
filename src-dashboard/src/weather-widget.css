@@ -10,6 +10,10 @@
     max-width: 350px;
     overflow: hidden;
     position: relative;
+    position: absolute;
+    right: 20px;
+    top: 650px;
+    
   }
   
   .weather-widget:hover {
