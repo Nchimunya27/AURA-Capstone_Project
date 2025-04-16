@@ -728,12 +728,12 @@ body {
     background-color: var(--background-secondary);
     border-radius: 8px;
     padding: 26px;
-    margin-top: 30px;
+    margin-top: 30rem;
     border: 1px solid var(--border-color);
-    margin: 2rem auto;
     box-shadow: var(--card-shadow);
     transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
+
 
 .calendar-header {
     display: flex;
