@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', function() {
       "So much aura…",
       "Keep stacking those wins",
       "You're on your afternoon arc",
-      "What if I throw a microwave at you?",
       "Time for lunch…or NOT…",
       "You don't take time to chomp?"
     ];

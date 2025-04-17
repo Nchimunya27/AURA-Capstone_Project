@@ -1,0 +1,33 @@
+
+
+/* DAY MODE - Enhanced colors for better contrast with browser UI */
+:root:not([data-theme="night"]) .logo-container {
+    /* More vibrant gradient that stands out from browser UI */
+    background: linear-gradient(to right, #7db9e8, #d6f0fd) !important;
+    color: #194973 !important; /* Darker blue text for better contrast */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important; /* Subtle shadow for depth */
+  }
+  
+  /* Make day mode logo text more visible */
+  :root:not([data-theme="night"]) .logo-text {
+    color: #194973 !important; /* Darker blue for better visibility */
+    font-weight: 600 !important; /* Slightly bolder */
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5) !important; /* Subtle text shadow */
+  }
+  
+  /* NIGHT MODE - Enhanced with more vibrant gradient */
+  [data-theme="night"] .logo-container {
+    /* More vibrant blue gradient that stands out */
+    background: linear-gradient(to right, #2563eb, #1e3a8a) !important;
+    color: white !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+  }
+  
+  /* Make night mode logo text more visible */
+  [data-theme="night"] .logo-text {
+    color: white !important;
+    font-weight: 600 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+  }

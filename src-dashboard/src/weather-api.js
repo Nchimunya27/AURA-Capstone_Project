@@ -1,8 +1,7 @@
 // Weather API Integration for Welcome Bar
 document.addEventListener('DOMContentLoaded', function() {
     // Your AccuWeather API Key 
-    const API_KEY = 'G9fV1lohZJ0pWoGGC9PJcXOt5AGIG88r'; // Replace with your actual API key
-    
+    const API_KEY = 'ZSeUUg773HffY5IkWK9gqn3NQiNgTw5I'; 
     // Function to add weather container to the welcome bar
     function addWeatherContainer() {
       // First check if the date-weather-container exists, if not create it

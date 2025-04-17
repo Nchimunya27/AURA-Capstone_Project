@@ -229,15 +229,37 @@ body {
     z-index: 2; /* Ensure sidebar content is above stars */
 }
 
-/* Logo Container */
+/* Logo Container - UPDATED */
 .logo-container {
     display: flex;
     align-items: center;
-    width: 118%;
+    width: 115.8%; /* Changed from 115.5% to 100% */
     gap: 5px;
     padding: 15px;
     border-bottom: 1px solid var(--border-color);
     transition: border-color 0.3s ease;
+    position: relative; /* Added position relative */
+    overflow: hidden; /* Added overflow hidden */
+    flex-wrap: nowrap; /* Ensure items don't wrap */
+    min-height: 72px; /* Ensure consistent height */
+    box-sizing: border-box; /* Make sure padding is included in width calculations */
+}
+
+/* Add a media query for smaller screens */
+@media (max-width: 768px) {
+    .logo-container {
+        padding: 10px; /* Reduced padding on smaller screens */
+        min-height: 62px; /* Slightly smaller height on mobile */
+    }
+    
+    .logo-container .logo-image {
+        width: 36px; /* Slightly smaller logo on mobile */
+        height: 36px;
+    }
+    
+    .logo-container .logo-text {
+        font-size: 18px; /* Smaller text on mobile */
+    }
 }
 
 .logo-image {
@@ -882,7 +904,7 @@ body {
     }
 
     .sidebar-column {
-        width: 100%;
+        width: 200%;
         border-right: none;
         border-bottom: 1px solid var(--border-color);
         
