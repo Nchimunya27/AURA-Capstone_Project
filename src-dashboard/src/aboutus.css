@@ -274,7 +274,9 @@
     background-color: var(--background-tertiary);
     overflow-y: auto;
     position: relative;
-    padding-left: 10px;
+    padding-left: 50px;
+    padding-right: 20px;
+    /* margin-left:30px; */
     display: flex;
     flex-direction: column;
 }
@@ -423,8 +425,9 @@ h4 {
     padding: 30px 0;
     color: white;
     margin-top: 60px;
-    width: 100%;
-    margin-left: -20px; 
+    position: relative;
+    left: -50px; /* Pull back to align with edge */
+    width: calc(100% + 70px); /* Extend across full width plus padding compensation */
 }
 
 .footer-content {
@@ -433,6 +436,7 @@ h4 {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 40px;
+    padding-left: calc(16% + 40px); /* Account for sidebar width plus some padding */
 }
 
 .footer-column {
@@ -656,6 +660,21 @@ h4 {
     
     .nav-link {
         padding: 10px 12px;
+    }
+    
+    .footer {
+        width: 100%;
+        left: 0;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        gap: 20px;
+        padding: 0 20px;
+    }
+    
+    .footer-column {
+        width: 100%;
     }
 }
 
