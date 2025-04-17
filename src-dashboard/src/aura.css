@@ -222,34 +222,43 @@ body {
 .sidebar {
     position: fixed;
     top: 0;
+    width: 16%; /* Match sidebar-column width */
     display: flex;
     flex-direction: column;
     padding-bottom: 27px;
     height: 100%;
-    z-index: 2; /* Ensure sidebar content is above stars */
+    z-index: 2;
+    overflow: hidden; /* Add overflow hidden to contain children */
 }
 
-/* Logo Container - UPDATED */
+/* Logo Container */
 .logo-container {
     display: flex;
     align-items: center;
-    width: 115.8%; /* Changed from 115.5% to 100% */
+    width: 100%; /* Match parent */
     gap: 5px;
     padding: 15px;
     border-bottom: 1px solid var(--border-color);
     transition: border-color 0.3s ease;
-    position: relative; /* Added position relative */
-    overflow: hidden; /* Added overflow hidden */
-    flex-wrap: nowrap; /* Ensure items don't wrap */
-    min-height: 72px; /* Ensure consistent height */
-    box-sizing: border-box; /* Make sure padding is included in width calculations */
+    position: relative;
+    overflow: hidden; /* Keep overflow hidden to prevent edge bleed */
+    flex-wrap: nowrap;
+    min-height: 72px;
+    box-sizing: border-box;
+    max-width: 100%; /* Ensure it doesn't exceed parent width */
 }
-
 /* Add a media query for smaller screens */
-@media (max-width: 768px) {
-    .logo-container {
-        padding: 10px; /* Reduced padding on smaller screens */
-        min-height: 62px; /* Slightly smaller height on mobile */
+@media (max-width: 1024px) {
+    .sidebar-column {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+
+    .sidebar {
+        position: relative;
+        width: 100%;
     }
     
     .logo-container .logo-image {
@@ -904,10 +913,11 @@ body {
     }
 
     .sidebar-column {
-        width: 200%;
-        border-right: none;
-        border-bottom: 1px solid var(--border-color);
-        
+        width: 16%;
+        background-image: var(--sidebar-gradient);
+        border-right: 1px solid #e5e7eb;
+        transition: border-color 0.3s ease, background-image 0.3s ease;
+        position: relative; /* Add position relative */
     }
 
     .main-content-column {
