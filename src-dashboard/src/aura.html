@@ -11,6 +11,15 @@
   <link rel="stylesheet" href="welcome-message.css">
   <link rel="stylesheet" href="weather-widget.css">
 
+  <link rel="stylesheet" href="mood.css">
+
+
+
+  <script src="mood.js"></script>
+
+
+
+
 
 
 
@@ -34,7 +43,7 @@
   </style>
 
 
-  <script src="theme-init.js"></script>
+<script src="theme-init.js"></script>
 
 </head>
 
@@ -154,6 +163,40 @@
                             </section>
                           </div>
                         </div>
+
+
+
+
+                        <div class="dashboard-column">
+                          <div class="mood-widget">
+                              <div id="rate-your-mood" class="mood-title">Rate Your Mood Today</div>
+                              
+                              <div class="mood-track" id="mood-track">
+                                  <div class="mood-dragger" id="mood-dragger"></div>
+                              </div>
+                              <div class="mood-labels">
+                                  <span>Sad</span>
+                                  <span>Neutral</span>
+                                  <span>Happy</span>
+                              </div>
+                              <div class="recommendation" id="recommendation">
+                                  <!-- Recommendation will be displayed here -->
+                              </div>
+                          </div>
+                      </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
                         <div class="sidebar-column">
                           <div class="sidebar-content">
                             <section class="achievements-section">
@@ -282,6 +325,8 @@
     window.addEventListener('load', updateUsername);
   })();
 </script>
+
+
 
 
 
