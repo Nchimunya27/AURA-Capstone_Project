@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -257,32 +256,69 @@
     const subjectArea = document.getElementById('subjectArea').value;
     const examDate = document.getElementById('examDate').value;
     const studyHours = document.getElementById('studyHours').value;
-    const knowledgeLevel = document.getElementById('knowledgeLevel').value;
     
     // Validating course name input
     if (!courseName.trim()) {
-      alert('Please enter a course name');
-      return;
+        alert('Please enter a course name');
+        return;
     }
 
     // Create a unique ID for each course
     const courseId = Date.now().toString();
     
-    // Create course object
+    // Create default tasks for the new course
+    const defaultTasks = [
+        {
+            id: `task_${Date.now()}_1`,
+            text: "Create first flashcard set",
+            completed: false,
+            type: "default",
+            category: "flashcards"
+        },
+        {
+            id: `task_${Date.now()}_2`,
+            text: "Create first quiz set",
+            completed: false,
+            type: "default",
+            category: "quizzes"
+        }
+    ];
+    
+    // Create course object with timestamp and initialize progress at 0
     const course = {
-      id: courseId,
-      name: courseName,
-      subject: subjectArea,
-      examDate: examDate,
-      studyHours: studyHours,
-      knowledgeLevel: knowledgeLevel
+        id: courseId,
+        name: courseName,
+        subject: subjectArea,
+        examDate: examDate,
+        studyHours: studyHours || '0',
+        knowledgeLevel: 0,
+        tasks: defaultTasks,
+        progress: {
+            tasks: {
+                completed: 0,
+                total: defaultTasks.length
+            },
+            quizzes: {
+                completed: 0,
+                total: 0
+            },
+            flashcards: {
+                mastered: 0,
+                total: 0
+            },
+            overall: 0
+        },
+        timestamp: Date.now()
     };
     
     // Add to courses array
     courses.push(course);
     
-    // Save to cache
-    saveCoursesToCache();
+    // Save to both cache and localStorage
+    saveCoursesToStorage(courses);
+    
+    // Save tasks separately for the course
+    saveTasks(courseId, defaultTasks);
     
     // Add to the UI
     addCourseToUI(course);
@@ -350,23 +386,23 @@
     courseCard.dataset.id = course.id;
     
     courseCard.innerHTML = `
-      <div class="course-header">
-        <div class="course-title">${course.name}</div>
-        <div class="course-progress-badge progress-blue">${course.knowledgeLevel}%</div>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill blue" style="width: ${course.knowledgeLevel}%;"></div>
-      </div>
-      <div class="course-details">
-        <div class="course-quiz">
-          <span class="quiz-icon">📅</span>
-          <span class="quiz-date">Next Quiz: ${course.examDate}</span>
+        <div class="course-header">
+            <div class="course-title">${course.name}</div>
+            <div class="course-progress-badge progress-blue">${course.progress.overall}%</div>
         </div>
-      </div>
-      <div class="course-actions">
-        <button class="edit-btn">Edit</button>
-        <button class="delete-btn">Delete</button>
-      </div>
+        <div class="progress-bar">
+            <div class="progress-fill blue" style="width: ${course.progress.overall}%;"></div>
+        </div>
+        <div class="course-details">
+            <div class="course-quiz">
+                <span class="quiz-icon">📅</span>
+                <span class="quiz-date">Next Quiz: ${course.examDate || 'Not set'}</span>
+            </div>
+        </div>
+        <div class="course-actions">
+            <button class="edit-btn">Edit</button>
+            <button class="delete-btn">Delete</button>
+        </div>
     `;
     
     coursesGridContainer.appendChild(courseCard);
@@ -467,6 +503,90 @@
     
     // Close the modal
     modal.style.display = 'none';
+  }
+
+  // Add function to update course progress
+  function updateCourseProgress(courseId, newProgress) {
+    // Find the course in memory
+    const courseIndex = courses.findIndex(course => course.id === courseId);
+    if (courseIndex === -1) return;
+    
+    // Update progress
+    courses[courseIndex].progress = newProgress;
+    courses[courseIndex].knowledgeLevel = newProgress.overall;
+    
+    // Save to storage
+    saveCoursesToStorage(courses);
+    
+    // Update UI
+    const courseCard = document.querySelector(`.course-card[data-id="${courseId}"]`);
+    if (courseCard) {
+        const progressBadge = courseCard.querySelector('.course-progress-badge');
+        const progressFill = courseCard.querySelector('.progress-fill');
+        
+        if (progressBadge) progressBadge.textContent = `${newProgress.overall}%`;
+        if (progressFill) progressFill.style.width = `${newProgress.overall}%`;
+    }
+  }
+
+  // Function to save tasks for a specific course
+  function saveTasks(courseId, tasks) {
+    const tasksKey = `tasks_${courseId}`;
+    localStorage.setItem(tasksKey, JSON.stringify(tasks));
+  }
+
+  // Function to load tasks for a specific course
+  function loadTasks(courseId) {
+    const tasksKey = `tasks_${courseId}`;
+    const tasksData = localStorage.getItem(tasksKey);
+    return tasksData ? JSON.parse(tasksData) : [];
+  }
+
+  // Function to update task completion status
+  function updateTaskStatus(courseId, taskId, completed) {
+    const tasks = loadTasks(courseId);
+    const taskIndex = tasks.findIndex(task => task.id === taskId);
+    
+    if (taskIndex !== -1) {
+        tasks[taskIndex].completed = completed;
+        saveTasks(courseId, tasks);
+        
+        // If this is a default task, update the course progress accordingly
+        if (tasks[taskIndex].type === 'default') {
+            const course = courses.find(c => c.id === courseId);
+            if (course) {
+                if (completed) {
+                    course.progress.tasks.completed++;
+                } else {
+                    course.progress.tasks.completed = Math.max(0, course.progress.tasks.completed - 1);
+                }
+                calculateOverallProgress(course);
+                saveCoursesToStorage(courses);
+            }
+        }
+    }
+  }
+
+  // Function to calculate overall progress
+  function calculateOverallProgress(course) {
+    const taskProgress = course.progress.tasks.total > 0 
+        ? (course.progress.tasks.completed / course.progress.tasks.total) * 100 
+        : 0;
+    
+    const quizProgress = course.progress.quizzes.total > 0 
+        ? (course.progress.quizzes.completed / course.progress.quizzes.total) * 100 
+        : 0;
+    
+    const flashcardProgress = course.progress.flashcards.total > 0 
+        ? (course.progress.flashcards.mastered / course.progress.flashcards.total) * 100 
+        : 0;
+    
+    // Calculate weighted average
+    course.progress.overall = Math.round(
+        (taskProgress * 0.4) + // 40% weight for tasks
+        (quizProgress * 0.3) + // 30% weight for quizzes
+        (flashcardProgress * 0.3) // 30% weight for flashcards
+    );
   }
 });
 </script>

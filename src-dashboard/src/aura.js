@@ -47,6 +47,9 @@ class Dashboard {
 
         // Initialize the dashboard
         this.init();
+
+        // Add this inside the Dashboard class constructor
+        this.initializeProgressListeners();
     }
 
     async init() {
@@ -618,6 +621,37 @@ class Dashboard {
         } catch (error) {
             console.error('Error during logout:', error);
         }
+    }
+
+    // Add this method to the Dashboard class
+    initializeProgressListeners() {
+        // Listen for progress updates from coursepage
+        window.addEventListener('courseProgressUpdated', (event) => {
+            const { courseId, progress } = event.detail;
+            this.updateCourseProgress(courseId, progress);
+        });
+    }
+
+    // Add this method to the Dashboard class
+    updateCourseProgress(courseId, progress) {
+        // Update course card in dashboard
+        const courseCard = document.querySelector(`.course-card[data-id="${courseId}"]`);
+        if (courseCard) {
+            const progressBadge = courseCard.querySelector('.course-progress');
+            const progressFill = courseCard.querySelector('.progress-fill');
+            
+            if (progressBadge) {
+                progressBadge.textContent = `${progress.overall}%`;
+            }
+            
+            if (progressFill) {
+                progressFill.style.width = `${progress.overall}%`;
+                progressFill.style.backgroundColor = this.getProgressColorUpdated(progress.overall);
+            }
+        }
+        
+        // Update overall stats if needed
+        this.loadStats();
     }
 }
 

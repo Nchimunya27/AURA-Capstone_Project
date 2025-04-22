@@ -3200,4 +3200,365 @@ document.addEventListener('DOMContentLoaded', function() {
   // Optional: If you have a task creation function, modify it to include the delete button
   // or replace it with addNewTaskWithDeleteButton
 });
+
+// Add this near the top of the file where other state is managed
+let courseProgress = {
+    tasks: {
+        completed: 0,
+        total: 0
+    },
+    quizzes: {
+        completed: 0,
+        total: 0
+    },
+    flashcards: {
+        mastered: 0,
+        total: 0
+    },
+    overall: 0
+};
+
+// Function to calculate and update overall progress
+function calculateOverallProgress() {
+    const taskWeight = 0.4; // 40% weight for tasks
+    const quizWeight = 0.4; // 40% weight for quizzes
+    const flashcardWeight = 0.2; // 20% weight for flashcards
+    
+    // Calculate individual component percentages
+    const taskProgress = courseProgress.tasks.total > 0 
+        ? (courseProgress.tasks.completed / courseProgress.tasks.total) * 100 
+        : 0;
+    
+    const quizProgress = courseProgress.quizzes.total > 0 
+        ? (courseProgress.quizzes.completed / courseProgress.quizzes.total) * 100 
+        : 0;
+    
+    const flashcardProgress = courseProgress.flashcards.total > 0 
+        ? (courseProgress.flashcards.mastered / courseProgress.flashcards.total) * 100 
+        : 0;
+    
+    // Calculate weighted overall progress
+    courseProgress.overall = Math.round(
+        (taskProgress * taskWeight) +
+        (quizProgress * quizWeight) +
+        (flashcardProgress * flashcardWeight)
+    );
+    
+    // Update UI
+    updateProgressUI();
+    
+    // Save progress to storage
+    saveProgress();
+}
+
+// Function to update progress UI
+function updateProgressUI() {
+    // Update progress bar
+    const progressFill = document.querySelector('.progress-fill');
+    const progressPercentage = document.querySelector('.progress-percentage');
+    
+    if (progressFill) {
+        progressFill.style.width = `${courseProgress.overall}%`;
+    }
+    
+    if (progressPercentage) {
+        progressPercentage.textContent = `${courseProgress.overall}%`;
+    }
+    
+    // Update task progress
+    const taskStats = document.querySelector('.task-stats');
+    if (taskStats) {
+        taskStats.textContent = `${courseProgress.tasks.completed}/${courseProgress.tasks.total} Tasks Completed`;
+    }
+    
+    // Update quiz progress
+    const quizStats = document.querySelector('.quiz-stats');
+    if (quizStats) {
+        quizStats.textContent = `${courseProgress.quizzes.completed}/${courseProgress.quizzes.total} Quizzes Completed`;
+    }
+    
+    // Update flashcard progress
+    const flashcardStats = document.querySelector('.flashcard-stats');
+    if (flashcardStats) {
+        flashcardStats.textContent = `${courseProgress.flashcards.mastered}/${courseProgress.flashcards.total} Flashcards Mastered`;
+    }
+}
+
+// Function to save progress to storage
+function saveProgress() {
+    const currentCourse = JSON.parse(localStorage.getItem('currentCourse'));
+    if (!currentCourse) return;
+    
+    // Get all courses
+    let courses = [];
+    try {
+        const coursesData = localStorage.getItem('courses');
+        if (coursesData) {
+            courses = JSON.parse(coursesData);
+        }
+    } catch (error) {
+        console.error('Error loading courses:', error);
+        return;
+    }
+    
+    // Find and update the current course
+    const courseIndex = courses.findIndex(c => c.id === currentCourse.id);
+    if (courseIndex !== -1) {
+        courses[courseIndex].progress = courseProgress;
+        courses[courseIndex].knowledgeLevel = courseProgress.overall;
+        
+        // Save back to storage
+        localStorage.setItem('courses', JSON.stringify(courses));
+        
+        // Update current course in storage
+        currentCourse.progress = courseProgress;
+        currentCourse.knowledgeLevel = courseProgress.overall;
+        localStorage.setItem('currentCourse', JSON.stringify(currentCourse));
+        
+        // Dispatch event for other pages to update
+        window.dispatchEvent(new CustomEvent('courseProgressUpdated', {
+            detail: {
+                courseId: currentCourse.id,
+                progress: courseProgress
+            }
+        }));
+    }
+}
+
+// Function to load progress from storage
+function loadProgress() {
+    const currentCourse = JSON.parse(localStorage.getItem('currentCourse'));
+    if (!currentCourse) return;
+    
+    if (currentCourse.progress) {
+        courseProgress = currentCourse.progress;
+    } else {
+        courseProgress = {
+            tasks: { completed: 0, total: 0 },
+            quizzes: { completed: 0, total: 0 },
+            flashcards: { mastered: 0, total: 0 },
+            overall: 0
+        };
+    }
+    
+    updateProgressUI();
+}
+
+// Update the task completion handler
+function handleTaskCompletion(taskItem, isCompleted) {
+    if (isCompleted) {
+        courseProgress.tasks.completed++;
+    } else {
+        courseProgress.tasks.completed = Math.max(0, courseProgress.tasks.completed - 1);
+    }
+    calculateOverallProgress();
+}
+
+// Update the quiz completion handler
+function handleQuizCompletion(quizScore) {
+    courseProgress.quizzes.completed++;
+    calculateOverallProgress();
+}
+
+// Update the flashcard mastery handler
+function handleFlashcardMastery(cardId) {
+    courseProgress.flashcards.mastered++;
+    calculateOverallProgress();
+}
+
+// Initialize progress tracking
+document.addEventListener('DOMContentLoaded', function() {
+    loadProgress();
+    
+    // Set up task event listeners
+    document.querySelectorAll('.todo-item input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            handleTaskCompletion(this.closest('.todo-item'), this.checked);
+        });
+    });
+    
+    // Set up quiz event listeners
+    document.querySelectorAll('.quiz-submit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // This would be called after quiz completion with actual score
+            handleQuizCompletion(85); // Example score
+        });
+    });
+    
+    // Set up flashcard event listeners
+    document.querySelectorAll('.flashcard-mastered-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const cardId = this.closest('.flashcard').dataset.id;
+            handleFlashcardMastery(cardId);
+        });
+    });
+});
+
+// ... existing code ...
+
+// Add to the initialization section
+document.addEventListener('DOMContentLoaded', function() {
+    // Load the current course
+    const currentCourse = JSON.parse(localStorage.getItem('currentCourse'));
+    if (currentCourse) {
+        // Load tasks for this course
+        loadCourseTasks(currentCourse.id);
+    }
+});
+
+// Function to load course tasks
+function loadCourseTasks(courseId) {
+    const tasksKey = `tasks_${courseId}`;
+    const tasksData = localStorage.getItem(tasksKey);
+    const tasks = tasksData ? JSON.parse(tasksData) : [];
+    
+    // Get the todo list container
+    const todoList = document.querySelector('.todo-list');
+    if (!todoList) return;
+    
+    // Clear existing tasks
+    todoList.innerHTML = '';
+    
+    // Add each task to the list
+    tasks.forEach(task => {
+        const taskElement = createTaskElement(task, courseId);
+        todoList.appendChild(taskElement);
+    });
+    
+    // Update empty state message
+    updateEmptyState(todoList, tasks.length);
+}
+
+// Function to create a task element
+function createTaskElement(task, courseId) {
+    const taskItem = document.createElement('div');
+    taskItem.className = 'todo-item' + (task.completed ? ' completed' : '');
+    taskItem.dataset.taskId = task.id;
+    taskItem.dataset.type = task.type || 'custom';
+    
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.className = 'todo-checkbox';
+    checkbox.checked = task.completed;
+    
+    const taskText = document.createElement('span');
+    taskText.textContent = task.text;
+    if (task.completed) {
+        taskText.style.textDecoration = 'line-through';
+        taskText.style.opacity = '0.7';
+    }
+    
+    // Add delete button only for custom tasks
+    if (task.type !== 'default') {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-task-btn';
+        deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+        deleteBtn.addEventListener('click', () => deleteTask(courseId, task.id));
+        taskItem.appendChild(deleteBtn);
+    }
+    
+    // Add checkbox event listener
+    checkbox.addEventListener('change', function() {
+        handleTaskCompletion(courseId, task.id, this.checked);
+        
+        // Update task appearance
+        taskText.style.textDecoration = this.checked ? 'line-through' : 'none';
+        taskText.style.opacity = this.checked ? '0.7' : '1';
+        taskItem.classList.toggle('completed', this.checked);
+        
+        // If this is a default task, check for automatic updates
+        if (task.type === 'default') {
+            checkDefaultTaskCompletion(courseId, task);
+        }
+    });
+    
+    taskItem.appendChild(checkbox);
+    taskItem.appendChild(taskText);
+    
+    return taskItem;
+}
+
+// Function to handle task completion
+function handleTaskCompletion(courseId, taskId, completed) {
+    // Update task status in storage
+    const tasksKey = `tasks_${courseId}`;
+    const tasksData = localStorage.getItem(tasksKey);
+    const tasks = tasksData ? JSON.parse(tasksData) : [];
+    
+    const taskIndex = tasks.findIndex(t => t.id === taskId);
+    if (taskIndex !== -1) {
+        tasks[taskIndex].completed = completed;
+        localStorage.setItem(tasksKey, JSON.stringify(tasks));
+        
+        // Update course progress
+        updateCourseProgress(courseId, tasks);
+    }
+}
+
+// Function to check and auto-complete default tasks
+function checkDefaultTaskCompletion(courseId, task) {
+    if (task.category === 'flashcards') {
+        // Check if user has created any flashcard sets
+        const flashcardSets = localStorage.getItem(`flashcardSets_${courseId}`);
+        if (flashcardSets && JSON.parse(flashcardSets).length > 0) {
+            handleTaskCompletion(courseId, task.id, true);
+        }
+    } else if (task.category === 'quizzes') {
+        // Check if user has created any quiz sets
+        const quizSets = localStorage.getItem(`quizSets_${courseId}`);
+        if (quizSets && JSON.parse(quizSets).length > 0) {
+            handleTaskCompletion(courseId, task.id, true);
+        }
+    }
+}
+
+// Function to update empty state message
+function updateEmptyState(todoList, taskCount) {
+    const emptyMessage = todoList.querySelector('.empty-tasks-message');
+    if (taskCount === 0) {
+        if (!emptyMessage) {
+            const message = document.createElement('div');
+            message.className = 'empty-tasks-message';
+            message.textContent = 'No tasks yet';
+            todoList.appendChild(message);
+        }
+    } else if (emptyMessage) {
+        emptyMessage.remove();
+    }
+}
+
+// Function to delete a task
+function deleteTask(courseId, taskId) {
+    const tasksKey = `tasks_${courseId}`;
+    const tasksData = localStorage.getItem(tasksKey);
+    let tasks = tasksData ? JSON.parse(tasksData) : [];
+    
+    // Only allow deletion of custom tasks
+    const task = tasks.find(t => t.id === taskId);
+    if (task && task.type === 'default') {
+        alert('Default tasks cannot be deleted');
+        return;
+    }
+    
+    // Remove the task
+    tasks = tasks.filter(t => t.id !== taskId);
+    localStorage.setItem(tasksKey, JSON.stringify(tasks));
+    
+    // Update UI
+    const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
+    if (taskElement) {
+        taskElement.remove();
+    }
+    
+    // Update empty state
+    const todoList = document.querySelector('.todo-list');
+    if (todoList) {
+        updateEmptyState(todoList, tasks.length);
+    }
+    
+    // Update course progress
+    updateCourseProgress(courseId, tasks);
+}
+
+// ... existing code ...
 })();
