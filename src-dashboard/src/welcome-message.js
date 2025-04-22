@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const afternoonGreetings = [
       "Lock in or tweak out",
       "Let's guac in",
-      "So much aura…",
+      "So much Aura…",
       "Keep stacking those wins",
       "You're on your afternoon arc",
       "Time for lunch…or NOT…",
