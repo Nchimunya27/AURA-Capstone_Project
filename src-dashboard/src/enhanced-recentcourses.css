@@ -2,95 +2,212 @@
 
 /* Color palette variables - ONLY for Recent Courses section */
 .courses-grid {
-    /* Custom color palette */
-    --rc-primary: #5997ac;
-    --rc-primary-light: #a1cbdd;
-    --rc-neutral: #eeede7;
-    --rc-accent: #f7aec2;
-    --rc-accent-dark: #af5166;
+    /* Custom color palette - using Aura theme colors */
+    --rc-primary: var(--accent-color, #5997ac);
+    --rc-primary-light: var(--accent-light, #a1cbdd);
+    --rc-neutral: var(--background-primary, #eeede7);
+    --rc-accent: var(--accent-secondary, #f7aec2);
+    --rc-accent-dark: var(--accent-dark, #af5166);
     
-    /* Light mode (default) with explicit white backgrounds */
-    --rc-card-bg: #ffffff;
-    --rc-card-shadow: rgba(0, 0, 0, 0.1);
-    --rc-border-color: rgba(0, 0, 0, 0.1);
-    --rc-hover-bg: #f8f9fa;
+    /* Light mode (default) */
+    --rc-card-bg: var(--background-secondary, #ffffff);
+    --rc-card-shadow: var(--card-shadow, rgba(0, 0, 0, 0.1));
+    --rc-border-color: var(--border-color, rgba(0, 0, 0, 0.1));
+    --rc-hover-bg: var(--background-tertiary, #f8f9fa);
     --rc-button-shadow: rgba(89, 151, 172, 0.3);
-    --rc-text-primary: #333333;
+    --rc-text-primary: var(--text-primary, #333333);
+    --rc-text-secondary: var(--text-secondary, #6b7280);
     --rc-text-light: #ffffff;
-    --rc-card-inner-bg: #ffffff;
-  }
-  
-  /* Dark mode overrides - will only apply when system is in dark mode */
-  @media (prefers-color-scheme: dark) {
-    .courses-grid {
-      --rc-card-bg: #2d2d2d;
-      --rc-card-shadow: rgba(0, 0, 0, 0.25);
-      --rc-border-color: rgba(255, 255, 255, 0.1);
-      --rc-hover-bg: #383838;
-      --rc-button-shadow: rgba(89, 151, 172, 0.5);
-      --rc-text-primary: #f0f0f0;
-      --rc-card-inner-bg: #333333;
-    }
-  }
-  
-  /* Interactive course card styles - specifically scoped to course cards */
-  .courses-grid .course-card.interactive-card {
+    --rc-card-inner-bg: var(--background-secondary, #ffffff);
+}
+
+/* Dark mode overrides - using Aura theme variables */
+[data-theme="night"] .courses-grid {
+    --rc-card-bg: var(--background-secondary, #2d2d2d);
+    --rc-card-shadow: rgba(0, 0, 0, 0.25);
+    --rc-border-color: var(--border-color, rgba(255, 255, 255, 0.1));
+    --rc-hover-bg: var(--background-tertiary, #383838);
+    --rc-button-shadow: rgba(89, 151, 172, 0.5);
+    --rc-text-primary: var(--text-primary, #f0f0f0);
+    --rc-text-secondary: var(--text-secondary, #a0a0a0);
+    --rc-card-inner-bg: var(--background-tertiary, #333333);
+}
+
+/* Interactive course card styles */
+.courses-grid .course-card.interactive-card {
     transition: all 0.3s ease;
     cursor: pointer;
     position: relative;
     overflow: hidden;
     border-radius: 12px;
     box-shadow: 0 2px 8px var(--rc-card-shadow);
-    background-color: var(--rc-card-bg) !important; /* Important to override any inherited styles */
+    background-color: var(--rc-card-bg);
     color: var(--rc-text-primary);
     border: 1px solid var(--rc-border-color);
-  }
-  
-  .courses-grid .course-card.interactive-card:hover {
+}
+
+.courses-grid .course-card.interactive-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 20px var(--rc-card-shadow);
-    background-color: var(--rc-hover-bg) !important;
-  }
-  
-  .courses-grid .course-card.card-highlight {
+    background-color: var(--rc-hover-bg);
+}
+
+.courses-grid .course-card.card-highlight {
     border-color: var(--rc-primary-light);
-  }
-  
-  /* Course card animation and transition effects */
-  .courses-grid .course-card.interactive-card .course-header {
+}
+
+/* Course card header */
+.courses-grid .course-card.interactive-card .course-header {
     padding: 18px;
     border-bottom: 1px solid var(--rc-border-color);
     transition: all 0.3s ease;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--rc-card-bg) !important;
-  }
-  
-  .courses-grid .course-card.interactive-card:hover .course-header {
+    background-color: var(--rc-card-bg);
+}
+
+.courses-grid .course-card.interactive-card:hover .course-header {
     border-bottom-color: var(--rc-primary-light);
-  }
-  
-  .courses-grid .course-card.interactive-card .course-title {
+}
+
+.courses-grid .course-card.interactive-card .course-title {
     font-weight: 600;
     transition: color 0.3s ease;
     font-size: 16px;
     color: var(--rc-text-primary);
-  }
-  
-  .courses-grid .course-card.interactive-card:hover .course-title {
+}
+
+.courses-grid .course-card.interactive-card:hover .course-title {
     color: var(--rc-primary);
-  }
-  
-  .courses-grid .course-card.interactive-card .course-progress {
+}
+
+.courses-grid .course-card.interactive-card .course-progress {
     font-size: 14px;
     font-weight: 500;
     transition: opacity 0.3s ease;
     color: var(--rc-text-primary);
-  }
-  
-  /* Donut chart - Updated for more circular appearance */
-  .courses-grid .progress-donut-container {
+    background-color: var(--rc-card-inner-bg);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--rc-border-color);
+}
+
+/* Progress bar styling */
+.courses-grid .progress-bar {
+    background-color: var(--rc-card-inner-bg);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 15px 0;
+    border: 1px solid var(--rc-border-color);
+}
+
+.courses-grid .progress-fill {
+    height: 100%;
+    background-color: var(--rc-primary);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+/* Course stats styling */
+.courses-grid .course-stats {
+    padding: 14px;
+    display: flex;
+    justify-content: space-around;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    border-top: 1px solid var(--rc-border-color);
+}
+
+.courses-grid .course-card.interactive-card:hover .course-stats:not(.hidden) {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.courses-grid .course-stats .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background-color: var(--rc-card-inner-bg);
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--rc-border-color);
+}
+
+.courses-grid .course-stats .stat-label {
+    font-size: 11px;
+    color: var(--rc-text-secondary);
+    margin-bottom: 4px;
+}
+
+.courses-grid .course-stats .stat-value {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--rc-text-primary);
+}
+
+/* Action buttons */
+.courses-grid .details-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    background-color: var(--rc-primary);
+    color: var(--rc-text-light);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px var(--rc-button-shadow);
+    display: inline-block;
+}
+
+.courses-grid .details-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--rc-button-shadow);
+    background-color: var(--rc-primary-light);
+}
+
+/* Helper class */
+.courses-grid .hidden {
+    display: none;
+}
+
+/* Course card glow effect for high progress */
+.courses-grid .course-card.interactive-card[data-progress="100"]::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 12px;
+    background: linear-gradient(45deg, 
+        transparent, 
+        rgba(89, 151, 172, 0.1), 
+        transparent
+    );
+    background-size: 200% 200%;
+    animation: cardGlow 2s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes cardGlow {
+    0% {
+        background-position: 0% 0%;
+    }
+    50% {
+        background-position: 100% 100%;
+    }
+    100% {
+        background-position: 0% 0%;
+    }
+}
+
+/* Donut chart - Updated for more circular appearance */
+.courses-grid .progress-donut-container {
     position: relative;
     width: 80px;
     height: 80px;
@@ -98,9 +215,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-  
-  .courses-grid .progress-donut {
+}
+
+.courses-grid .progress-donut {
     width: 100%;
     height: 100%;
     border-radius: 50%;
@@ -110,10 +227,10 @@
     background-color: transparent !important;
     position: relative;
     transition: transform 1s ease;
-  }
-  
-  /* Outer stroke for donut - made more circular */
-  .courses-grid .progress-donut::before {
+}
+
+/* Outer stroke for donut - made more circular */
+.courses-grid .progress-donut::before {
     content: "";
     position: absolute;
     width: 100%;
@@ -123,10 +240,10 @@
     mask: radial-gradient(transparent 62%, black 63%, black 90%, transparent 91%);
     -webkit-mask: radial-gradient(transparent 62%, black 63%, black 90%, transparent 91%);
     transform: rotate(-90deg);
-  }
-  
-  /* Inner circle */
-  .courses-grid .progress-donut::after {
+}
+
+/* Inner circle */
+.courses-grid .progress-donut::after {
     content: "";
     position: absolute;
     width: 75%;
@@ -135,9 +252,9 @@
     background-color: var(--rc-card-inner-bg) !important;
     z-index: 0;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-  }
-  
-  .courses-grid .progress-percentage {
+}
+
+.courses-grid .progress-percentage {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -146,10 +263,10 @@
     font-weight: 600;
     color: var(--progress-color);
     z-index: 1;
-  }
-  
-  /* Add subtle shadow to enhance the circular effect */
-  .courses-grid .progress-donut-container::after {
+}
+
+/* Add subtle shadow to enhance the circular effect */
+.courses-grid .progress-donut-container::after {
     content: "";
     position: absolute;
     width: 84%;
@@ -158,134 +275,71 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     pointer-events: none;
     z-index: -1;
-  }
-  
-  /* Course details styling */
-  .courses-grid .course-details {
+}
+
+/* Course details styling */
+.courses-grid .course-details {
     padding: 16px;
     transition: background-color 0.3s ease;
     background-color: var(--rc-card-bg) !important;
-  }
-  
-  .courses-grid .next-quiz {
+}
+
+.courses-grid .next-quiz {
     display: flex;
     align-items: center;
     margin: 12px 0;
     padding: 8px 0;
     border-bottom: 1px solid var(--rc-border-color);
-  }
-  
-  .courses-grid .quiz-icon {
+}
+
+.courses-grid .quiz-icon {
     margin-right: 10px;
     opacity: 0.7;
     color: var(--rc-primary);
-  }
-  
-  .courses-grid .quiz-date {
+}
+
+.courses-grid .quiz-date {
     font-size: 14px;
     color: var(--rc-text-primary);
-  }
-  
-  /* Course actions styling */
-  .courses-grid .course-actions {
+}
+
+/* Course actions styling */
+.courses-grid .course-actions {
     margin-top: 16px;
     padding: 0 0 8px;
     opacity: 0;
     transform: translateY(10px);
     transition: opacity 0.4s ease, transform 0.4s ease;
     text-align: center;
-  }
-  
-  .courses-grid .course-card.interactive-card:hover .course-actions:not(.hidden) {
+}
+
+.courses-grid .course-card.interactive-card:hover .course-actions:not(.hidden) {
     opacity: 1;
     transform: translateY(0);
-  }
-  
-  .courses-grid .details-button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 20px;
-    background-color: var(--rc-primary) !important;
-    color: var(--rc-text-light) !important;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 5px var(--rc-button-shadow);
-    display: inline-block;
-  }
-  
-  .courses-grid .details-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px var(--rc-button-shadow);
-    background-color: var(--rc-primary-light) !important;
-  }
-  
-  /* Course stats styling */
-  .courses-grid .course-stats {
-    padding: 0 10px 10px;
-    margin-top: 14px;
-    display: flex;
-    justify-content: space-around;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.4s ease, transform 0.4s ease;
-    border-top: 1px solid var(--rc-border-color);
-    padding-top: 14px;
-  }
-  
-  .courses-grid .course-card.interactive-card:hover .course-stats:not(.hidden) {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  
-  .courses-grid .course-stats .stat-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  
-  .courses-grid .course-stats .stat-label {
-    font-size: 11px;
-    color: var(--rc-text-primary);
-    opacity: 0.7;
-    margin-bottom: 4px;
-  }
-  
-  .courses-grid .course-stats .stat-value {
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--rc-text-primary);
-  }
-  
-  /* Helper class to hide elements */
-  .courses-grid .hidden {
-    display: none;
-  }
-  
-  /* Add a subtle glow animation to nearly complete courses */
-  @keyframes glow {
+}
+
+/* Add a subtle glow animation to nearly complete courses */
+@keyframes glow {
     0% { box-shadow: 0 0 5px var(--rc-button-shadow); }
     50% { box-shadow: 0 0 15px var(--rc-button-shadow); }
     100% { box-shadow: 0 0 5px var(--rc-button-shadow); }
-  }
-  
-  .courses-grid .course-card.high-progress {
+}
+
+.courses-grid .course-card.high-progress {
     animation: glow 3s infinite;
-  }
-  
-  /* Improve the empty state styling */
-  .courses-grid .no-courses-message {
+}
+
+/* Improve the empty state styling */
+.courses-grid .no-courses-message {
     text-align: center;
     padding: 30px 20px;
     background-color: var(--rc-card-bg) !important;
     color: var(--rc-text-primary);
     border-radius: 12px;
     border: 1px dashed var(--rc-border-color);
-  }
-  
-  .courses-grid .add-course-btn {
+}
+
+.courses-grid .add-course-btn {
     margin-top: 15px;
     background-color: var(--rc-primary) !important;
     color: var(--rc-text-light) !important;
@@ -296,32 +350,32 @@
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 2px 5px var(--rc-button-shadow);
-  }
-  
-  .courses-grid .add-course-btn:hover {
+}
+
+.courses-grid .add-course-btn:hover {
     background-color: var(--rc-primary-light) !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px var(--rc-button-shadow);
-  }
-  
-  /* Apply smooth fade-in animation to course cards when the page loads */
-  @keyframes fadeIn {
+}
+
+/* Apply smooth fade-in animation to course cards when the page loads */
+@keyframes fadeIn {
     from { opacity: 0; transform: translateY(15px); }
     to { opacity: 1; transform: translateY(0); }
-  }
-  
-  .courses-grid .course-row {
+}
+
+.courses-grid .course-row {
     animation: fadeIn 0.5s ease forwards;
-  }
-  
-  .courses-grid .course-row:nth-child(2) {
+}
+
+.courses-grid .course-row:nth-child(2) {
     animation-delay: 0.1s;
-  }
-  
-  .courses-grid .course-row:nth-child(3) {
+}
+
+.courses-grid .course-row:nth-child(3) {
     animation-delay: 0.2s;
-  }
-  
-  .courses-grid .course-row:nth-child(4) {
+}
+
+.courses-grid .course-row:nth-child(4) {
     animation-delay: 0.3s;
-  }
+}
