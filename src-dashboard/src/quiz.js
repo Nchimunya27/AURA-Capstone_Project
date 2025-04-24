@@ -261,7 +261,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const unansweredCount = userAnswers.filter(answer => answer === null).length;
     
     if (unansweredCount > 0) {
-      if (!confirm(`You have ${unansweredCount} unanswered ${unansweredCount === 1 ? 'question' : 'questions'}. Do you want to submit anyway?`)) {
+      if (!confirm(`You have ${unansweredCount} unanswered questions. Do you want to submit anyway?`)) {
         return;
       }
     }
@@ -275,6 +275,24 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     
     const score = Math.round((correctAnswers / quizData.length) * 100);
+
+    // Record quiz completion in localStorage
+    const quizCompletions = JSON.parse(localStorage.getItem('quizCompletions') || '[]');
+    const newQuiz = {
+      id: Date.now(),
+      score: score,
+      date: new Date().toISOString(),
+      totalQuestions: quizData.length,
+      correctAnswers: correctAnswers
+    };
+    quizCompletions.unshift(newQuiz); // Add to beginning of array
+    localStorage.setItem('quizCompletions', JSON.stringify(quizCompletions));
+
+    // Update quiz status for analytics
+    const quizStatus = JSON.parse(localStorage.getItem('quizStatus') || '{"completed": 0, "total": 0}');
+    quizStatus.completed += 1;
+    quizStatus.total += 1;
+    localStorage.setItem('quizStatus', JSON.stringify(quizStatus));
     
     // Display enhanced interactive results
     displayEnhancedResults(correctAnswers, quizData.length, score);

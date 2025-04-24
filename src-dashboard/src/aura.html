@@ -330,10 +330,18 @@
   })();
 </script>
 
-
-
-
-
+<script>
+    // Initialize study time tracking when first visiting the dashboard
+    if (window.analyticsData) {
+        window.analyticsData.initializeStudyTime();
+    } else {
+        // If analyticsData is not available, initialize directly
+        const STUDY_TIME_KEY = 'aura_study_start_time';
+        if (!localStorage.getItem(STUDY_TIME_KEY)) {
+            localStorage.setItem(STUDY_TIME_KEY, Date.now().toString());
+        }
+    }
+</script>
 
 </body>
 </html>

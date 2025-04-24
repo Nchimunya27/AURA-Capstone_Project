@@ -13,11 +13,15 @@ const analyticsState = {
   chartsInitialized: false,
   darkMode: false,
   userSettings: {},
+  studyTimeInterval: null,
 };
 
 // Main initialization function
 async function initializeAnalytics() {
   try {
+    // Clean up any existing intervals
+    cleanupAnalytics();
+    
     // Check for theme preference
     analyticsState.darkMode = document.documentElement.getAttribute('data-theme') === 'night';
     
@@ -332,8 +336,17 @@ function updateKPICards(data) {
   // Longest Streak KPI
   document.getElementById('longest-streak-value').textContent = userProfile.longestStreak;
   
-  // Study Time KPI
-  document.getElementById('study-time-value').textContent = `${userProfile.totalStudyHours}h`;
+  // Study Time KPI - Format with one decimal place
+  const studyTimeElement = document.getElementById('study-time-value');
+  studyTimeElement.textContent = `${userProfile.totalStudyHours}h`;
+  
+  // Start periodic updates of study time if not already started
+  if (!analyticsState.studyTimeInterval) {
+    analyticsState.studyTimeInterval = setInterval(() => {
+      const currentStudyHours = window.analyticsData.getStudyTime();
+      studyTimeElement.textContent = `${currentStudyHours}h`;
+    }, 1000); // Update every second
+  }
 }
 
 // Initialize chart visualizations
@@ -1599,3 +1612,14 @@ function showToast(message, type = 'info') {
     }, 300);
   }, 5000);
 }
+
+// Add cleanup function to stop the interval when leaving the page
+function cleanupAnalytics() {
+  if (analyticsState.studyTimeInterval) {
+    clearInterval(analyticsState.studyTimeInterval);
+    analyticsState.studyTimeInterval = null;
+  }
+}
+
+// Add event listener for page unload
+window.addEventListener('unload', cleanupAnalytics);

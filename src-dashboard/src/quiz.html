@@ -508,7 +508,7 @@
           <div class="quiz-header">
             <a href="#" class="back-button">
               <i class="fas fa-arrow-left"></i>
-              Web Development Quiz #3
+              Quiz
             </a>
 
             <div class="progress-container">
@@ -809,6 +809,20 @@
           });
           
           const score = Math.round((correctAnswers / quizData.length) * 100);
+
+          // Store the quiz score in localStorage
+          const recentScores = JSON.parse(localStorage.getItem('recentQuizScores')) || [];
+          const newScore = {
+            title: `Quiz ${recentScores.length + 1}`,
+            score: score,
+            date: new Date().toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            })
+          };
+          recentScores.unshift(newScore); // Add to beginning of array
+          localStorage.setItem('recentQuizScores', JSON.stringify(recentScores));
           
           // Display enhanced interactive results
           displayEnhancedResults(correctAnswers, quizData.length, score);
@@ -867,7 +881,7 @@
               </div>
               
               <div class="action-buttons results-actions">
-                <button class="review-button">Review Answers</button>
+                <button class="review-button" onclick="navigateToQuizTab()">Back to Quiz Tab</button>
                 <button class="new-quiz-button" onclick="window.location.href='upload.html'">Create New Quiz</button>
               </div>
             </div>
@@ -1072,6 +1086,13 @@
         // Initialize the quiz
         loadQuestion();
       });
+
+      function navigateToQuizTab() {
+        // Store the tab preference in localStorage
+        localStorage.setItem('selectedTab', 'quizzes');
+        // Navigate to coursepage.html
+        window.location.href = 'coursepage.html';
+      }
     </script>
   </body>
 </html>

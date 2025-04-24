@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results - AURA Learning Platform</title>
+    <link rel="stylesheet" href="coursepage.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .quiz-result-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background-color: var(--accent-color, #5997ac);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background-color 0.2s;
+        }
+
+        .back-button:hover {
+            background-color: var(--accent-light, #4a8697);
+        }
+
+        .quiz-result-card {
+            background: var(--background-secondary, #ffffff);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px var(--card-shadow, rgba(0, 0, 0, 0.1));
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .quiz-title {
+            font-size: 24px;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .quiz-date {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .quiz-score {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            position: relative;
+        }
+
+        .score-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        .excellent .score-circle { background-color: var(--success-color, #059669); }
+        .good .score-circle { background-color: var(--accent-color, #5997ac); }
+        .average .score-circle { background-color: var(--warning-color, #ca8a04); }
+        .needs-improvement .score-circle { background-color: var(--error-color, #dc2626); }
+
+        [data-theme="night"] .quiz-result-card {
+            background-color: var(--background-secondary, #1f2937);
+        }
+
+        [data-theme="night"] .quiz-title {
+            color: var(--text-primary, #e5e7eb);
+        }
+
+        [data-theme="night"] .quiz-date,
+        [data-theme="night"] .score-label {
+            color: var(--text-secondary, #9ca3af);
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-result-container">
+        <button class="back-button" onclick="window.location.href='coursepage.html'">
+            <i class="fas fa-arrow-left"></i>
+            Back to Course
+        </button>
+        
+        <div class="quiz-result-card">
+            <div class="quiz-header">
+                <div>
+                    <h1 class="quiz-title" id="quiz-title">Loading...</h1>
+                    <p class="quiz-date" id="quiz-date"></p>
+                </div>
+            </div>
+            
+            <div class="quiz-score" id="quiz-score">
+                <div class="score-circle">
+                    <span id="score-value">--%</span>
+                </div>
+                <div class="score-label">Final Score</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load and display quiz result
+        document.addEventListener('DOMContentLoaded', () => {
+            const quizResult = JSON.parse(localStorage.getItem('currentQuizResult'));
+            if (!quizResult) {
+                window.location.href = 'coursepage.html';
+                return;
+            }
+
+            document.getElementById('quiz-title').textContent = quizResult.title;
+            document.getElementById('quiz-date').textContent = quizResult.date;
+            document.getElementById('score-value').textContent = `${quizResult.score}%`;
+
+            const scoreClass = getScoreClass(quizResult.score);
+            document.querySelector('.quiz-score').classList.add(scoreClass);
+        });
+
+        function getScoreClass(score) {
+            if (score >= 90) return 'excellent';
+            if (score >= 70) return 'good';
+            if (score >= 50) return 'average';
+            return 'needs-improvement';
+        }
+    </script>
+</body>
+</html> 

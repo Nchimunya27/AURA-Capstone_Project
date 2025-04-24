@@ -410,40 +410,184 @@ Course Pages Styles
 }
 
 /* Quiz Card */
-.quiz-info {
+.quiz-card {
+  background: var(--background-secondary, #ffffff);
+  border: 1px solid var(--border-color);
+  border-radius: 11px;
+  padding: 23px;
+  box-shadow: 0px 1px 2px var(--card-shadow, rgba(0, 0, 0, 0.05));
+}
+
+.quiz-section-title {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0 0 15px;
+  color: var(--text-primary);
+}
+
+.upcoming-list {
   display: flex;
+  flex-direction: column;
   gap: 15px;
-  margin-bottom: 15px;
+}
+
+.upcoming-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: var(--background-tertiary, #f8f9fa);
+  transition: all 0.2s ease;
+}
+
+.upcoming-item:hover {
+  background-color: var(--background-hover, #f3f4f6);
+  transform: translateY(-1px);
 }
 
 .quiz-icon {
-  width: 32px;
-  aspect-ratio: 0.84;
-  object-fit: contain;
-  border-radius: 7px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--accent-color, #5997ac);
+  color: var(--text-on-accent, #ffffff);
 }
 
-.quiz-details h4 {
+.quiz-icon.locked {
+  background-color: var(--text-secondary, #6b7280);
+}
+
+.quiz-info {
+  flex: 1;
+}
+
+.quiz-title {
   font-size: 15px;
   font-weight: 600;
-  margin: 0 0 8px;
+  margin: 0 0 4px;
+  color: var(--text-primary);
 }
 
-.quiz-details p {
+.quiz-date {
   font-size: 13px;
   color: var(--text-secondary);
   margin: 0;
 }
 
-.practice-btn {
-  background-color: var(--success-color);
-  color: var(--bg-white);
-  border: none;
-  border-radius: 7px;
-  padding: 9px 70px;
-  font-size: 15px;
-  width: 100%;
-  cursor: pointer;
+.quiz-status {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+.quiz-status.pending {
+  background-color: var(--warning-light, #fff7ed);
+  color: var(--warning-color, #ca8a04);
+}
+
+.quiz-status.scheduled {
+  background-color: var(--accent-light-transparent, rgba(89, 151, 172, 0.1));
+  color: var(--accent-color, #5997ac);
+}
+
+.quiz-status.excellent {
+  background-color: var(--success-light, #ecfdf5);
+  color: var(--success-color, #059669);
+}
+
+.quiz-status.good {
+  background-color: var(--accent-light-transparent, rgba(89, 151, 172, 0.1));
+  color: var(--accent-color, #5997ac);
+}
+
+.quiz-status.average {
+  background-color: var(--warning-light, #fff7ed);
+  color: var(--warning-color, #ca8a04);
+}
+
+.quiz-status.needs-improvement {
+  background-color: var(--error-light, #fef2f2);
+  color: var(--error-color, #dc2626);
+}
+
+/* Empty state styling */
+.quiz-empty-state {
+  text-align: center;
+  padding: 30px 20px;
+  background-color: var(--background-tertiary, #f8f9fa);
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.quiz-empty-icon {
+  font-size: 24px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.quiz-empty-message {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.quiz-empty-submessage {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin: 8px 0 0;
+}
+
+/* Night mode enhancements */
+[data-theme="night"] .quiz-card {
+  background-color: var(--background-secondary, #1f2937);
+}
+
+[data-theme="night"] .upcoming-item {
+  background-color: var(--background-tertiary, #374151);
+}
+
+[data-theme="night"] .upcoming-item:hover {
+  background-color: var(--background-hover, #4b5563);
+}
+
+[data-theme="night"] .quiz-empty-state {
+  background-color: var(--background-tertiary, #374151);
+}
+
+[data-theme="night"] .quiz-status.pending {
+  background-color: var(--warning-dark, #78350f);
+  color: var(--warning-light, #fef3c7);
+}
+
+[data-theme="night"] .quiz-status.scheduled {
+  background-color: var(--accent-dark-transparent, rgba(89, 151, 172, 0.2));
+  color: var(--accent-light, #a1cbdd);
+}
+
+[data-theme="night"] .quiz-status.excellent {
+  background-color: var(--success-dark, #064e3b);
+  color: var(--success-light, #d1fae5);
+}
+
+[data-theme="night"] .quiz-status.good {
+  background-color: var(--accent-dark-transparent, rgba(89, 151, 172, 0.2));
+  color: var(--accent-light, #a1cbdd);
+}
+
+[data-theme="night"] .quiz-status.average {
+  background-color: var(--warning-dark, #78350f);
+  color: var(--warning-light, #fef3c7);
+}
+
+[data-theme="night"] .quiz-status.needs-improvement {
+  background-color: var(--error-dark, #7f1d1d);
+  color: var(--error-light, #fee2e2);
 }
 
 /* Streak Card */
@@ -1375,10 +1519,10 @@ Course Pages Styles
 /* Enhanced To-Do Card Styling */
 
 .todo-card {
-  background: var(--bg-white);
+  background: var(--background-secondary, #ffffff);
   border: 1px solid var(--border-color);
   border-radius: 11px;
-  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0px 1px 2px var(--card-shadow, rgba(0, 0, 0, 0.05));
   margin-bottom: 21px;
   overflow: hidden;
   display: flex;
@@ -1388,13 +1532,14 @@ Course Pages Styles
 .todo-card .card-header {
   padding: 18px 20px;
   border-bottom: 1px solid var(--border-color);
-  background-color: #f8f9fa;
+  background-color: var(--background-tertiary, #f8f9fa);
 }
 
 .todo-card .card-header h3 {
   font-size: 17px;
   font-weight: 600;
   margin: 0;
+  color: var(--text-primary);
 }
 
 /* Add task section */
@@ -1405,16 +1550,16 @@ Course Pages Styles
 
 .add-task-input-container {
   display: flex;
-  background-color: #f5f7f9;
-  border: 1px solid #e0e0e0;
+  background-color: var(--background-tertiary, #f5f7f9);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   overflow: hidden;
   transition: all 0.2s ease;
 }
 
 .add-task-input-container:focus-within {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(89, 151, 172, 0.2);
+  border-color: var(--accent-color, #5997ac);
+  box-shadow: 0 0 0 2px var(--accent-light-transparent, rgba(89, 151, 172, 0.2));
 }
 
 .add-task-input {
@@ -1432,8 +1577,8 @@ Course Pages Styles
 
 .add-task-btn {
   width: 42px;
-  background-color: var(--primary-color);
-  color: white;
+  background-color: var(--accent-color, #5997ac);
+  color: var(--text-on-accent, #ffffff);
   border: none;
   cursor: pointer;
   display: flex;
@@ -1443,7 +1588,7 @@ Course Pages Styles
 }
 
 .add-task-btn:hover {
-  background-color: #4a8697;
+  background-color: var(--accent-light, #4a8697);
 }
 
 .add-task-btn i {
@@ -1454,7 +1599,7 @@ Course Pages Styles
 .todo-category-tabs {
   display: flex;
   border-bottom: 1px solid var(--border-color);
-  background-color: #fafafa;
+  background-color: var(--background-tertiary, #fafafa);
 }
 
 .todo-tab {
@@ -1463,18 +1608,18 @@ Course Pages Styles
   background: none;
   border: none;
   font-size: 14px;
-  color: #666;
+  color: var(--text-secondary, #666);
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
 }
 
 .todo-tab:hover {
-  color: var(--primary-color);
+  color: var(--accent-color, #5997ac);
 }
 
 .todo-tab.active {
-  color: var(--primary-color);
+  color: var(--accent-color, #5997ac);
   font-weight: 500;
 }
 
@@ -1485,7 +1630,7 @@ Course Pages Styles
   left: 0;
   right: 0;
   height: 2px;
-  background-color: var(--primary-color);
+  background-color: var(--accent-color, #5997ac);
 }
 
 /* Todo list */
@@ -1494,6 +1639,7 @@ Course Pages Styles
   flex: 1;
   overflow-y: auto;
   max-height: 250px;
+  background-color: var(--background-secondary, #ffffff);
 }
 
 /* Task items */
@@ -1501,7 +1647,7 @@ Course Pages Styles
   display: flex;
   align-items: center;
   padding: 12px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-color);
   transition: background-color 0.2s;
   cursor: pointer;
 }
@@ -1511,7 +1657,7 @@ Course Pages Styles
 }
 
 .todo-item:hover {
-  background-color: rgba(89, 151, 172, 0.05);
+  background-color: var(--accent-light-transparent, rgba(89, 151, 172, 0.05));
 }
 
 .todo-checkbox {
@@ -1522,15 +1668,15 @@ Course Pages Styles
   margin-right: 12px;
   -webkit-appearance: none;
   appearance: none;
-  border: 2px solid #ccc;
+  border: 2px solid var(--border-color);
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .todo-checkbox:checked {
-  border-color: var(--primary-color);
-  background-color: var(--primary-color);
+  border-color: var(--accent-color, #5997ac);
+  background-color: var(--accent-color, #5997ac);
 }
 
 .todo-checkbox:checked::after {
@@ -1540,8 +1686,8 @@ Course Pages Styles
   left: 6px;
   width: 5px;
   height: 10px;
-  border-right: 2px solid white;
-  border-bottom: 2px solid white;
+  border-right: 2px solid var(--text-on-accent, #ffffff);
+  border-bottom: 2px solid var(--text-on-accent, #ffffff);
   transform: rotate(45deg);
 }
 
@@ -1550,17 +1696,18 @@ Course Pages Styles
   font-size: 14px;
   word-break: break-word;
   transition: all 0.2s;
+  color: var(--text-primary);
 }
 
 .todo-item.completed span {
   text-decoration: line-through;
-  color: #999;
+  color: var(--text-secondary, #999);
 }
 
 .todo-item .delete-task {
   opacity: 0;
   margin-left: 10px;
-  color: #e74c3c;
+  color: var(--error-color, #e74c3c);
   border: none;
   background: none;
   font-size: 14px;
@@ -1580,7 +1727,7 @@ Course Pages Styles
 .empty-tasks-message {
   text-align: center;
   padding: 30px 0;
-  color: #999;
+  color: var(--text-secondary, #999);
   font-size: 14px;
   font-style: italic;
 }
@@ -1592,12 +1739,12 @@ Course Pages Styles
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #f8f9fa;
+  background-color: var(--background-tertiary, #f8f9fa);
   font-size: 13px;
 }
 
 .todo-stats {
-  color: #666;
+  color: var(--text-secondary, #666);
 }
 
 .tasks-count {
@@ -1607,7 +1754,7 @@ Course Pages Styles
 .clear-completed-btn {
   background: none;
   border: none;
-  color: var(--primary-color);
+  color: var(--accent-color, #5997ac);
   font-size: 13px;
   cursor: pointer;
   padding: 5px 10px;
@@ -1616,7 +1763,7 @@ Course Pages Styles
 }
 
 .clear-completed-btn:hover:not(:disabled) {
-  background-color: rgba(89, 151, 172, 0.1);
+  background-color: var(--accent-light-transparent, rgba(89, 151, 172, 0.1));
 }
 
 .clear-completed-btn:disabled {
@@ -1971,54 +2118,110 @@ Course Pages Styles
 [data-theme="night"] .delete-task-btn:hover {
   background-color: rgba(248, 113, 113, 0.2);
 }
-/* Delete Task Button Styling */
-.delete-task-btn {
-  background: none;
-  border: none;
-  color: #d1d5db;
-  cursor: pointer;
-  padding: 5px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  opacity: 0.5;
-  font-size: 14px;
-  width: 24px;
-  height: 24px;
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+
+/* Recent Quiz Scores styling */
+.scores-card {
+    background: var(--background-secondary, #ffffff);
+    border: 1px solid var(--border-color);
+    border-radius: 11px;
+    padding: 20px;
+    margin-top: 20px;
 }
 
-.todo-item:hover .delete-task-btn {
-  opacity: 1;
-  color: #ef4444;
+.scores-card h3 {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0 0 15px;
+    color: var(--text-primary);
 }
 
-.delete-task-btn:hover {
-  background-color: rgba(239, 68, 68, 0.1);
+.scores-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-/* Make sure todo items have position relative for absolute positioning of the delete button */
-.todo-item {
-  position: relative;
-  padding-right: 30px !important;
+.score-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: var(--background-tertiary, #f8f9fa);
+    border-radius: 8px;
+    transition: transform 0.2s ease;
 }
 
-/* Night mode enhancements for delete button */
-[data-theme="night"] .delete-task-btn {
-  color: #9ca3af;
+.score-item:hover {
+    transform: translateY(-2px);
 }
 
-[data-theme="night"] .todo-item:hover .delete-task-btn {
-  color: #f87171;
+.quiz-name {
+    font-size: 14px;
+    color: var(--text-secondary);
 }
 
-[data-theme="night"] .delete-task-btn:hover {
-  background-color: rgba(248, 113, 113, 0.2);
+.score {
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 14px;
+}
+
+.score.excellent {
+    background-color: var(--success-light, #ecfdf5);
+    color: var(--success-color, #059669);
+}
+
+.score.good {
+    background-color: var(--accent-light-transparent, rgba(89, 151, 172, 0.1));
+    color: var(--accent-color, #5997ac);
+}
+
+.score.average {
+    background-color: var(--warning-light, #fff7ed);
+    color: var(--warning-color, #ca8a04);
+}
+
+.score.needs-improvement {
+    background-color: var(--error-light, #fef2f2);
+    color: var(--error-color, #dc2626);
+}
+
+.empty-scores-message {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-secondary);
+    font-style: italic;
+    font-size: 14px;
+}
+
+/* Night mode enhancements */
+[data-theme="night"] .scores-card {
+    background-color: var(--background-secondary, #1f2937);
+}
+
+[data-theme="night"] .score-item {
+    background-color: var(--background-tertiary, #374151);
+}
+
+[data-theme="night"] .score.excellent {
+    background-color: var(--success-dark, #064e3b);
+    color: var(--success-light, #d1fae5);
+}
+
+[data-theme="night"] .score.good {
+    background-color: var(--accent-dark-transparent, rgba(89, 151, 172, 0.2));
+    color: var(--accent-light, #a1cbdd);
+}
+
+[data-theme="night"] .score.average {
+    background-color: var(--warning-dark, #78350f);
+    color: var(--warning-light, #fef3c7);
+}
+
+[data-theme="night"] .score.needs-improvement {
+    background-color: var(--error-dark, #7f1d1d);
+    color: var(--error-light, #fee2e2);
 }
 
 

@@ -17,6 +17,9 @@ const API_ENDPOINTS = {
   RECORD_STUDY_SESSION: '/api/user/activity/record'
 };
 
+// Add this near the top of the file, after the API_ENDPOINTS definition
+const STUDY_TIME_KEY = 'aura_study_start_time';
+
 // Student data interface
 class AnalyticsDataService {
   constructor() {
@@ -39,6 +42,9 @@ class AnalyticsDataService {
     
     // Set up periodic refresh
     setInterval(() => this.refreshAllData(), 5 * 60 * 1000); // Refresh every 5 minutes
+    
+    // Initialize study time tracking
+    this.initializeStudyTime();
   }
   
   // Event handling methods
@@ -119,26 +125,61 @@ class AnalyticsDataService {
     }
   }
   
-  // Get user profile data
+  // Initialize study time tracking
+  initializeStudyTime() {
+    // Check if we already have a start time
+    const startTime = localStorage.getItem(STUDY_TIME_KEY);
+    if (!startTime) {
+      // Set initial start time
+      localStorage.setItem(STUDY_TIME_KEY, Date.now().toString());
+    }
+  }
+
+  // Get total study time in hours
+  getStudyTime() {
+    const startTime = parseInt(localStorage.getItem(STUDY_TIME_KEY) || Date.now());
+    const currentTime = Date.now();
+    const elapsedHours = (currentTime - startTime) / (1000 * 60 * 60); // Convert ms to hours
+    return Math.round(elapsedHours * 10) / 10; // Round to 1 decimal place
+  }
+
+  // Reset study time tracking
+  resetStudyTime() {
+    localStorage.setItem(STUDY_TIME_KEY, Date.now().toString());
+  }
+
+  // Get user profile data with dynamic study time
   async getUserProfile(forceRefresh = false) {
     const cacheKey = 'userProfile';
     
     if (!forceRefresh) {
       const cachedData = this.getCache(cacheKey);
-      if (cachedData) return cachedData;
+      if (cachedData) {
+        // Update study time in cached data
+        cachedData.totalStudyHours = this.getStudyTime();
+        return cachedData;
+      }
     }
     
     if (USE_REAL_DATA) {
       try {
         const data = await this.fetchAPI(API_ENDPOINTS.USER_PROFILE);
+        // Add dynamic study time to the data
+        data.totalStudyHours = this.getStudyTime();
         this.setCache(cacheKey, data);
         return data;
       } catch (error) {
         console.error('Error fetching user profile:', error);
-        return this.getPlaceholderUserProfile(); // Fallback to placeholder
+        const placeholder = this.getPlaceholderUserProfile();
+        // Add dynamic study time to placeholder
+        placeholder.totalStudyHours = this.getStudyTime();
+        return placeholder;
       }
     } else {
-      return this.getPlaceholderUserProfile();
+      const placeholder = this.getPlaceholderUserProfile();
+      // Add dynamic study time to placeholder
+      placeholder.totalStudyHours = this.getStudyTime();
+      return placeholder;
     }
   }
 
@@ -184,7 +225,33 @@ class AnalyticsDataService {
         return this.getPlaceholderQuizPerformance(); // Fallback to placeholder
       }
     } else {
-      return this.getPlaceholderQuizPerformance();
+      // Get actual quiz status from localStorage
+      const quizStatus = JSON.parse(localStorage.getItem('quizStatus') || '{"completed": 0, "total": 0}');
+      const quizCompletions = JSON.parse(localStorage.getItem('quizCompletions') || '[]');
+      
+      // Calculate average score from completions
+      let averageScore = 0;
+      let highestScore = 0;
+      if (quizCompletions.length > 0) {
+        const totalScore = quizCompletions.reduce((sum, quiz) => sum + quiz.score, 0);
+        averageScore = Math.round(totalScore / quizCompletions.length);
+        highestScore = Math.max(...quizCompletions.map(quiz => quiz.score));
+      }
+
+      return {
+        completed: quizStatus.completed,
+        pending: 0, // We don't track pending quizzes yet
+        totalQuizzes: quizStatus.total,
+        averageScore: averageScore,
+        highestScore: highestScore,
+        lowestScore: quizCompletions.length > 0 ? Math.min(...quizCompletions.map(quiz => quiz.score)) : 0,
+        recentQuizzes: quizCompletions.slice(0, 5).map(quiz => ({
+          name: `Quiz ${quiz.id}`,
+          date: new Date(quiz.date).toLocaleDateString(),
+          score: quiz.score,
+          status: 'completed'
+        }))
+      };
     }
   }
 
@@ -404,15 +471,29 @@ class AnalyticsDataService {
   }
 
   getPlaceholderQuizPerformance() {
+    // Get actual quiz status from localStorage
+    const quizStatus = JSON.parse(localStorage.getItem('quizStatus') || '{"completed": 0, "total": 0}');
+    const quizCompletions = JSON.parse(localStorage.getItem('quizCompletions') || '[]');
+
     return {
-      completed: 0,                // Changed from 7 to 0
-      pending: 0,                  // Changed from 3 to 0
-      totalQuizzes: 0,             // Changed from 10 to 0
-      averageScore: 0,             // Changed from 85 to 0
-      highestScore: 0,             // Changed from 95 to 0
-      lowestScore: 0,              // Changed from 70 to 0
-      nextQuiz: null,              // Changed from object to null
-      recentQuizzes: []            // Changed from array with quizzes to empty array
+      completed: quizStatus.completed,
+      pending: 0,
+      totalQuizzes: quizStatus.total,
+      averageScore: quizCompletions.length > 0 
+        ? Math.round(quizCompletions.reduce((sum, quiz) => sum + quiz.score, 0) / quizCompletions.length)
+        : 0,
+      highestScore: quizCompletions.length > 0 
+        ? Math.max(...quizCompletions.map(quiz => quiz.score))
+        : 0,
+      lowestScore: quizCompletions.length > 0 
+        ? Math.min(...quizCompletions.map(quiz => quiz.score))
+        : 0,
+      recentQuizzes: quizCompletions.slice(0, 5).map(quiz => ({
+        name: `Quiz ${quiz.id}`,
+        date: new Date(quiz.date).toLocaleDateString(),
+        score: quiz.score,
+        status: 'completed'
+      }))
     };
   }
 

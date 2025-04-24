@@ -353,28 +353,29 @@
             <!-- Upcoming Quizzes Section -->
             <div class="quiz-card upcoming-quizzes">
               <h3 class="quiz-section-title">Upcoming Quizzes</h3>
-              <div class="upcoming-list">
-                <div class="upcoming-item">
-                  <div class="quiz-icon locked">
-                    <i class="fas fa-lock"></i>
+              <div class="upcoming-list" id="upcoming-quizzes-list">
+                <!-- Empty state message - shown when no quizzes -->
+                <div class="quiz-empty-state" id="upcoming-empty-state">
+                  <div class="quiz-empty-icon">
+                    <i class="fas fa-calendar-alt"></i>
                   </div>
-                  <div class="quiz-info">
-                    <h4 class="quiz-title">Chapter 5 Quiz</h4>
-                    <p class="quiz-date">Tomorrow, 2:00 PM</p>
-                  </div>
-                  <div class="quiz-status pending">Pending</div>
+                  <p class="quiz-empty-message">No upcoming quizzes scheduled</p>
+                  <p class="quiz-empty-submessage">Check back later for new quiz assignments</p>
                 </div>
-                
-                <div class="upcoming-item">
-                  <div class="quiz-icon locked">
-                    <i class="fas fa-lock"></i>
+
+                <!-- Dynamic quiz items will be inserted here -->
+                <template id="upcoming-quiz-template">
+                  <div class="upcoming-item">
+                    <div class="quiz-icon locked">
+                      <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="quiz-info">
+                      <h4 class="quiz-title"></h4>
+                      <p class="quiz-date"></p>
+                    </div>
+                    <div class="quiz-status"></div>
                   </div>
-                  <div class="quiz-info">
-                    <h4 class="quiz-title">Mid-term Review</h4>
-                    <p class="quiz-date">Next Week</p>
-                  </div>
-                  <div class="quiz-status scheduled">Scheduled</div>
-                </div>
+                </template>
               </div>
             </div>
           </div>
@@ -382,37 +383,29 @@
           <!-- Past Quizzes Section -->
           <div class="past-quizzes">
             <h3 class="quiz-section-title">Past Quizzes</h3>
-            
-            <div class="past-quiz-list">
-              <div class="past-quiz-item">
-                <div class="quiz-left">
-                   <div class="quiz-icon locked">
-                    <i class="fas fa-lock"></i>
+            <div class="upcoming-list" id="past-quizzes-list">
+              <!-- Empty state message - shown when no past quizzes -->
+              <div class="quiz-empty-state" id="past-empty-state">
+                <div class="quiz-empty-icon">
+                  <i class="fas fa-history"></i>
+                </div>
+                <p class="quiz-empty-message">No past quizzes available</p>
+                <p class="quiz-empty-submessage">Completed quizzes will appear here</p>
+              </div>
+
+              <!-- Dynamic quiz items will be inserted here -->
+              <template id="past-quiz-template">
+                <div class="upcoming-item">
+                  <div class="quiz-icon">
+                    <i class="fas fa-check"></i>
                   </div>
                   <div class="quiz-info">
-                    <h4 class="quiz-title">Quiz 1</h4>
-                    <p class="quiz-subject">Chapter 5: Binary Trees</p>
+                    <h4 class="quiz-title"></h4>
+                    <p class="quiz-date"></p>
                   </div>
+                  <div class="quiz-status"></div>
                 </div>
-                <div class="quiz-right">
-                  <p class="quiz-date">Tomorrow<br>10:00 AM</p>
-                </div>
-              </div>
-              
-              <div class="past-quiz-item">
-                <div class="quiz-left">
-                  <div class="quiz-icon question">
-                    <i class="fas fa-question-circle"></i>
-                  </div>
-                  <div class="quiz-info">
-                    <h4 class="quiz-title">Quiz 2</h4>
-                    <p class="quiz-subject">Advanced Mathematics</p>
-                  </div>
-                </div>
-                <div class="quiz-right">
-                  <p class="quiz-date">Wed, Mar 15<br>2:30 PM</p>
-                </div>
-              </div>
+              </template>
             </div>
           </div>
         </div>
@@ -450,7 +443,7 @@
           <p id="quiz-date"></p>
         </div>
       </div>
-      <button class="practice-btn" id="practice-btn" disabled>Start Practice Quiz</button>
+      
     </article>
 
     <article class="streak-card">
@@ -564,9 +557,42 @@
 
       <article class="scores-card">
         <h3>Recent Quiz Scores</h3>
-        <div class="scores-list">
-          <div class="empty-scores-message">No quiz scores yet</div>
+        <div class="scores-list" id="recent-scores-list">
+          <!-- Scores will be populated dynamically -->
         </div>
+        <script>
+          // Function to update recent scores
+          function updateRecentScores() {
+            const scoresList = document.getElementById('recent-scores-list');
+            const recentScores = JSON.parse(localStorage.getItem('recentQuizScores')) || [];
+            
+            if (recentScores.length === 0) {
+              scoresList.innerHTML = '<div class="empty-scores-message">No quiz scores yet</div>';
+              return;
+            }
+
+            scoresList.innerHTML = recentScores.map(score => `
+              <div class="score-item">
+                <div class="quiz-name">${score.title} - ${score.date}</div>
+                <div class="score ${getScoreClass(score.score)}">${score.score}%</div>
+              </div>
+            `).join('');
+          }
+
+          // Helper function to determine score class
+          function getScoreClass(score) {
+            if (score >= 90) return 'excellent';
+            if (score >= 70) return 'good';
+            if (score >= 50) return 'average';
+            return 'needs-improvement';
+          }
+
+          // Update scores when page loads
+          document.addEventListener('DOMContentLoaded', updateRecentScores);
+
+          // Also update when the tab changes
+          document.addEventListener('tabChanged', updateRecentScores);
+        </script>
       </article>
     </div>
   </div>
