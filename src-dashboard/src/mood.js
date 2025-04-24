@@ -1,98 +1,120 @@
 // Mood Widget
-document.addEventListener('DOMContentLoaded', () => {
-    const moodTrack = document.getElementById('mood-track');
-    const moodDragger = document.getElementById('mood-dragger');
-    const recommendationEl = document.getElementById('recommendation');
+document.addEventListener('DOMContentLoaded', function() {
+    const track = document.getElementById('mood-track');
+    const dragger = document.getElementById('mood-dragger');
+    const recommendation = document.getElementById('recommendation');
+    let isDragging = false;
+    let startX, draggerLeft;
 
-    // Recommendations for different mood ranges
-    const recommendations = {
-        verySad: [
-            "Oh bummer! Take it easy today. Watch a YouTube tutorial to get familiar with the topic.",
-            "Feeling down? Try a gentle learning approach with some relaxed YouTube videos.",
-            "Low energy today? Focus on passive learning through short, engaging video tutorials."
-        ],
-        sad: [
-            "Looks like you're feeling a bit low. Consider a light study session with interactive coding tutorials.",
-            "Feeling a bit down? Try some fun, beginner-friendly coding challenges.",
-            "Take it slow today. Explore some inspirational coding content on YouTube."
-        ],
-        neutral: [
-            "You're in a balanced mood. Perfect time for steady, consistent learning.",
-            "Neutral energy? Great for focused, methodical study.",
-            "Maintain a steady pace and dive into your learning materials."
-        ],
-        happy: [
-            "Great mood! You're ready to tackle more challenging coding concepts.",
-            "Feeling good? Time to push your learning boundaries!",
-            "Your positive energy is perfect for diving deep into complex topics."
-        ],
-        veryHappy: [
-            "Wow, you're on fire! Time for an ambitious learning marathon!",
-            "Excellent mood! Challenge yourself with advanced coding projects.",
-            "Maximum energy! Perfect for intensive learning and coding."
-        ]
+    // Emoji mapping based on mood level (0-100)
+    const getEmoji = (value) => {
+        if (value < 20) return '😢';
+        if (value < 40) return '😕';
+        if (value < 60) return '😐';
+        if (value < 80) return '🙂';
+        return '😄';
     };
 
-    // Determine mood category based on position
-    function getMoodCategory(moodValue) {
-        if (moodValue < 20) return 'verySad';
-        if (moodValue < 40) return 'sad';
-        if (moodValue < 60) return 'neutral';
-        if (moodValue < 80) return 'happy';
-        return 'veryHappy';
-    }
+    // Recommendation mapping based on mood level
+    const getRecommendation = (value) => {
+        if (value < 20) return "Take a break and talk to someone you trust. Remember, it's okay to not be okay.";
+        if (value < 40) return "How about trying some light exercise or listening to your favorite music?";
+        if (value < 60) return "You're doing alright! Consider taking a short walk to boost your mood.";
+        if (value < 80) return "Great mood! Why not share your positivity with others?";
+        return "Fantastic! Your positive energy can inspire those around you!";
+    };
 
-    // Get a random recommendation for a mood category
-    function getRecommendation(category) {
-        const categoryRecs = recommendations[category];
-        return categoryRecs[Math.floor(Math.random() * categoryRecs.length)];
-    }
+    // Initialize dragger with neutral emoji
+    dragger.innerHTML = '😐';
 
-    // Update dragger position and mood
-    function updateMoodPosition(clientX) {
-        const trackRect = moodTrack.getBoundingClientRect();
-        let newX = clientX - trackRect.left;
+    // Function to update mood based on position
+    function updateMood(clientX) {
+        const trackRect = track.getBoundingClientRect();
+        let newLeft = clientX - trackRect.left;
         
-        // Constrain within track
-        newX = Math.max(0, Math.min(newX, trackRect.width));
+        // Constrain to track bounds
+        newLeft = Math.max(0, Math.min(newLeft, trackRect.width));
         
-        // Calculate mood percentage
-        const moodPercentage = Math.round((newX / trackRect.width) * 100);
+        // Convert to percentage
+        const percentage = (newLeft / trackRect.width) * 100;
         
         // Update dragger position
-        moodDragger.style.left = `calc(${moodPercentage}% - 20px)`;
+        dragger.style.left = `${percentage}%`;
         
-        // Update background color based on mood
-        const red = Math.round(255 * (1 - moodPercentage / 100));
-        const green = Math.round(255 * (moodPercentage / 100));
-        moodDragger.style.backgroundColor = `rgb(${red}, ${green}, 0)`;
+        // Update emoji with animation
+        const newEmoji = getEmoji(percentage);
+        if (dragger.innerHTML !== newEmoji) {
+            dragger.classList.add('emoji-change');
+            dragger.innerHTML = newEmoji;
+            setTimeout(() => dragger.classList.remove('emoji-change'), 300);
+        }
         
-        // Get and display recommendation
-        const moodCategory = getMoodCategory(moodPercentage);
-        const recommendation = getRecommendation(moodCategory);
-        recommendationEl.innerHTML = `
-            <h3>Recommendation:</h3>
-            <p>${recommendation}</p>
-        `;
+        // Update recommendation
+        recommendation.textContent = getRecommendation(percentage);
+        
+        // Save mood to localStorage
+        localStorage.setItem('currentMood', percentage);
+        localStorage.setItem('lastMoodUpdate', new Date().toISOString());
     }
 
-    // Drag functionality
-    let isDragging = false;
-
-    moodDragger.addEventListener('mousedown', (e) => {
+    // Mouse event handlers
+    dragger.addEventListener('mousedown', function(e) {
         isDragging = true;
-        e.preventDefault(); // Prevent text selection
+        startX = e.clientX - dragger.offsetLeft;
+        dragger.style.cursor = 'grabbing';
     });
 
-    document.addEventListener('mousemove', (e) => {
+    document.addEventListener('mousemove', function(e) {
         if (!isDragging) return;
-        updateMoodPosition(e.clientX);
+        e.preventDefault();
+        updateMood(e.clientX);
     });
 
-    document.addEventListener('mouseup', () => {
+    document.addEventListener('mouseup', function() {
         isDragging = false;
+        dragger.style.cursor = 'grab';
     });
 
-    // Initial positioning
-    updateMoodPosition(moodTrack.getBoundingClientRect().left + moodTrack.getBoundingClientRect().width / 2);
+    // Track click handler
+    track.addEventListener('click', function(e) {
+        updateMood(e.clientX);
+    });
+
+    // Touch event handlers
+    dragger.addEventListener('touchstart', function(e) {
+        isDragging = true;
+        startX = e.touches[0].clientX - dragger.offsetLeft;
+        dragger.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('touchmove', function(e) {
+        if (!isDragging) return;
+        e.preventDefault();
+        updateMood(e.touches[0].clientX);
+    });
+
+    document.addEventListener('touchend', function() {
+        isDragging = false;
+        dragger.style.cursor = 'grab';
+    });
+
+    // Load saved mood if it exists and was set today
+    const savedMood = localStorage.getItem('currentMood');
+    const lastUpdate = localStorage.getItem('lastMoodUpdate');
+    
+    if (savedMood && lastUpdate) {
+        const lastUpdateDate = new Date(lastUpdate);
+        const today = new Date();
+        
+        if (lastUpdateDate.toDateString() === today.toDateString()) {
+            dragger.style.left = `${savedMood}%`;
+            dragger.innerHTML = getEmoji(parseFloat(savedMood));
+            recommendation.textContent = getRecommendation(parseFloat(savedMood));
+        } else {
+            // Reset for new day
+            dragger.style.left = '50%';
+            dragger.innerHTML = '😐';
+            recommendation.textContent = getRecommendation(50);
+        }
+    }
 });

@@ -29,7 +29,7 @@
 .file-input-label {
   display: inline-block;
   padding: 12px 20px;
-  background-color: var(--brand-color, #af5166);
+  background-color: var(--accent-color);
   color: white;
   border-radius: 6px;
   cursor: pointer;
@@ -38,7 +38,7 @@
 }
 
 .file-input-label:hover {
-  background-color: var(--primary-color, #5997ac);
+  background-color: var(--accent-hover);
 }
 
 #file-input {
@@ -73,7 +73,7 @@
 }
 
 .upload-form .submit-button {
-  background-color: var(--brand-color, #af5166);
+  background-color: var(--accent-color);
   color: white;
   border: none;
   border-radius: 5px;
@@ -85,11 +85,11 @@
 }
 
 .upload-form .submit-button:hover {
-  background-color: var(--primary-color, #5997ac);
+  background-color: var(--accent-hover);
 }
 
 .upload-form .submit-button:disabled {
-  background-color: var(--text-tertiary, #cccccc);
+  background-color: var(--text-tertiary);
   cursor: not-allowed;
 }
 
