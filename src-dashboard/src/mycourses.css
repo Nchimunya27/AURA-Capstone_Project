@@ -132,9 +132,12 @@
 
 .course-details {
     margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
-.course-quiz {
+.course-quiz, .review-schedule {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -143,12 +146,25 @@
     transition: color 0.3s ease;
 }
 
-.quiz-icon {
+.quiz-icon, .schedule-icon {
     font-size: 15px;
 }
 
-.quiz-date {
+.quiz-date, .schedule-text {
     font-weight: 500;
+}
+
+.review-schedule {
+    background-color: var(--background-primary);
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+/* Night mode compatibility */
+[data-theme="night"] .review-schedule {
+    background-color: #31456e;
+    border-color: #4a5b82;
 }
 
 /* Night mode styles for my courses page */

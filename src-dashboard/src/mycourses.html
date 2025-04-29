@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="profile-picture-styler.css">
   <link rel="stylesheet" href="logo-color-enhancement.css">
 
-
+  <script src="spaced-repetition.js"></script>
   <script src="mycoursestocoursepage.js"></script>
   <script src="coursepage.js"></script>
   <script src="documentholder.js"></script>
@@ -385,6 +385,19 @@
     courseCard.className = 'course-card';
     courseCard.dataset.id = course.id;
     
+    // Generate review schedule
+    let reviewSchedule = { message: "No exam date set" };
+    if (course.examDate) {
+      try {
+        reviewSchedule = window.SpacedRepetition.generateReviewSchedule(
+          new Date(course.examDate),
+          course.knowledgeLevel || 0
+        );
+      } catch (error) {
+        console.error('Error generating review schedule:', error);
+      }
+    }
+    
     courseCard.innerHTML = `
         <div class="course-header">
             <div class="course-title">${course.name}</div>
@@ -396,7 +409,11 @@
         <div class="course-details">
             <div class="course-quiz">
                 <span class="quiz-icon">📅</span>
-                <span class="quiz-date">Next Quiz: ${course.examDate || 'Not set'}</span>
+                <span class="quiz-date">Exam: ${course.examDate ? new Date(course.examDate).toLocaleDateString() : 'Not set'}</span>
+            </div>
+            <div class="review-schedule">
+                <span class="schedule-icon">📚</span>
+                <span class="schedule-text">${reviewSchedule.message}</span>
             </div>
         </div>
         <div class="course-actions">
