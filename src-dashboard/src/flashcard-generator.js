@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const OPENAI_API_KEY = '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';
+  // TODO: Replace with your own OpenAI API key
+  // Get your API key from: https://platform.openai.com/api-keys
+  const OPENAI_API_KEY = 'YOUR_SECRET_KEY_HERE';
   
   // Load required libraries
   const scriptPDF = document.createElement('script');
